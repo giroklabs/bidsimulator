@@ -138,458 +138,178 @@ class AuctionSimulator {
         };
     }
 
-    // 고도화된 낙찰 확률 계산 (머신러닝 + 베이지안 모델)
+    // 간단하고 현실적인 낙찰 확률 계산
     calculateWinProbability(bidPrice, propertyValue, competitorCount, marketWeight, urgencyWeight, failedCount, appraisalPrice, minimumBid, marketPrice, renovationCost) {
-        // 1. 다차원 특성 벡터 생성
-        const features = this.extractFeatures(bidPrice, propertyValue, competitorCount, marketWeight, urgencyWeight, failedCount, appraisalPrice, minimumBid, marketPrice, renovationCost);
+        // 1. 기본 확률 (가격 대비)
+        const priceRatio = bidPrice / propertyValue;
+        let baseProbability = this.calculateSimpleBaseProbability(priceRatio);
         
-        // 2. 머신러닝 기반 경쟁자 행동 예측
-        const competitorBehavior = this.predictCompetitorBehavior(features);
+        // 2. 경쟁자 수 조정
+        const competitorFactor = this.calculateSimpleCompetitorFactor(competitorCount);
         
-        // 3. 시계열 분석 기반 시장 트렌드
-        const marketTrend = this.analyzeMarketTrend(features);
+        // 3. 시장 상황 조정
+        const marketFactor = marketWeight;
         
-        // 4. 지역별 부동산 특성 반영
-        const locationFactor = this.calculateLocationFactor(features);
+        // 4. 긴급도 조정
+        const urgencyFactor = urgencyWeight;
         
-        // 5. Monte Carlo 시뮬레이션
-        const monteCarloResult = this.runMonteCarloSimulation(features, competitorBehavior);
+        // 5. 유찰 횟수 조정
+        const failedFactor = this.calculateSimpleFailedFactor(failedCount);
         
-        // 6. 앙상블 모델 (여러 알고리즘 결합)
-        const ensembleProbability = this.calculateEnsembleProbability(
-            competitorBehavior, marketTrend, locationFactor, monteCarloResult
-        );
+        // 6. 최저입찰가 대비 조정
+        const minimumBidFactor = this.calculateMinimumBidFactor(bidPrice, minimumBid);
         
-        // 7. 불확실성 정량화
-        const uncertainty = this.quantifyUncertainty(features, ensembleProbability);
+        // 7. 감정가 대비 조정
+        const appraisalFactor = this.calculateAppraisalFactor(bidPrice, appraisalPrice);
         
-        // 8. 최종 확률 (신뢰구간 포함)
-        return this.adjustProbabilityWithUncertainty(ensembleProbability, uncertainty);
+        // 8. 최종 확률 계산
+        const finalProbability = baseProbability * competitorFactor * marketFactor * urgencyFactor * 
+                                failedFactor * minimumBidFactor * appraisalFactor;
+        
+        return Math.max(0.01, Math.min(0.99, finalProbability));
     }
 
-    // 다차원 특성 벡터 추출
+    // 간단한 기본 확률 계산
+    calculateSimpleBaseProbability(priceRatio) {
+        if (priceRatio < 0.7) return 0.1;      // 70% 미만: 10%
+        if (priceRatio < 0.8) return 0.3;      // 70-80%: 30%
+        if (priceRatio < 0.9) return 0.6;      // 80-90%: 60%
+        if (priceRatio < 1.0) return 0.8;      // 90-100%: 80%
+        if (priceRatio < 1.1) return 0.9;      // 100-110%: 90%
+        if (priceRatio < 1.2) return 0.95;     // 110-120%: 95%
+        return 0.98;                           // 120% 이상: 98%
+    }
+
+    // 간단한 경쟁자 수 조정
+    calculateSimpleCompetitorFactor(competitorCount) {
+        if (competitorCount <= 1) return 0.95;
+        if (competitorCount === 2) return 0.7;
+        if (competitorCount === 3) return 0.5;
+        if (competitorCount === 4) return 0.35;
+        if (competitorCount === 5) return 0.25;
+        if (competitorCount <= 8) return 0.15;
+        return 0.1; // 9명 이상
+    }
+
+    // 간단한 유찰 횟수 조정
+    calculateSimpleFailedFactor(failedCount) {
+        if (failedCount === 0) return 1.0;
+        if (failedCount === 1) return 0.9;
+        if (failedCount === 2) return 0.8;
+        if (failedCount === 3) return 0.7;
+        return 0.6; // 4회 이상
+    }
+
+    // 최저입찰가 대비 조정
+    calculateMinimumBidFactor(bidPrice, minimumBid) {
+        const ratio = bidPrice / minimumBid;
+        if (ratio < 1.05) return 0.5;      // 최저가 근처: 50%
+        if (ratio < 1.1) return 0.7;       // 최저가 110%: 70%
+        if (ratio < 1.2) return 0.9;       // 최저가 120%: 90%
+        if (ratio < 1.5) return 1.0;       // 최저가 150%: 100%
+        return 1.1;                        // 그 이상: 110%
+    }
+
+    // 감정가 대비 조정
+    calculateAppraisalFactor(bidPrice, appraisalPrice) {
+        const ratio = bidPrice / appraisalPrice;
+        if (ratio < 0.8) return 0.6;       // 감정가 80% 미만: 60%
+        if (ratio < 0.9) return 0.8;       // 감정가 80-90%: 80%
+        if (ratio < 1.1) return 1.0;       // 감정가 90-110%: 100%
+        if (ratio < 1.3) return 1.1;       // 감정가 110-130%: 110%
+        return 1.2;                        // 그 이상: 120%
+    }
+
+    // 간단한 특성 추출 (Monte Carlo 제거)
     extractFeatures(bidPrice, propertyValue, competitorCount, marketWeight, urgencyWeight, failedCount, appraisalPrice, minimumBid, marketPrice, renovationCost) {
         return {
-            // 가격 관련 특성
             priceRatio: bidPrice / propertyValue,
             appraisalRatio: bidPrice / appraisalPrice,
             minimumBidRatio: bidPrice / minimumBid,
             marketRatio: bidPrice / marketPrice,
-            
-            // 시장 특성
             competitorCount: competitorCount,
             marketWeight: marketWeight,
             urgencyWeight: urgencyWeight,
-            failedCount: failedCount,
-            
-            // 수익성 특성
-            renovationRatio: renovationCost / propertyValue,
-            profitMargin: (propertyValue - bidPrice) / propertyValue,
-            
-            // 시장 효율성
-            marketEfficiency: (appraisalPrice - minimumBid) / appraisalPrice,
-            liquidityRatio: (marketPrice - minimumBid) / marketPrice,
-            
-            // 리스크 특성
-            volatility: Math.abs(appraisalPrice - marketPrice) / marketPrice,
-            leverage: bidPrice / (propertyValue - renovationCost)
+            failedCount: failedCount
         };
     }
 
-    // 머신러닝 기반 경쟁자 행동 예측
+    // 간단한 경쟁자 행동 예측 (Monte Carlo 제거)
     predictCompetitorBehavior(features) {
-        // 랜덤 포레스트 스타일 의사결정 트리
-        const trees = this.buildDecisionTrees(features);
-        const predictions = trees.map(tree => this.predictWithTree(features, tree));
-        
-        // 앙상블 평균
-        const avgPrediction = predictions.reduce((sum, pred) => sum + pred, 0) / predictions.length;
-        
-        // 가중치 적용 (최근 데이터에 더 높은 가중치)
-        const weights = [0.4, 0.3, 0.2, 0.1]; // 최신부터 과거 순
-        const weightedPrediction = predictions.reduce((sum, pred, idx) => 
-            sum + pred * weights[idx], 0);
+        // 간단한 경쟁자 행동 예측
+        const baseProb = 0.5;
+        const competitorFactor = features.competitorCount <= 3 ? 0.8 : 0.3;
+        const marketFactor = features.marketWeight;
         
         return {
-            average: avgPrediction,
-            weighted: weightedPrediction,
-            variance: this.calculateVariance(predictions),
-            confidence: this.calculateConfidence(predictions)
+            average: baseProb * competitorFactor * marketFactor,
+            weighted: baseProb * competitorFactor * marketFactor,
+            variance: 0.1,
+            confidence: 0.8
         };
     }
 
-    // 의사결정 트리 구축
-    buildDecisionTrees(features) {
-        return [
-            // 트리 1: 가격 기반
-            {
-                root: { feature: 'priceRatio', threshold: 0.9, left: 0.8, right: 0.3 },
-                left: { feature: 'competitorCount', threshold: 3, left: 0.9, right: 0.6 },
-                right: { feature: 'marketWeight', threshold: 0.8, left: 0.5, right: 0.2 }
-            },
-            // 트리 2: 시장 상황 기반
-            {
-                root: { feature: 'marketWeight', threshold: 0.7, left: 0.7, right: 0.4 },
-                left: { feature: 'failedCount', threshold: 2, left: 0.8, right: 0.6 },
-                right: { feature: 'urgencyWeight', threshold: 0.8, left: 0.5, right: 0.3 }
-            },
-            // 트리 3: 수익성 기반
-            {
-                root: { feature: 'profitMargin', threshold: 0.2, left: 0.9, right: 0.4 },
-                left: { feature: 'renovationRatio', threshold: 0.1, left: 0.95, right: 0.8 },
-                right: { feature: 'volatility', threshold: 0.15, left: 0.6, right: 0.3 }
-            },
-            // 트리 4: 리스크 기반
-            {
-                root: { feature: 'leverage', threshold: 0.8, left: 0.7, right: 0.5 },
-                left: { feature: 'liquidityRatio', threshold: 0.3, left: 0.8, right: 0.6 },
-                right: { feature: 'marketEfficiency', threshold: 0.2, left: 0.6, right: 0.4 }
-            }
-        ];
-    }
-
-    // 트리로 예측
-    predictWithTree(features, tree) {
-        let node = tree.root;
-        
-        while (node.left !== undefined && node.right !== undefined) {
-            const value = features[node.feature];
-            node = value <= node.threshold ? tree[node.feature + '_left'] || node.left : node.right;
-        }
-        
-        return node;
-    }
-
-    // 시계열 분석 기반 시장 트렌드
+    // 간단한 시장 트렌드 분석 (Monte Carlo 제거)
     analyzeMarketTrend(features) {
-        // 가상의 시계열 데이터 (실제로는 외부 API에서 가져옴)
-        const historicalData = this.getHistoricalMarketData();
-        
-        // 이동평균 계산
-        const shortMA = this.calculateMovingAverage(historicalData, 5);
-        const longMA = this.calculateMovingAverage(historicalData, 20);
-        
-        // 트렌드 방향
-        const trend = shortMA > longMA ? 'upward' : 'downward';
-        const trendStrength = Math.abs(shortMA - longMA) / longMA;
-        
-        // 계절성 분석
-        const seasonality = this.analyzeSeasonality(historicalData);
-        
-        // 변동성 분석
-        const volatility = this.calculateVolatility(historicalData);
-        
         return {
-            trend: trend,
-            strength: trendStrength,
-            seasonality: seasonality,
-            volatility: volatility,
-            momentum: this.calculateMomentum(historicalData)
+            trend: 'stable',
+            strength: 0.1,
+            seasonality: 1.0,
+            volatility: 0.15,
+            momentum: 0.0
         };
     }
 
-    // 지역별 부동산 특성 반영
+    // 간단한 지역 특성 (Monte Carlo 제거)
     calculateLocationFactor(features) {
-        // 가상의 지역 데이터 (실제로는 GIS 데이터 활용)
-        const locationData = this.getLocationData();
-        
-        // 접근성 점수
-        const accessibility = this.calculateAccessibility(locationData);
-        
-        // 인프라 점수
-        const infrastructure = this.calculateInfrastructure(locationData);
-        
-        // 인구 밀도
-        const populationDensity = locationData.populationDensity;
-        
-        // 개발 계획
-        const developmentPlan = locationData.developmentPlan;
-        
         return {
-            accessibility: accessibility,
-            infrastructure: infrastructure,
-            populationDensity: populationDensity,
-            developmentPlan: developmentPlan,
-            overall: (accessibility + infrastructure + populationDensity + developmentPlan) / 4
+            accessibility: 0.8,
+            infrastructure: 0.7,
+            populationDensity: 0.6,
+            developmentPlan: 0.5,
+            overall: 0.65
         };
     }
 
-    // Monte Carlo 시뮬레이션
-    runMonteCarloSimulation(features, competitorBehavior, iterations = 1000) {
-        const results = [];
-        
-        for (let i = 0; i < iterations; i++) {
-            // 랜덤 시나리오 생성
-            const scenario = this.generateRandomScenario(features);
-            
-            // 시나리오별 결과 계산
-            const result = this.simulateScenario(scenario, competitorBehavior);
-            results.push(result);
-        }
-        
-        // 통계 분석
+    // 간단한 시뮬레이션 (Monte Carlo 제거)
+    runMonteCarloSimulation(features, competitorBehavior) {
         return {
-            mean: this.calculateMean(results),
-            median: this.calculateMedian(results),
-            stdDev: this.calculateStandardDeviation(results),
-            percentiles: this.calculatePercentiles(results),
-            winRate: results.filter(r => r.win).length / results.length
+            mean: 0.5,
+            median: 0.5,
+            stdDev: 0.1,
+            percentiles: { p25: 0.4, p50: 0.5, p75: 0.6, p90: 0.7, p95: 0.8 },
+            winRate: 0.5
         };
     }
 
-    // 앙상블 모델
+    // 간단한 앙상블 모델 (Monte Carlo 제거)
     calculateEnsembleProbability(competitorBehavior, marketTrend, locationFactor, monteCarloResult) {
-        // 가중치 설정
-        const weights = {
-            competitor: 0.35,
-            market: 0.25,
-            location: 0.20,
-            monteCarlo: 0.20
-        };
-        
-        // 각 모델의 확률 계산
-        const competitorProb = competitorBehavior.weighted;
-        const marketProb = this.calculateMarketProbability(marketTrend);
-        const locationProb = locationFactor.overall;
-        const monteCarloProb = monteCarloResult.winRate;
-        
-        // 가중 평균
-        const ensembleProb = 
-            competitorProb * weights.competitor +
-            marketProb * weights.market +
-            locationProb * weights.location +
-            monteCarloProb * weights.monteCarlo;
-        
-        return Math.max(0.01, Math.min(0.99, ensembleProb));
+        return competitorBehavior.weighted;
     }
 
-    // 불확실성 정량화
+    // 간단한 불확실성 정량화 (Monte Carlo 제거)
     quantifyUncertainty(features, probability) {
-        // 데이터 품질 점수
-        const dataQuality = this.assessDataQuality(features);
-        
-        // 모델 불확실성
-        const modelUncertainty = this.calculateModelUncertainty(features);
-        
-        // 시장 불확실성
-        const marketUncertainty = this.calculateMarketUncertainty(features);
-        
-        // 총 불확실성
-        const totalUncertainty = (dataQuality + modelUncertainty + marketUncertainty) / 3;
-        
         return {
-            dataQuality: dataQuality,
-            modelUncertainty: modelUncertainty,
-            marketUncertainty: marketUncertainty,
-            total: totalUncertainty,
-            confidence: 1 - totalUncertainty
+            dataQuality: 0.9,
+            modelUncertainty: 0.1,
+            marketUncertainty: 0.1,
+            total: 0.1,
+            confidence: 0.9
         };
     }
 
-    // 불확실성을 고려한 확률 조정
+    // 간단한 확률 조정 (Monte Carlo 제거)
     adjustProbabilityWithUncertainty(probability, uncertainty) {
-        // 불확실성이 높을수록 확률을 중간값으로 조정
-        const adjustment = uncertainty.total * 0.3; // 최대 30% 조정
-        const adjustedProb = probability * (1 - adjustment) + 0.5 * adjustment;
-        
-        return Math.max(0.01, Math.min(0.99, adjustedProb));
+        return probability;
     }
 
-    // 헬퍼 함수들
+    // 간단한 헬퍼 함수들 (Monte Carlo 제거)
     calculateVariance(predictions) {
-        const mean = predictions.reduce((sum, pred) => sum + pred, 0) / predictions.length;
-        const variance = predictions.reduce((sum, pred) => sum + Math.pow(pred - mean, 2), 0) / predictions.length;
-        return Math.sqrt(variance);
+        return 0.1; // 고정값
     }
 
     calculateConfidence(predictions) {
-        const variance = this.calculateVariance(predictions);
-        return Math.max(0, 1 - variance); // 분산이 낮을수록 신뢰도 높음
-    }
-
-    getHistoricalMarketData() {
-        // 결정론적 시계열 데이터 (일관된 결과를 위해)
-        const basePrice = 250000000;
-        const baseVolume = 500;
-        const baseVolatility = 0.15;
-        
-        return Array.from({length: 30}, (_, i) => {
-            // 사인파 패턴으로 일관된 데이터 생성
-            const trend = Math.sin(i * 0.2) * 0.1; // 10% 변동
-            const seasonality = Math.sin(i * 0.5) * 0.05; // 5% 계절성
-            const noise = Math.sin(i * 1.5) * 0.03; // 3% 노이즈
-            
-            return {
-                date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
-                price: basePrice * (1 + trend + seasonality + noise),
-                volume: baseVolume * (1 + Math.sin(i * 0.3) * 0.2),
-                volatility: baseVolatility * (1 + Math.sin(i * 0.4) * 0.3)
-            };
-        });
-    }
-
-    calculateMovingAverage(data, period) {
-        const recent = data.slice(-period);
-        return recent.reduce((sum, item) => sum + item.price, 0) / recent.length;
-    }
-
-    analyzeSeasonality(data) {
-        // 계절성 분석 (월별 패턴)
-        const monthlyData = {};
-        data.forEach(item => {
-            const month = item.date.getMonth();
-            if (!monthlyData[month]) monthlyData[month] = [];
-            monthlyData[month].push(item.price);
-        });
-        
-        const monthlyAverages = Object.values(monthlyData).map(prices => 
-            prices.reduce((sum, price) => sum + price, 0) / prices.length
-        );
-        
-        const overallAverage = monthlyAverages.reduce((sum, avg) => sum + avg, 0) / monthlyAverages.length;
-        const seasonality = monthlyAverages.map(avg => avg / overallAverage);
-        
-        return seasonality;
-    }
-
-    calculateVolatility(data) {
-        const returns = [];
-        for (let i = 1; i < data.length; i++) {
-            returns.push((data[i].price - data[i-1].price) / data[i-1].price);
-        }
-        const mean = returns.reduce((sum, ret) => sum + ret, 0) / returns.length;
-        const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - mean, 2), 0) / returns.length;
-        return Math.sqrt(variance);
-    }
-
-    calculateMomentum(data) {
-        const recent = data.slice(-5);
-        const older = data.slice(-10, -5);
-        const recentAvg = recent.reduce((sum, item) => sum + item.price, 0) / recent.length;
-        const olderAvg = older.reduce((sum, item) => sum + item.price, 0) / older.length;
-        return (recentAvg - olderAvg) / olderAvg;
-    }
-
-    getLocationData() {
-        // 가상의 지역 데이터 (실제로는 GIS API)
-        return {
-            accessibility: 0.8, // 지하철, 버스 접근성
-            infrastructure: 0.7, // 상업시설, 교육시설
-            populationDensity: 0.6, // 인구 밀도
-            developmentPlan: 0.5 // 개발 계획
-        };
-    }
-
-    calculateAccessibility(locationData) {
-        return locationData.accessibility;
-    }
-
-    calculateInfrastructure(locationData) {
-        return locationData.infrastructure;
-    }
-
-    generateRandomScenario(features) {
-        // 결정론적 시나리오 생성 (일관된 결과를 위해)
-        const seed = features.competitorCount + features.marketWeight + features.urgencyWeight;
-        
-        return {
-            competitorCount: Math.max(1, Math.round(features.competitorCount + Math.sin(seed) * 0.5)),
-            marketWeight: Math.max(0.1, Math.min(1.0, features.marketWeight + Math.cos(seed * 1.1) * 0.1)),
-            urgencyWeight: Math.max(0.1, Math.min(1.0, features.urgencyWeight + Math.sin(seed * 1.3) * 0.1)),
-            priceRatio: Math.max(0.5, Math.min(1.5, features.priceRatio + Math.cos(seed * 1.7) * 0.05))
-        };
-    }
-
-    simulateScenario(scenario, competitorBehavior) {
-        // 시나리오별 낙찰 여부 시뮬레이션 (결정론적)
-        const baseProb = competitorBehavior.weighted;
-        const scenarioProb = baseProb * scenario.marketWeight * scenario.urgencyWeight;
-        
-        // 결정론적 낙찰 여부 결정 (시드 기반)
-        const seed = scenario.competitorCount + scenario.marketWeight + scenario.urgencyWeight;
-        const deterministicValue = Math.sin(seed * 2.3) * 0.5 + 0.5; // 0-1 범위
-        const win = deterministicValue < scenarioProb;
-        
-        return {
-            win: win,
-            probability: scenarioProb,
-            scenario: scenario
-        };
-    }
-
-    calculateMean(results) {
-        return results.reduce((sum, result) => sum + result.probability, 0) / results.length;
-    }
-
-    calculateMedian(results) {
-        const sorted = results.map(r => r.probability).sort((a, b) => a - b);
-        const mid = Math.floor(sorted.length / 2);
-        return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
-    }
-
-    calculateStandardDeviation(results) {
-        const mean = this.calculateMean(results);
-        const variance = results.reduce((sum, result) => sum + Math.pow(result.probability - mean, 2), 0) / results.length;
-        return Math.sqrt(variance);
-    }
-
-    calculatePercentiles(results) {
-        const sorted = results.map(r => r.probability).sort((a, b) => a - b);
-        return {
-            p25: sorted[Math.floor(sorted.length * 0.25)],
-            p50: sorted[Math.floor(sorted.length * 0.5)],
-            p75: sorted[Math.floor(sorted.length * 0.75)],
-            p90: sorted[Math.floor(sorted.length * 0.9)],
-            p95: sorted[Math.floor(sorted.length * 0.95)]
-        };
-    }
-
-    calculateMarketProbability(marketTrend) {
-        let prob = 0.5; // 기본 확률
-        
-        // 트렌드에 따른 조정
-        if (marketTrend.trend === 'upward') {
-            prob += marketTrend.strength * 0.3;
-        } else {
-            prob -= marketTrend.strength * 0.3;
-        }
-        
-        // 변동성에 따른 조정
-        prob -= marketTrend.volatility * 0.2;
-        
-        // 모멘텀에 따른 조정
-        prob += marketTrend.momentum * 0.1;
-        
-        return Math.max(0.1, Math.min(0.9, prob));
-    }
-
-    assessDataQuality(features) {
-        // 데이터 품질 평가
-        let quality = 1.0;
-        
-        // 누락된 데이터 체크
-        const missingData = Object.values(features).filter(val => val === null || val === undefined).length;
-        quality -= missingData * 0.1;
-        
-        // 이상치 체크
-        const outliers = Object.values(features).filter(val => val < 0 || val > 10).length;
-        quality -= outliers * 0.05;
-        
-        return Math.max(0, quality);
-    }
-
-    calculateModelUncertainty(features) {
-        // 모델 불확실성 계산
-        const complexity = Object.keys(features).length;
-        const uncertainty = Math.min(0.5, complexity * 0.02);
-        return uncertainty;
-    }
-
-    calculateMarketUncertainty(features) {
-        // 시장 불확실성 계산
-        const volatility = features.volatility || 0.1;
-        const marketEfficiency = features.marketEfficiency || 0.5;
-        return volatility * (1 - marketEfficiency);
+        return 0.8; // 고정값
     }
 
     // 기본 확률 계산 (개선된 S자 곡선 모델)
@@ -858,7 +578,7 @@ class AuctionSimulator {
             profits.push(riskAdjustedProfit); // 리스크 조정 수익률 사용
         }
         
-        // 기대값이 가장 높은 입찰가격 찾기 (개선된 모델)
+        // 간단하고 현실적인 기대값 계산
         let bestBidIndex = 0;
         let bestExpectedValue = -Infinity;
         
@@ -870,59 +590,25 @@ class AuctionSimulator {
             // 1. 기본 기대값: 성공시 수익률 × 성공확률
             const basicExpectedValue = winProb * profit;
             
-            // 2. 최저입찰가 대비 페널티 (최저가에 가까울수록 페널티 증가)
+            // 2. 최저입찰가 근처 페널티 (간단하게)
             const minimumBidRatio = bidPrice / minimumBid;
             let minimumBidPenalty = 0;
-            if (minimumBidRatio < 1.2) {
-                minimumBidPenalty = (1.2 - minimumBidRatio) * 50; // 최저가 근처는 큰 페널티
+            if (minimumBidRatio < 1.15) {
+                minimumBidPenalty = 10; // 최저가 근처는 10점 페널티
             }
             
-            // 3. 감정가 대비 보너스 (감정가에 가까울수록 보너스)
+            // 3. 감정가 근처 보너스 (간단하게)
             const appraisalRatio = bidPrice / appraisalPrice;
             let appraisalBonus = 0;
-            if (appraisalRatio >= 0.9 && appraisalRatio <= 1.1) {
-                appraisalBonus = 20; // 감정가 근처는 보너스
+            if (appraisalRatio >= 0.95 && appraisalRatio <= 1.05) {
+                appraisalBonus = 15; // 감정가 근처는 15점 보너스
             }
             
-            // 4. 실패시 페널티 (입찰가의 일정 비율 손실)
-            const failurePenalty = (1 - winProb) * (bidPrice / propertyValue) * 3; // 5% → 3%로 감소
+            // 4. 실패시 페널티 (간단하게)
+            const failurePenalty = (1 - winProb) * 5; // 실패 확률 × 5점
             
-            // 5. 기회비용 (다른 투자 기회 고려)
-            const opportunityCost = winProb * 0.01; // 2% → 1%로 감소
-            
-            // 6. 긴급도 보너스/페널티 (제한된 범위)
-            let urgencyAdjustment = 0;
-            if (urgencyWeight > 1.0) {
-                urgencyAdjustment = Math.min(5, (urgencyWeight - 1.0) * 10); // 최대 5점 보너스
-            } else if (urgencyWeight < 1.0) {
-                urgencyAdjustment = Math.max(-3, (urgencyWeight - 1.0) * 10); // 최대 3점 페널티
-            }
-            
-            // 7. 시장 상황 보너스/페널티 (제한된 범위)
-            let marketAdjustment = 0;
-            if (marketWeight > 1.0) {
-                marketAdjustment = Math.min(3, (marketWeight - 1.0) * 10); // 최대 3점 보너스
-            } else if (marketWeight < 1.0) {
-                marketAdjustment = Math.max(-2, (marketWeight - 1.0) * 10); // 최대 2점 페널티
-            }
-            
-            // 8. 경쟁자 수 보너스/페널티 (제한된 범위)
-            let competitorAdjustment = 0;
-            if (competitorCount > 3) {
-                competitorAdjustment = Math.min(4, (competitorCount - 3) * 2); // 최대 4점 보너스
-            } else if (competitorCount < 3) {
-                competitorAdjustment = Math.max(-2, (competitorCount - 3) * 2); // 최대 2점 페널티
-            }
-            
-            // 9. 유찰 횟수 보너스/페널티 (제한된 범위)
-            let failedAdjustment = 0;
-            if (failedCount > 0) {
-                failedAdjustment = Math.max(-6, -failedCount * 3); // 최대 6점 페널티
-            }
-            
-            // 10. 최종 기대값
-            const expectedValue = basicExpectedValue - minimumBidPenalty + appraisalBonus - failurePenalty - opportunityCost + 
-                                urgencyAdjustment + marketAdjustment + competitorAdjustment + failedAdjustment;
+            // 5. 최종 기대값 (간단하게)
+            const expectedValue = basicExpectedValue - minimumBidPenalty + appraisalBonus - failurePenalty;
             
             if (expectedValue > bestExpectedValue) {
                 bestExpectedValue = expectedValue;
