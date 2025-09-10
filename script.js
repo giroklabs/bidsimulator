@@ -812,7 +812,7 @@ class AuctionSimulator {
             
             console.log('결과 표시 시작');
             // 결과 표시 (원 단위로 표시)
-            this.displayResults(result, costInfo, propertyValue, competitorCount, marketCondition, 
+            this.displayResults(result, costInfo, propertyValue, competitorCount, marketCondition, urgency,
                               marketPrice, appraisalPrice, minimumBid, marketProfitability, failedCount, renovationCost);
             console.log('결과 표시 완료');
             
@@ -839,7 +839,7 @@ class AuctionSimulator {
     }
 
     // 결과 표시
-    displayResults(result, costInfo, propertyValue, competitorCount, marketCondition, 
+    displayResults(result, costInfo, propertyValue, competitorCount, marketCondition, urgency,
                   marketPrice, appraisalPrice, minimumBid, marketProfitability, failedCount, renovationCost) {
         // 초기 메시지 숨기기
         const initialMessage = document.getElementById('initialMessage');
