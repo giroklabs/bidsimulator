@@ -21,7 +21,7 @@
                 <form id="auctionForm">
                     <div class="form-group">
                         <label for="propertyValue">목표 수익 기준가 (원)</label>
-                        <input type="number" id="propertyValue" value="500000000" placeholder="예: 500000000" required>
+                        <input type="number" id="propertyValue" value="250000000" placeholder="예: 250000000" required>
                         <small class="help-text">낙찰 후 실제로 받을 수 있는 가치 (시세 또는 목표 처분가)</small>
                     </div>
 
@@ -43,8 +43,8 @@
                     <div class="form-group">
                         <label for="marketCondition">시장 상황</label>
                         <select id="marketCondition" required>
-                            <option value="hot">활발한 시장</option>
-                            <option value="normal" selected>보통 시장</option>
+                            <option value="hot" selected>활발한 시장</option>
+                            <option value="normal">보통 시장</option>
                             <option value="cold">침체된 시장</option>
                         </select>
                     </div>
@@ -52,35 +52,35 @@
                     <div class="form-group">
                         <label for="urgency">입찰 긴급도</label>
                         <select id="urgency" required>
-                            <option value="high">높음 (반드시 낙찰 필요)</option>
-                            <option value="medium" selected>보통</option>
+                            <option value="high" selected>높음 (반드시 낙찰 필요)</option>
+                            <option value="medium">보통</option>
                             <option value="low">낮음 (적당한 가격에만)</option>
                         </select>
                     </div>
 
                     <div class="form-group">
                         <label for="marketPrice">시세 (원)</label>
-                        <input type="number" id="marketPrice" value="450000000" placeholder="예: 450000000" required>
+                        <input type="number" id="marketPrice" value="250000000" placeholder="예: 250000000" required>
                         <small class="help-text">현재 시장에서 거래되는 가격</small>
                     </div>
 
                     <div class="form-group">
                         <label for="appraisalPrice">감정가 (원)</label>
-                        <input type="number" id="appraisalPrice" value="480000000" placeholder="예: 480000000" required>
+                        <input type="number" id="appraisalPrice" value="243000000" placeholder="예: 243000000" required>
                         <small class="help-text">경매원이 책정한 감정가</small>
                     </div>
 
                     <div class="form-group">
                         <label for="minimumBid">최저입찰가 (원)</label>
-                        <input type="number" id="minimumBid" value="300000000" placeholder="예: 300000000" required>
+                        <input type="number" id="minimumBid" value="170100000" placeholder="예: 170100000" required>
                         <small class="help-text">경매 시작가격</small>
                     </div>
 
                     <div class="form-group">
                         <label for="failedCount">유찰 횟수</label>
                         <select id="failedCount" required>
-                            <option value="0" selected>1회차 (첫 경매)</option>
-                            <option value="1">2회차 (1회 유찰)</option>
+                            <option value="0">1회차 (첫 경매)</option>
+                            <option value="1" selected>2회차 (1회 유찰)</option>
                             <option value="2">3회차 (2회 유찰)</option>
                             <option value="3">4회차 (3회 유찰)</option>
                             <option value="4">5회차 이상 (4회 이상 유찰)</option>
@@ -90,7 +90,7 @@
 
                     <div class="form-group">
                         <label for="renovationCost">예상 리모델링 비용 (원)</label>
-                        <input type="number" id="renovationCost" value="0" placeholder="예: 50000000" required>
+                        <input type="number" id="renovationCost" value="10000000" placeholder="예: 10000000" required>
                         <small class="help-text">낙찰 후 예상되는 리모델링/수리 비용</small>
                     </div>
 
