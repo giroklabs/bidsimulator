@@ -20,6 +20,37 @@ class AuctionSimulator {
         return amount / 10000;
     }
 
+    // 입력값 검증 및 파싱 함수
+    validateAndParseInt(value, fieldName, defaultValue, minValue = 0, maxValue = Infinity) {
+        // 빈 문자열이나 null 체크
+        if (!value || value.trim() === '') {
+            console.warn(`${fieldName}이 비어있습니다. 기본값 ${defaultValue}를 사용합니다.`);
+            return defaultValue;
+        }
+
+        // 숫자 변환
+        const parsed = parseInt(value, 10);
+        
+        // NaN 체크
+        if (isNaN(parsed)) {
+            console.error(`${fieldName}이 유효한 숫자가 아닙니다. 기본값 ${defaultValue}를 사용합니다.`);
+            return defaultValue;
+        }
+
+        // 범위 체크
+        if (parsed < minValue) {
+            console.warn(`${fieldName}이 최소값 ${minValue}보다 작습니다. ${minValue}로 조정합니다.`);
+            return minValue;
+        }
+
+        if (parsed > maxValue) {
+            console.warn(`${fieldName}이 최대값 ${maxValue}보다 큽니다. ${maxValue}로 조정합니다.`);
+            return maxValue;
+        }
+
+        return parsed;
+    }
+
     initializeEventListeners() {
         console.log('이벤트 리스너 등록 시작');
         
@@ -140,8 +171,14 @@ class AuctionSimulator {
 
     // 간단하고 현실적인 낙찰 확률 계산
     calculateWinProbability(bidPrice, propertyValue, competitorCount, marketWeight, urgencyWeight, failedCount, appraisalPrice, minimumBid, marketPrice, renovationCost) {
-        // 1. 기본 확률 (가격 대비)
-        const priceRatio = bidPrice / propertyValue;
+        // 입력값 검증
+        if (isNaN(bidPrice) || isNaN(propertyValue) || propertyValue <= 0) {
+            console.error('calculateWinProbability: 잘못된 입력값', { bidPrice, propertyValue });
+            return 0.01; // 최소 확률 반환
+        }
+
+        // 1. 기본 확률 (가격 대비) - 0으로 나누기 방지
+        const priceRatio = propertyValue > 0 ? bidPrice / propertyValue : 0;
         let baseProbability = this.calculateSimpleBaseProbability(priceRatio);
         
         // 2. 경쟁자 수 조정
@@ -202,6 +239,11 @@ class AuctionSimulator {
 
     // 최저입찰가 대비 조정
     calculateMinimumBidFactor(bidPrice, minimumBid) {
+        // 0으로 나누기 방지
+        if (isNaN(bidPrice) || isNaN(minimumBid) || minimumBid <= 0) {
+            return 1.0; // 기본값 반환
+        }
+        
         const ratio = bidPrice / minimumBid;
         if (ratio < 1.05) return 0.5;      // 최저가 근처: 50%
         if (ratio < 1.1) return 0.7;       // 최저가 110%: 70%
@@ -212,6 +254,11 @@ class AuctionSimulator {
 
     // 감정가 대비 조정
     calculateAppraisalFactor(bidPrice, appraisalPrice) {
+        // 0으로 나누기 방지
+        if (isNaN(bidPrice) || isNaN(appraisalPrice) || appraisalPrice <= 0) {
+            return 1.0; // 기본값 반환
+        }
+        
         const ratio = bidPrice / appraisalPrice;
         if (ratio < 0.8) return 0.6;       // 감정가 80% 미만: 60%
         if (ratio < 0.9) return 0.8;       // 감정가 80-90%: 80%
@@ -454,6 +501,10 @@ class AuctionSimulator {
 
     // 예상 수익률 계산 (기본)
     calculateExpectedProfit(propertyValue, totalCost) {
+        // 0으로 나누기 방지
+        if (isNaN(propertyValue) || isNaN(totalCost) || totalCost <= 0) {
+            return 0; // 기본값 반환
+        }
         return ((propertyValue - totalCost) / totalCost) * 100;
     }
 
@@ -538,7 +589,7 @@ class AuctionSimulator {
         const probabilities = [];
         const profits = [];
         
-        // 현실적인 입찰가격 범위 설정
+        // 현실적인 입찰가격 범위 설정 (안전한 범위 보장)
         const baseMinBid = Math.max(minimumBid * 1.1, propertyValue * 0.7);
         
         // 최대 입찰가격을 시세의 100%로 제한 (수익성 보장)
@@ -548,28 +599,25 @@ class AuctionSimulator {
             propertyValue * 0.9   // 목표가의 90%
         );
         
+        // 최소값이 최대값보다 크거나 같은 경우 방지
+        if (baseMinBid >= realisticMaxBid) {
+            console.warn('입찰가격 범위가 비정상적입니다. 범위를 조정합니다.');
+            const adjustedMaxBid = baseMinBid * 1.2; // 최소값의 120%로 설정
+            console.log('조정된 범위:', { baseMinBid, adjustedMaxBid });
+        }
+        
         console.log('입찰가격 범위:', { baseMinBid, realisticMaxBid, minimumBid, marketPrice, appraisalPrice, propertyValue });
         
-        // 1. 긴급도 조정 (제한된 범위)
-        const urgencyMultiplier = Math.min(1.2, Math.max(0.8, urgencyWeight)); // 0.8 ~ 1.2 범위로 제한
-        
-        // 2. 시장 상황 조정 (제한된 범위)
+        // 1. 시장 상황 조정 (제한된 범위)
         const marketMultiplier = Math.min(1.2, Math.max(0.8, marketWeight)); // 0.8 ~ 1.2 범위로 제한
         
-        // 3. 경쟁자 수 조정 (제한된 범위)
+        // 2. 경쟁자 수 조정 (제한된 범위)
         const competitorMultiplier = Math.min(1.2, Math.max(0.9, 1.0 + (competitorCount - 1) * 0.05)); // 0.9 ~ 1.2 범위
         
-        // 4. 유찰 횟수 조정 (제한된 범위)
+        // 3. 유찰 횟수 조정 (제한된 범위)
         const failedMultiplier = Math.max(0.8, Math.min(1.1, 1.0 - failedCount * 0.05)); // 0.8 ~ 1.1 범위
         
-        // 5. 종합 조정 (더 보수적으로)
-        const totalMultiplier = Math.min(1.3, Math.max(0.7, 
-            urgencyMultiplier * marketMultiplier * competitorMultiplier * failedMultiplier
-        ));
-        
-        console.log('조정 계수들:', { urgencyMultiplier, marketMultiplier, competitorMultiplier, failedMultiplier, totalMultiplier });
-        
-        // 긴급도에 따른 입찰가격 범위 조정
+        // 4. 긴급도에 따른 입찰가격 범위 조정 (단일 조정으로 통합)
         let urgencyBidAdjustment = 1.0;
         if (urgency === 'high') {
             urgencyBidAdjustment = 1.15; // 긴급시 15% 상향 조정
@@ -579,9 +627,22 @@ class AuctionSimulator {
             urgencyBidAdjustment = 0.9; // 낮을시 10% 하향 조정
         }
         
-        // 입찰가격 범위를 긴급도에 따라 조정
-        const minBid = Math.max(baseMinBid * 0.8, minimumBid * 1.05) * urgencyBidAdjustment;
-        const maxBid = Math.min(realisticMaxBid, baseMinBid * 1.3) * urgencyBidAdjustment;
+        // 5. 종합 조정 (긴급도 제외)
+        const totalMultiplier = Math.min(1.3, Math.max(0.7, 
+            marketMultiplier * competitorMultiplier * failedMultiplier
+        ));
+        
+        console.log('조정 계수들:', { marketMultiplier, competitorMultiplier, failedMultiplier, totalMultiplier, urgencyBidAdjustment });
+        
+        // 입찰가격 범위를 안전하게 설정
+        let minBid = Math.max(baseMinBid * 0.8, minimumBid * 1.05) * urgencyBidAdjustment;
+        let maxBid = Math.min(realisticMaxBid, baseMinBid * 1.3) * urgencyBidAdjustment;
+        
+        // 범위 역전 방지
+        if (minBid >= maxBid) {
+            console.warn('입찰가격 범위가 역전되었습니다. 범위를 재조정합니다.');
+            maxBid = minBid * 1.2; // 최소값의 120%로 설정
+        }
         
         console.log('긴급도 조정:', { urgency, urgencyBidAdjustment, minBid, maxBid });
         
@@ -602,7 +663,10 @@ class AuctionSimulator {
             };
         }
         
-        for (let bidPrice = minBid; bidPrice <= maxBid; bidPrice += step) {
+        // step이 너무 작으면 조정
+        const adjustedStep = step < 1 ? 1 : step;
+        
+        for (let bidPrice = minBid; bidPrice <= maxBid; bidPrice += adjustedStep) {
             const winProbability = this.calculateWinProbability(
                 bidPrice, propertyValue, competitorCount, marketWeight, urgencyWeight, 
                 failedCount, appraisalPrice, minimumBid, marketPrice, renovationCost
@@ -621,6 +685,7 @@ class AuctionSimulator {
         // 현실적인 기대값 계산 (수익성 우선)
         let bestBidIndex = 0;
         let bestExpectedValue = -Infinity;
+        let profitableBidsCount = 0; // 수익성 있는 입찰가 개수 추적
         
         for (let i = 0; i < bidPrices.length; i++) {
             const winProb = probabilities[i];
@@ -632,15 +697,14 @@ class AuctionSimulator {
             const totalCostManWon = (bidPrice + this.calculateTotalCost(bidPrice, auctionType, renovationCost).totalCost) / 10000;
             const marketProfit = marketPriceManWon - totalCostManWon;
             
-            // 시세 대비 수익이 마이너스면 기대값을 매우 낮게 설정
+            // 시세 대비 수익이 마이너스면 해당 입찰가를 건너뛰기
             if (marketProfit < 0) {
-                const expectedValue = -1000; // 매우 낮은 기대값
-                if (expectedValue > bestExpectedValue) {
-                    bestExpectedValue = expectedValue;
-                    bestBidIndex = i;
-                }
-                continue;
+                console.log(`입찰가 ${bidPrice}는 수익성이 없어 제외됩니다. (시세: ${marketPriceManWon}, 총비용: ${totalCostManWon})`);
+                continue; // 해당 입찰가를 완전히 제외
             }
+            
+            // 수익성 있는 입찰가 개수 증가
+            profitableBidsCount++;
             
             // 2. 기본 기대값: 성공시 수익률 × 성공확률
             const basicExpectedValue = winProb * profit;
@@ -682,10 +746,39 @@ class AuctionSimulator {
             }
         }
         
+        // 수익성 있는 입찰가가 없는 경우 처리
+        if (profitableBidsCount === 0) {
+            console.warn('모든 입찰가가 수익성이 없습니다. 최저입찰가를 권장합니다.');
+            return {
+                recommendedBid: minimumBid,
+                winProbability: 0.1, // 낮은 확률
+                expectedProfit: -50, // 마이너스 수익률
+                bidPrices: [minimumBid],
+                probabilities: [0.1],
+                profits: [-50]
+            };
+        }
+        
+        // 배열 길이 검증
+        if (bidPrices.length === 0) {
+            console.error('입찰가격 배열이 비어있습니다.');
+            return {
+                recommendedBid: minimumBid,
+                winProbability: 0.5,
+                expectedProfit: 0,
+                bidPrices: [minimumBid],
+                probabilities: [0.5],
+                profits: [0]
+            };
+        }
+        
+        // 인덱스 범위 검증
+        const safeIndex = Math.max(0, Math.min(bestBidIndex, bidPrices.length - 1));
+        
         return {
-            recommendedBid: bidPrices[bestBidIndex],
-            winProbability: probabilities[bestBidIndex],
-            expectedProfit: profits[bestBidIndex],
+            recommendedBid: bidPrices[safeIndex],
+            winProbability: probabilities[safeIndex],
+            expectedProfit: profits[safeIndex],
             bidPrices: bidPrices,
             probabilities: probabilities,
             profits: profits
@@ -830,17 +923,17 @@ class AuctionSimulator {
     runSimulation() {
         console.log('시뮬레이션 시작');
         
-        // 입력값 가져오기 (원 단위로 입력받음)
-        const propertyValue = parseInt(document.getElementById('propertyValue').value);
+        // 입력값 가져오기 및 검증 (원 단위로 입력받음)
+        const propertyValue = this.validateAndParseInt(document.getElementById('propertyValue').value, '목표 수익 기준가', 1000000);
         const auctionType = document.getElementById('auctionType').value;
-        const competitorCount = parseInt(document.getElementById('competitorCount').value);
+        const competitorCount = this.validateAndParseInt(document.getElementById('competitorCount').value, '예상 경쟁자 수', 1, 1, 50);
         const marketCondition = document.getElementById('marketCondition').value;
         const urgency = document.getElementById('urgency').value;
-        const marketPrice = parseInt(document.getElementById('marketPrice').value);
-        const appraisalPrice = parseInt(document.getElementById('appraisalPrice').value);
-        const minimumBid = parseInt(document.getElementById('minimumBid').value);
-        const failedCount = parseInt(document.getElementById('failedCount').value);
-        const renovationCost = parseInt(document.getElementById('renovationCost').value);
+        const marketPrice = this.validateAndParseInt(document.getElementById('marketPrice').value, '시세', 1000000);
+        const appraisalPrice = this.validateAndParseInt(document.getElementById('appraisalPrice').value, '감정가', 1000000);
+        const minimumBid = this.validateAndParseInt(document.getElementById('minimumBid').value, '최저입찰가', 1000000);
+        const failedCount = this.validateAndParseInt(document.getElementById('failedCount').value, '유찰 횟수', 0, 0, 10);
+        const renovationCost = this.validateAndParseInt(document.getElementById('renovationCost').value, '리모델링 비용', 0, 0);
 
         console.log('입력값 확인:', {
             propertyValue, auctionType, competitorCount, marketCondition, 
