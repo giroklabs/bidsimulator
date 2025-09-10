@@ -567,12 +567,28 @@ class AuctionSimulator {
             urgencyMultiplier * marketMultiplier * competitorMultiplier * failedMultiplier
         ));
         
-        const minBid = baseMinBid * totalMultiplier;
-        const maxBid = Math.min(realisticMaxBid, baseMinBid * totalMultiplier * 1.5);
+        console.log('조정 계수들:', { urgencyMultiplier, marketMultiplier, competitorMultiplier, failedMultiplier, totalMultiplier });
+        
+        // 입찰가격 범위를 더 안전하게 설정
+        const minBid = Math.max(baseMinBid * 0.8, minimumBid * 1.05); // 최소한 최저입찰가의 105% 이상
+        const maxBid = Math.min(realisticMaxBid, baseMinBid * 1.3); // 최대한 현실적인 상한선
         
         const step = (maxBid - minBid) / 20;
         
         console.log('최종 입찰가격 범위:', { minBid, maxBid, step, totalMultiplier });
+        
+        // 입찰가격 범위 검증
+        if (minBid >= maxBid || step <= 0) {
+            console.error('입찰가격 범위 오류:', { minBid, maxBid, step });
+            return {
+                recommendedBid: minimumBid,
+                winProbability: 0.5,
+                expectedProfit: 0,
+                bidPrices: [minimumBid],
+                probabilities: [0.5],
+                profits: [0]
+            };
+        }
         
         for (let bidPrice = minBid; bidPrice <= maxBid; bidPrice += step) {
             const winProbability = this.calculateWinProbability(
