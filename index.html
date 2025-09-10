@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경매 입찰가격 시뮬레이션 서비스</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏛️ 경매 입찰가격 시뮬레이션</h1>
+            <p>최적의 입찰가격을 찾아보세요</p>
+        </header>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2>경매 정보 입력</h2>
+                <form id="auctionForm">
+                    <div class="form-group">
+                        <label for="propertyValue">목표 수익 기준가 (원)</label>
+                        <input type="number" id="propertyValue" value="500000000" placeholder="예: 500000000" required>
+                        <small class="help-text">낙찰 후 실제로 받을 수 있는 가치 (시세 또는 목표 처분가)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="auctionType">경매 유형</label>
+                        <select id="auctionType" required>
+                            <option value="realEstate" selected>부동산 경매</option>
+                            <option value="vehicle">자동차 경매</option>
+                            <option value="art">예술품 경매</option>
+                            <option value="general">일반 물건 경매</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="competitorCount">예상 경쟁자 수</label>
+                        <input type="number" id="competitorCount" value="5" placeholder="예: 5" min="1" max="50" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="marketCondition">시장 상황</label>
+                        <select id="marketCondition" required>
+                            <option value="hot">활발한 시장</option>
+                            <option value="normal" selected>보통 시장</option>
+                            <option value="cold">침체된 시장</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="urgency">입찰 긴급도</label>
+                        <select id="urgency" required>
+                            <option value="high">높음 (반드시 낙찰 필요)</option>
+                            <option value="medium" selected>보통</option>
+                            <option value="low">낮음 (적당한 가격에만)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="marketPrice">시세 (원)</label>
+                        <input type="number" id="marketPrice" value="450000000" placeholder="예: 450000000" required>
+                        <small class="help-text">현재 시장에서 거래되는 가격</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appraisalPrice">감정가 (원)</label>
+                        <input type="number" id="appraisalPrice" value="480000000" placeholder="예: 480000000" required>
+                        <small class="help-text">경매원이 책정한 감정가</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="minimumBid">최저입찰가 (원)</label>
+                        <input type="number" id="minimumBid" value="300000000" placeholder="예: 300000000" required>
+                        <small class="help-text">경매 시작가격</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="failedCount">유찰 횟수</label>
+                        <select id="failedCount" required>
+                            <option value="0" selected>1회차 (첫 경매)</option>
+                            <option value="1">2회차 (1회 유찰)</option>
+                            <option value="2">3회차 (2회 유찰)</option>
+                            <option value="3">4회차 (3회 유찰)</option>
+                            <option value="4">5회차 이상 (4회 이상 유찰)</option>
+                        </select>
+                        <small class="help-text">이전 경매에서 유찰된 횟수</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="renovationCost">예상 리모델링 비용 (원)</label>
+                        <input type="number" id="renovationCost" value="0" placeholder="예: 50000000" required>
+                        <small class="help-text">낙찰 후 예상되는 리모델링/수리 비용</small>
+                    </div>
+
+                    <button type="submit" class="simulate-btn">시뮬레이션 실행</button>
+                </form>
+            </div>
+
+            <div class="results-section" id="resultsSection">
+                <h2>시뮬레이션 결과</h2>
+                <div id="initialMessage" class="initial-message">
+                    <p>👈 왼쪽에서 경매 정보를 입력하고 "시뮬레이션 실행" 버튼을 클릭하세요</p>
+                </div>
+                <div class="result-cards" style="display: none;">
+                    <div class="result-card">
+                        <h3>권장 입찰가격</h3>
+                        <div class="price-display" id="recommendedPrice">0</div>
+                        <p class="price-unit">원</p>
+                    </div>
+                    <div class="result-card">
+                        <h3>낙찰 확률</h3>
+                        <div class="probability-display" id="winProbability">0%</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>예상 수익률</h3>
+                        <div class="profit-display" id="expectedProfit">0%</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>리스크 조정 수익률</h3>
+                        <div class="profit-display" id="riskAdjustedProfit">0%</div>
+                    </div>
+                    <div class="result-card">
+                        <h3>모델 신뢰도</h3>
+                        <div class="probability-display" id="modelConfidence">0%</div>
+                    </div>
+                </div>
+
+                <div class="detailed-results" style="display: none;">
+                    <h3>상세 분석</h3>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <span class="label">총 비용 (수수료 포함)</span>
+                            <span class="value" id="totalCost">0원</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">경매 수수료</span>
+                            <span class="value" id="auctionFee">0원</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">등기비용</span>
+                            <span class="value" id="registrationFee">0원</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">세금</span>
+                            <span class="value" id="tax">0원</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">리모델링 비용</span>
+                            <span class="value" id="renovationCostDisplay">0원</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">총 투자 비용</span>
+                            <span class="value" id="totalInvestment">0원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="price-analysis" style="display: none;">
+                    <h3>가격 분석</h3>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <span class="label">감정가 대비 입찰가</span>
+                            <span class="value" id="appraisalRatio">0%</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">시세 대비 입찰가</span>
+                            <span class="value" id="marketRatio">0%</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">최저입찰가 대비</span>
+                            <span class="value" id="minimumRatio">0%</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="label">시세 대비 예상 수익</span>
+                            <span class="value" id="marketProfit">0원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container" style="display: none;">
+                    <h3>입찰가격별 낙찰 확률</h3>
+                    <canvas id="probabilityChart"></canvas>
+                </div>
+
+                <div class="strategy-section" style="display: none;">
+                    <h3>입찰 전략</h3>
+                    <div id="strategyAdvice" class="strategy-advice"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
