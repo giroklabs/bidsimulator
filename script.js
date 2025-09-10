@@ -569,9 +569,21 @@ class AuctionSimulator {
         
         console.log('조정 계수들:', { urgencyMultiplier, marketMultiplier, competitorMultiplier, failedMultiplier, totalMultiplier });
         
-        // 입찰가격 범위를 더 안전하게 설정
-        const minBid = Math.max(baseMinBid * 0.8, minimumBid * 1.05); // 최소한 최저입찰가의 105% 이상
-        const maxBid = Math.min(realisticMaxBid, baseMinBid * 1.3); // 최대한 현실적인 상한선
+        // 긴급도에 따른 입찰가격 범위 조정
+        let urgencyBidAdjustment = 1.0;
+        if (urgency === 'high') {
+            urgencyBidAdjustment = 1.15; // 긴급시 15% 상향 조정
+        } else if (urgency === 'medium') {
+            urgencyBidAdjustment = 1.0; // 보통시 기본값
+        } else if (urgency === 'low') {
+            urgencyBidAdjustment = 0.9; // 낮을시 10% 하향 조정
+        }
+        
+        // 입찰가격 범위를 긴급도에 따라 조정
+        const minBid = Math.max(baseMinBid * 0.8, minimumBid * 1.05) * urgencyBidAdjustment;
+        const maxBid = Math.min(realisticMaxBid, baseMinBid * 1.3) * urgencyBidAdjustment;
+        
+        console.log('긴급도 조정:', { urgency, urgencyBidAdjustment, minBid, maxBid });
         
         const step = (maxBid - minBid) / 20;
         
@@ -653,8 +665,16 @@ class AuctionSimulator {
             // 6. 실패시 페널티
             const failurePenalty = (1 - winProb) * 5;
             
-            // 7. 최종 기대값
-            const expectedValue = basicExpectedValue + profitBonus - minimumBidPenalty + appraisalBonus - failurePenalty;
+            // 7. 긴급도 보너스 (긴급할수록 높은 입찰가 선호)
+            let urgencyBonus = 0;
+            if (urgency === 'high') {
+                urgencyBonus = bidPrice / 1000 * 0.1; // 긴급시 입찰가 1000만원당 0.1점 보너스
+            } else if (urgency === 'low') {
+                urgencyBonus = -bidPrice / 1000 * 0.05; // 낮을시 입찰가 1000만원당 0.05점 페널티
+            }
+            
+            // 8. 최종 기대값
+            const expectedValue = basicExpectedValue + profitBonus - minimumBidPenalty + appraisalBonus - failurePenalty + urgencyBonus;
             
             if (expectedValue > bestExpectedValue) {
                 bestExpectedValue = expectedValue;
