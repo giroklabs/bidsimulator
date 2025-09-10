@@ -522,9 +522,16 @@ class AuctionSimulator {
 
     // 최적 입찰가격 계산
     calculateOptimalBid(propertyValue, auctionType, competitorCount, marketCondition, urgency, marketPrice, appraisalPrice, minimumBid, failedCount, renovationCost) {
+        console.log('calculateOptimalBid 시작:', {
+            propertyValue, auctionType, competitorCount, marketCondition, urgency, 
+            marketPrice, appraisalPrice, minimumBid, failedCount, renovationCost
+        });
+        
         const marketWeight = this.getMarketWeight(marketCondition);
         const urgencyWeight = this.getUrgencyWeight(urgency);
         const appraisalWeight = this.getAppraisalRatioWeight(appraisalPrice, marketPrice);
+        
+        console.log('가중치 계산:', { marketWeight, urgencyWeight, appraisalWeight });
         
         // 다양한 입찰가격에 대해 시뮬레이션
         const bidPrices = [];
@@ -540,6 +547,8 @@ class AuctionSimulator {
             appraisalPrice * 1.1,  // 감정가의 110%
             propertyValue * 0.9   // 목표가의 90%
         );
+        
+        console.log('입찰가격 범위:', { baseMinBid, realisticMaxBid, minimumBid, marketPrice, appraisalPrice, propertyValue });
         
         // 1. 긴급도 조정 (제한된 범위)
         const urgencyMultiplier = Math.min(1.2, Math.max(0.8, urgencyWeight)); // 0.8 ~ 1.2 범위로 제한
@@ -562,6 +571,8 @@ class AuctionSimulator {
         const maxBid = Math.min(realisticMaxBid, baseMinBid * totalMultiplier * 1.5);
         
         const step = (maxBid - minBid) / 20;
+        
+        console.log('최종 입찰가격 범위:', { minBid, maxBid, step, totalMultiplier });
         
         for (let bidPrice = minBid; bidPrice <= maxBid; bidPrice += step) {
             const winProbability = this.calculateWinProbability(
@@ -812,8 +823,15 @@ class AuctionSimulator {
 
         try {
             console.log('최적 입찰가격 계산 시작');
+            console.log('입력값 검증:', {
+                propertyValueManWon, auctionType, competitorCount, marketCondition, urgency,
+                marketPriceManWon, appraisalPriceManWon, minimumBidManWon, failedCount, renovationCost
+            });
+            
             // 최적 입찰가격 계산 (만원 단위로 계산)
             const renovationCostManWon = this.convertToManWon(renovationCost);
+            console.log('renovationCostManWon:', renovationCostManWon);
+            
             const result = this.calculateOptimalBid(
                 propertyValueManWon, auctionType, competitorCount, marketCondition, urgency,
                 marketPriceManWon, appraisalPriceManWon, minimumBidManWon, failedCount, renovationCostManWon
