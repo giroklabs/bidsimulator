@@ -84,9 +84,9 @@ class AuctionSimulator {
     // 시장 상황별 가중치 계산
     getMarketWeight(marketCondition) {
         const weights = {
-            hot: 1.2,    // 활발한 시장: 20% 높은 경쟁
+            hot: 1.4,    // 활발한 시장: 40% 높은 경쟁
             normal: 1.0,  // 보통 시장
-            cold: 0.8    // 침체된 시장: 20% 낮은 경쟁
+            cold: 0.6    // 침체된 시장: 40% 낮은 경쟁
         };
         return weights[marketCondition] || 1.0;
     }
@@ -810,14 +810,27 @@ class AuctionSimulator {
         const probabilities = [];
         const profits = [];
         
-        // 긴급도에 따른 입찰가격 범위 조정
+        // 모든 요소에 따른 입찰가격 범위 조정
         const baseMinBid = Math.max(minimumBid * 1.1, propertyValue * 0.7);
         const baseMaxBid = Math.max(appraisalPrice * 1.5, propertyValue * 1.3);
         
-        // 긴급도가 높을수록 더 높은 가격 범위로 조정
-        const urgencyMultiplier = urgencyWeight; // high: 1.15, medium: 1.0, low: 0.85
-        const minBid = baseMinBid * urgencyMultiplier;
-        const maxBid = baseMaxBid * urgencyMultiplier;
+        // 1. 긴급도 조정
+        const urgencyMultiplier = urgencyWeight; // high: 1.3, medium: 1.0, low: 0.7
+        
+        // 2. 시장 상황 조정
+        const marketMultiplier = marketWeight; // hot: 1.2, normal: 1.0, cold: 0.8
+        
+        // 3. 경쟁자 수 조정 (경쟁자가 많을수록 더 높은 가격 필요)
+        const competitorMultiplier = Math.min(1.5, 1.0 + (competitorCount - 1) * 0.1); // 최대 1.5배
+        
+        // 4. 유찰 횟수 조정 (유찰이 많을수록 더 낮은 가격)
+        const failedMultiplier = Math.max(0.6, 1.0 - failedCount * 0.1); // 최소 0.6배
+        
+        // 5. 종합 조정
+        const totalMultiplier = urgencyMultiplier * marketMultiplier * competitorMultiplier * failedMultiplier;
+        
+        const minBid = baseMinBid * totalMultiplier;
+        const maxBid = baseMaxBid * totalMultiplier;
         
         const step = (maxBid - minBid) / 20;
         
@@ -872,15 +885,36 @@ class AuctionSimulator {
             // 6. 긴급도 보너스/페널티
             let urgencyAdjustment = 0;
             if (urgencyWeight > 1.0) {
-                // 높은 긴급도: 더 높은 가격에 보너스
-                urgencyAdjustment = (urgencyWeight - 1.0) * 30; // 최대 4.5점 보너스
+                urgencyAdjustment = (urgencyWeight - 1.0) * 30; // 최대 9점 보너스
             } else if (urgencyWeight < 1.0) {
-                // 낮은 긴급도: 더 낮은 가격에 페널티
-                urgencyAdjustment = (urgencyWeight - 1.0) * 20; // 최대 3점 페널티
+                urgencyAdjustment = (urgencyWeight - 1.0) * 20; // 최대 6점 페널티
             }
             
-            // 7. 최종 기대값
-            const expectedValue = basicExpectedValue - minimumBidPenalty + appraisalBonus - failurePenalty - opportunityCost + urgencyAdjustment;
+            // 7. 시장 상황 보너스/페널티
+            let marketAdjustment = 0;
+            if (marketWeight > 1.0) {
+                marketAdjustment = (marketWeight - 1.0) * 25; // 활발한 시장: 5점 보너스
+            } else if (marketWeight < 1.0) {
+                marketAdjustment = (marketWeight - 1.0) * 15; // 침체 시장: 3점 페널티
+            }
+            
+            // 8. 경쟁자 수 보너스/페널티
+            let competitorAdjustment = 0;
+            if (competitorCount > 3) {
+                competitorAdjustment = (competitorCount - 3) * 5; // 경쟁자 많을수록 보너스
+            } else if (competitorCount < 3) {
+                competitorAdjustment = (competitorCount - 3) * 3; // 경쟁자 적을수록 페널티
+            }
+            
+            // 9. 유찰 횟수 보너스/페널티
+            let failedAdjustment = 0;
+            if (failedCount > 0) {
+                failedAdjustment = -failedCount * 8; // 유찰할수록 페널티
+            }
+            
+            // 10. 최종 기대값
+            const expectedValue = basicExpectedValue - minimumBidPenalty + appraisalBonus - failurePenalty - opportunityCost + 
+                                urgencyAdjustment + marketAdjustment + competitorAdjustment + failedAdjustment;
             
             if (expectedValue > bestExpectedValue) {
                 bestExpectedValue = expectedValue;
