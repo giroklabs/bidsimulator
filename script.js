@@ -91,12 +91,12 @@ class AuctionSimulator {
         return weights[marketCondition] || 1.0;
     }
 
-    // 긴급도별 입찰 전략 가중치
+    // 긴급도별 입찰 전략 가중치 (더 극명한 차이)
     getUrgencyWeight(urgency) {
         const weights = {
-            high: 1.15,   // 높음: 15% 더 높은 입찰
+            high: 1.3,    // 높음: 30% 더 높은 입찰
             medium: 1.0,  // 보통
-            low: 0.85     // 낮음: 15% 더 낮은 입찰
+            low: 0.7      // 낮음: 30% 더 낮은 입찰
         };
         return weights[urgency] || 1.0;
     }
@@ -810,9 +810,15 @@ class AuctionSimulator {
         const probabilities = [];
         const profits = [];
         
-        // 입찰가격 범위를 최저입찰가의 110%부터 감정가의 150%까지로 설정
-        const minBid = Math.max(minimumBid * 1.1, propertyValue * 0.7); // 최저입찰가의 110%와 목표가의 70% 중 큰 값
-        const maxBid = Math.max(appraisalPrice * 1.5, propertyValue * 1.3); // 감정가의 150%와 목표가의 130% 중 큰 값
+        // 긴급도에 따른 입찰가격 범위 조정
+        const baseMinBid = Math.max(minimumBid * 1.1, propertyValue * 0.7);
+        const baseMaxBid = Math.max(appraisalPrice * 1.5, propertyValue * 1.3);
+        
+        // 긴급도가 높을수록 더 높은 가격 범위로 조정
+        const urgencyMultiplier = urgencyWeight; // high: 1.15, medium: 1.0, low: 0.85
+        const minBid = baseMinBid * urgencyMultiplier;
+        const maxBid = baseMaxBid * urgencyMultiplier;
+        
         const step = (maxBid - minBid) / 20;
         
         for (let bidPrice = minBid; bidPrice <= maxBid; bidPrice += step) {
@@ -863,8 +869,18 @@ class AuctionSimulator {
             // 5. 기회비용 (다른 투자 기회 고려)
             const opportunityCost = winProb * 0.01; // 2% → 1%로 감소
             
-            // 6. 최종 기대값
-            const expectedValue = basicExpectedValue - minimumBidPenalty + appraisalBonus - failurePenalty - opportunityCost;
+            // 6. 긴급도 보너스/페널티
+            let urgencyAdjustment = 0;
+            if (urgencyWeight > 1.0) {
+                // 높은 긴급도: 더 높은 가격에 보너스
+                urgencyAdjustment = (urgencyWeight - 1.0) * 30; // 최대 4.5점 보너스
+            } else if (urgencyWeight < 1.0) {
+                // 낮은 긴급도: 더 낮은 가격에 페널티
+                urgencyAdjustment = (urgencyWeight - 1.0) * 20; // 최대 3점 페널티
+            }
+            
+            // 7. 최종 기대값
+            const expectedValue = basicExpectedValue - minimumBidPenalty + appraisalBonus - failurePenalty - opportunityCost + urgencyAdjustment;
             
             if (expectedValue > bestExpectedValue) {
                 bestExpectedValue = expectedValue;
