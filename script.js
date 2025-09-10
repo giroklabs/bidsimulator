@@ -408,13 +408,24 @@ class AuctionSimulator {
     }
 
     getHistoricalMarketData() {
-        // 가상의 시계열 데이터 (실제로는 외부 API)
-        return Array.from({length: 30}, (_, i) => ({
-            date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
-            price: 250000000 + Math.random() * 50000000 - 25000000,
-            volume: Math.random() * 1000 + 100,
-            volatility: Math.random() * 0.2 + 0.1
-        }));
+        // 결정론적 시계열 데이터 (일관된 결과를 위해)
+        const basePrice = 250000000;
+        const baseVolume = 500;
+        const baseVolatility = 0.15;
+        
+        return Array.from({length: 30}, (_, i) => {
+            // 사인파 패턴으로 일관된 데이터 생성
+            const trend = Math.sin(i * 0.2) * 0.1; // 10% 변동
+            const seasonality = Math.sin(i * 0.5) * 0.05; // 5% 계절성
+            const noise = Math.sin(i * 1.5) * 0.03; // 3% 노이즈
+            
+            return {
+                date: new Date(Date.now() - (29 - i) * 24 * 60 * 60 * 1000),
+                price: basePrice * (1 + trend + seasonality + noise),
+                volume: baseVolume * (1 + Math.sin(i * 0.3) * 0.2),
+                volatility: baseVolatility * (1 + Math.sin(i * 0.4) * 0.3)
+            };
+        });
     }
 
     calculateMovingAverage(data, period) {
@@ -478,20 +489,26 @@ class AuctionSimulator {
     }
 
     generateRandomScenario(features) {
-        // 랜덤 시나리오 생성 (정규분포 기반)
+        // 결정론적 시나리오 생성 (일관된 결과를 위해)
+        const seed = features.competitorCount + features.marketWeight + features.urgencyWeight;
+        
         return {
-            competitorCount: Math.max(1, Math.round(features.competitorCount + (Math.random() - 0.5) * 2)),
-            marketWeight: Math.max(0.1, Math.min(1.0, features.marketWeight + (Math.random() - 0.5) * 0.2)),
-            urgencyWeight: Math.max(0.1, Math.min(1.0, features.urgencyWeight + (Math.random() - 0.5) * 0.2)),
-            priceRatio: Math.max(0.5, Math.min(1.5, features.priceRatio + (Math.random() - 0.5) * 0.1))
+            competitorCount: Math.max(1, Math.round(features.competitorCount + Math.sin(seed) * 0.5)),
+            marketWeight: Math.max(0.1, Math.min(1.0, features.marketWeight + Math.cos(seed * 1.1) * 0.1)),
+            urgencyWeight: Math.max(0.1, Math.min(1.0, features.urgencyWeight + Math.sin(seed * 1.3) * 0.1)),
+            priceRatio: Math.max(0.5, Math.min(1.5, features.priceRatio + Math.cos(seed * 1.7) * 0.05))
         };
     }
 
     simulateScenario(scenario, competitorBehavior) {
-        // 시나리오별 낙찰 여부 시뮬레이션
+        // 시나리오별 낙찰 여부 시뮬레이션 (결정론적)
         const baseProb = competitorBehavior.weighted;
         const scenarioProb = baseProb * scenario.marketWeight * scenario.urgencyWeight;
-        const win = Math.random() < scenarioProb;
+        
+        // 결정론적 낙찰 여부 결정 (시드 기반)
+        const seed = scenario.competitorCount + scenario.marketWeight + scenario.urgencyWeight;
+        const deterministicValue = Math.sin(seed * 2.3) * 0.5 + 0.5; // 0-1 범위
+        const win = deterministicValue < scenarioProb;
         
         return {
             win: win,
