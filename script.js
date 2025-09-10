@@ -810,27 +810,35 @@ class AuctionSimulator {
         const probabilities = [];
         const profits = [];
         
-        // 모든 요소에 따른 입찰가격 범위 조정
+        // 현실적인 입찰가격 범위 설정
         const baseMinBid = Math.max(minimumBid * 1.1, propertyValue * 0.7);
-        const baseMaxBid = Math.max(appraisalPrice * 1.5, propertyValue * 1.3);
         
-        // 1. 긴급도 조정
-        const urgencyMultiplier = urgencyWeight; // high: 1.3, medium: 1.0, low: 0.7
+        // 최대 입찰가격을 시세의 120%로 제한 (현실적 상한선)
+        const realisticMaxBid = Math.min(
+            marketPrice * 1.2,  // 시세의 120% (현실적 상한선)
+            appraisalPrice * 1.3,  // 감정가의 130%
+            propertyValue * 1.1   // 목표가의 110%
+        );
         
-        // 2. 시장 상황 조정
-        const marketMultiplier = marketWeight; // hot: 1.2, normal: 1.0, cold: 0.8
+        // 1. 긴급도 조정 (제한된 범위)
+        const urgencyMultiplier = Math.min(1.2, Math.max(0.8, urgencyWeight)); // 0.8 ~ 1.2 범위로 제한
         
-        // 3. 경쟁자 수 조정 (경쟁자가 많을수록 더 높은 가격 필요)
-        const competitorMultiplier = Math.min(1.5, 1.0 + (competitorCount - 1) * 0.1); // 최대 1.5배
+        // 2. 시장 상황 조정 (제한된 범위)
+        const marketMultiplier = Math.min(1.2, Math.max(0.8, marketWeight)); // 0.8 ~ 1.2 범위로 제한
         
-        // 4. 유찰 횟수 조정 (유찰이 많을수록 더 낮은 가격)
-        const failedMultiplier = Math.max(0.6, 1.0 - failedCount * 0.1); // 최소 0.6배
+        // 3. 경쟁자 수 조정 (제한된 범위)
+        const competitorMultiplier = Math.min(1.2, Math.max(0.9, 1.0 + (competitorCount - 1) * 0.05)); // 0.9 ~ 1.2 범위
         
-        // 5. 종합 조정
-        const totalMultiplier = urgencyMultiplier * marketMultiplier * competitorMultiplier * failedMultiplier;
+        // 4. 유찰 횟수 조정 (제한된 범위)
+        const failedMultiplier = Math.max(0.8, Math.min(1.1, 1.0 - failedCount * 0.05)); // 0.8 ~ 1.1 범위
+        
+        // 5. 종합 조정 (더 보수적으로)
+        const totalMultiplier = Math.min(1.3, Math.max(0.7, 
+            urgencyMultiplier * marketMultiplier * competitorMultiplier * failedMultiplier
+        ));
         
         const minBid = baseMinBid * totalMultiplier;
-        const maxBid = baseMaxBid * totalMultiplier;
+        const maxBid = Math.min(realisticMaxBid, baseMinBid * totalMultiplier * 1.5);
         
         const step = (maxBid - minBid) / 20;
         
@@ -882,34 +890,34 @@ class AuctionSimulator {
             // 5. 기회비용 (다른 투자 기회 고려)
             const opportunityCost = winProb * 0.01; // 2% → 1%로 감소
             
-            // 6. 긴급도 보너스/페널티
+            // 6. 긴급도 보너스/페널티 (제한된 범위)
             let urgencyAdjustment = 0;
             if (urgencyWeight > 1.0) {
-                urgencyAdjustment = (urgencyWeight - 1.0) * 30; // 최대 9점 보너스
+                urgencyAdjustment = Math.min(5, (urgencyWeight - 1.0) * 10); // 최대 5점 보너스
             } else if (urgencyWeight < 1.0) {
-                urgencyAdjustment = (urgencyWeight - 1.0) * 20; // 최대 6점 페널티
+                urgencyAdjustment = Math.max(-3, (urgencyWeight - 1.0) * 10); // 최대 3점 페널티
             }
             
-            // 7. 시장 상황 보너스/페널티
+            // 7. 시장 상황 보너스/페널티 (제한된 범위)
             let marketAdjustment = 0;
             if (marketWeight > 1.0) {
-                marketAdjustment = (marketWeight - 1.0) * 25; // 활발한 시장: 5점 보너스
+                marketAdjustment = Math.min(3, (marketWeight - 1.0) * 10); // 최대 3점 보너스
             } else if (marketWeight < 1.0) {
-                marketAdjustment = (marketWeight - 1.0) * 15; // 침체 시장: 3점 페널티
+                marketAdjustment = Math.max(-2, (marketWeight - 1.0) * 10); // 최대 2점 페널티
             }
             
-            // 8. 경쟁자 수 보너스/페널티
+            // 8. 경쟁자 수 보너스/페널티 (제한된 범위)
             let competitorAdjustment = 0;
             if (competitorCount > 3) {
-                competitorAdjustment = (competitorCount - 3) * 5; // 경쟁자 많을수록 보너스
+                competitorAdjustment = Math.min(4, (competitorCount - 3) * 2); // 최대 4점 보너스
             } else if (competitorCount < 3) {
-                competitorAdjustment = (competitorCount - 3) * 3; // 경쟁자 적을수록 페널티
+                competitorAdjustment = Math.max(-2, (competitorCount - 3) * 2); // 최대 2점 페널티
             }
             
-            // 9. 유찰 횟수 보너스/페널티
+            // 9. 유찰 횟수 보너스/페널티 (제한된 범위)
             let failedAdjustment = 0;
             if (failedCount > 0) {
-                failedAdjustment = -failedCount * 8; // 유찰할수록 페널티
+                failedAdjustment = Math.max(-6, -failedCount * 3); // 최대 6점 페널티
             }
             
             // 10. 최종 기대값
