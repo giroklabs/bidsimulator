@@ -433,7 +433,7 @@ class AuctionSimulator {
     }
 
     // 총 비용 계산 (수수료, 세금 포함)
-    calculateTotalCost(bidPrice, auctionType) {
+    calculateTotalCost(bidPrice, auctionType, renovationCost = 0) {
         const fees = this.getAuctionFees(auctionType);
         
         const auctionFee = bidPrice * fees.auctionFee;
@@ -447,7 +447,8 @@ class AuctionSimulator {
             registrationFee: registrationFee,
             tax: tax,
             additionalCosts: additionalCosts,
-            totalCost: bidPrice + auctionFee + registrationFee + tax + additionalCosts
+            renovationCost: renovationCost,
+            totalCost: bidPrice + auctionFee + registrationFee + tax + additionalCosts + renovationCost
         };
     }
 
@@ -520,7 +521,7 @@ class AuctionSimulator {
     }
 
     // 최적 입찰가격 계산
-    calculateOptimalBid(propertyValue, auctionType, competitorCount, marketCondition, urgency, marketPrice, appraisalPrice, minimumBid, failedCount) {
+    calculateOptimalBid(propertyValue, auctionType, competitorCount, marketCondition, urgency, marketPrice, appraisalPrice, minimumBid, failedCount, renovationCost) {
         const marketWeight = this.getMarketWeight(marketCondition);
         const urgencyWeight = this.getUrgencyWeight(urgency);
         const appraisalWeight = this.getAppraisalRatioWeight(appraisalPrice, marketPrice);
@@ -567,7 +568,7 @@ class AuctionSimulator {
                 bidPrice, propertyValue, competitorCount, marketWeight, urgencyWeight, 
                 failedCount, appraisalPrice, minimumBid, marketPrice, renovationCost
             );
-            const costInfo = this.calculateTotalCost(bidPrice, auctionType);
+            const costInfo = this.calculateTotalCost(bidPrice, auctionType, renovationCost);
             const expectedProfit = this.calculateExpectedProfit(propertyValue, costInfo.totalCost);
             const riskAdjustedProfit = this.calculateRiskAdjustedProfit(
                 propertyValue, costInfo.totalCost, winProbability, marketCondition, failedCount
@@ -589,7 +590,7 @@ class AuctionSimulator {
             
             // 1. 수익성 체크: 시세 대비 수익이 마이너스면 제외
             const marketPriceManWon = marketPrice / 10000;
-            const totalCostManWon = (bidPrice + this.calculateTotalCost(bidPrice, auctionType).totalCost) / 10000;
+            const totalCostManWon = (bidPrice + this.calculateTotalCost(bidPrice, auctionType, renovationCost).totalCost) / 10000;
             const marketProfit = marketPriceManWon - totalCostManWon;
             
             // 시세 대비 수익이 마이너스면 기대값을 매우 낮게 설정
@@ -812,15 +813,16 @@ class AuctionSimulator {
         try {
             console.log('최적 입찰가격 계산 시작');
             // 최적 입찰가격 계산 (만원 단위로 계산)
+            const renovationCostManWon = this.convertToManWon(renovationCost);
             const result = this.calculateOptimalBid(
                 propertyValueManWon, auctionType, competitorCount, marketCondition, urgency,
-                marketPriceManWon, appraisalPriceManWon, minimumBidManWon, failedCount
+                marketPriceManWon, appraisalPriceManWon, minimumBidManWon, failedCount, renovationCostManWon
             );
             console.log('최적 입찰가격 계산 완료:', result);
             
             console.log('총 비용 계산 시작');
             // 총 비용 계산 (만원 단위로 계산)
-            const costInfo = this.calculateTotalCost(result.recommendedBid, auctionType);
+            const costInfo = this.calculateTotalCost(result.recommendedBid, auctionType, renovationCostManWon);
             console.log('총 비용 계산 완료:', costInfo);
             
             console.log('시세 대비 수익성 분석 시작');
