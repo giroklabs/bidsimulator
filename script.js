@@ -533,11 +533,11 @@ class AuctionSimulator {
         // 현실적인 입찰가격 범위 설정
         const baseMinBid = Math.max(minimumBid * 1.1, propertyValue * 0.7);
         
-        // 최대 입찰가격을 시세의 120%로 제한 (현실적 상한선)
+        // 최대 입찰가격을 시세의 100%로 제한 (수익성 보장)
         const realisticMaxBid = Math.min(
-            marketPrice * 1.2,  // 시세의 120% (현실적 상한선)
-            appraisalPrice * 1.3,  // 감정가의 130%
-            propertyValue * 1.1   // 목표가의 110%
+            marketPrice * 0.95,  // 시세의 95% (수익성 보장)
+            appraisalPrice * 1.1,  // 감정가의 110%
+            propertyValue * 0.9   // 목표가의 90%
         );
         
         // 1. 긴급도 조정 (제한된 범위)
@@ -578,7 +578,7 @@ class AuctionSimulator {
             profits.push(riskAdjustedProfit); // 리스크 조정 수익률 사용
         }
         
-        // 간단하고 현실적인 기대값 계산
+        // 현실적인 기대값 계산 (수익성 우선)
         let bestBidIndex = 0;
         let bestExpectedValue = -Infinity;
         
@@ -587,28 +587,46 @@ class AuctionSimulator {
             const profit = profits[i];
             const bidPrice = bidPrices[i];
             
-            // 1. 기본 기대값: 성공시 수익률 × 성공확률
+            // 1. 수익성 체크: 시세 대비 수익이 마이너스면 제외
+            const marketPriceManWon = marketPrice / 10000;
+            const totalCostManWon = (bidPrice + this.calculateTotalCost(bidPrice, auctionType).totalCost) / 10000;
+            const marketProfit = marketPriceManWon - totalCostManWon;
+            
+            // 시세 대비 수익이 마이너스면 기대값을 매우 낮게 설정
+            if (marketProfit < 0) {
+                const expectedValue = -1000; // 매우 낮은 기대값
+                if (expectedValue > bestExpectedValue) {
+                    bestExpectedValue = expectedValue;
+                    bestBidIndex = i;
+                }
+                continue;
+            }
+            
+            // 2. 기본 기대값: 성공시 수익률 × 성공확률
             const basicExpectedValue = winProb * profit;
             
-            // 2. 최저입찰가 근처 페널티 (간단하게)
+            // 3. 수익성 보너스 (수익이 높을수록 보너스)
+            const profitBonus = Math.max(0, marketProfit / 1000) * 5; // 수익 1000만원당 5점 보너스
+            
+            // 4. 최저입찰가 근처 페널티
             const minimumBidRatio = bidPrice / minimumBid;
             let minimumBidPenalty = 0;
             if (minimumBidRatio < 1.15) {
-                minimumBidPenalty = 10; // 최저가 근처는 10점 페널티
+                minimumBidPenalty = 10;
             }
             
-            // 3. 감정가 근처 보너스 (간단하게)
+            // 5. 감정가 근처 보너스
             const appraisalRatio = bidPrice / appraisalPrice;
             let appraisalBonus = 0;
             if (appraisalRatio >= 0.95 && appraisalRatio <= 1.05) {
-                appraisalBonus = 15; // 감정가 근처는 15점 보너스
+                appraisalBonus = 15;
             }
             
-            // 4. 실패시 페널티 (간단하게)
-            const failurePenalty = (1 - winProb) * 5; // 실패 확률 × 5점
+            // 6. 실패시 페널티
+            const failurePenalty = (1 - winProb) * 5;
             
-            // 5. 최종 기대값 (간단하게)
-            const expectedValue = basicExpectedValue - minimumBidPenalty + appraisalBonus - failurePenalty;
+            // 7. 최종 기대값
+            const expectedValue = basicExpectedValue + profitBonus - minimumBidPenalty + appraisalBonus - failurePenalty;
             
             if (expectedValue > bestExpectedValue) {
                 bestExpectedValue = expectedValue;
