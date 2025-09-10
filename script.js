@@ -1100,6 +1100,8 @@ class AuctionSimulator {
         document.getElementById('riskAdjustedProfit').textContent = Math.round(riskAdjustedProfit) + '%';
         
         // 모델 신뢰도 계산 및 표시
+        const marketWeight = this.getMarketWeight(marketCondition);
+        const urgencyWeight = this.getUrgencyWeight(urgency);
         const features = this.extractFeatures(
             result.recommendedBid, propertyValue, competitorCount, marketWeight, urgencyWeight, 
             failedCount, appraisalPrice, minimumBid, marketPrice, renovationCost
