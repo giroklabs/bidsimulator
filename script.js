@@ -793,8 +793,8 @@ class AuctionSimulator {
         const probabilities = [];
         const profits = [];
         
-        // 입찰가격 범위를 최저입찰가부터 감정가의 150%까지로 설정
-        const minBid = Math.max(minimumBid, propertyValue * 0.6); // 최저입찰가와 목표가의 60% 중 큰 값
+        // 입찰가격 범위를 최저입찰가의 110%부터 감정가의 150%까지로 설정
+        const minBid = Math.max(minimumBid * 1.1, propertyValue * 0.7); // 최저입찰가의 110%와 목표가의 70% 중 큰 값
         const maxBid = Math.max(appraisalPrice * 1.5, propertyValue * 1.3); // 감정가의 150%와 목표가의 130% 중 큰 값
         const step = (maxBid - minBid) / 20;
         
@@ -814,26 +814,40 @@ class AuctionSimulator {
             profits.push(riskAdjustedProfit); // 리스크 조정 수익률 사용
         }
         
-        // 기대값이 가장 높은 입찰가격 찾기 (정교화된 모델)
+        // 기대값이 가장 높은 입찰가격 찾기 (개선된 모델)
         let bestBidIndex = 0;
         let bestExpectedValue = -Infinity;
         
         for (let i = 0; i < bidPrices.length; i++) {
             const winProb = probabilities[i];
             const profit = profits[i];
+            const bidPrice = bidPrices[i];
             
             // 1. 기본 기대값: 성공시 수익률 × 성공확률
             const basicExpectedValue = winProb * profit;
             
-            // 2. 실패시 페널티 (입찰가의 일정 비율 손실)
-            const bidPrice = bidPrices[i];
-            const failurePenalty = (1 - winProb) * (bidPrice / propertyValue) * 5; // 입찰가 대비 5% 손실
+            // 2. 최저입찰가 대비 페널티 (최저가에 가까울수록 페널티 증가)
+            const minimumBidRatio = bidPrice / minimumBid;
+            let minimumBidPenalty = 0;
+            if (minimumBidRatio < 1.2) {
+                minimumBidPenalty = (1.2 - minimumBidRatio) * 50; // 최저가 근처는 큰 페널티
+            }
             
-            // 3. 기회비용 (다른 투자 기회 고려)
-            const opportunityCost = winProb * 0.02; // 2% 기회비용
+            // 3. 감정가 대비 보너스 (감정가에 가까울수록 보너스)
+            const appraisalRatio = bidPrice / appraisalPrice;
+            let appraisalBonus = 0;
+            if (appraisalRatio >= 0.9 && appraisalRatio <= 1.1) {
+                appraisalBonus = 20; // 감정가 근처는 보너스
+            }
             
-            // 4. 최종 기대값
-            const expectedValue = basicExpectedValue - failurePenalty - opportunityCost;
+            // 4. 실패시 페널티 (입찰가의 일정 비율 손실)
+            const failurePenalty = (1 - winProb) * (bidPrice / propertyValue) * 3; // 5% → 3%로 감소
+            
+            // 5. 기회비용 (다른 투자 기회 고려)
+            const opportunityCost = winProb * 0.01; // 2% → 1%로 감소
+            
+            // 6. 최종 기대값
+            const expectedValue = basicExpectedValue - minimumBidPenalty + appraisalBonus - failurePenalty - opportunityCost;
             
             if (expectedValue > bestExpectedValue) {
                 bestExpectedValue = expectedValue;
