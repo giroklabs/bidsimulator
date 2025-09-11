@@ -1,0 +1,1044 @@
+{
+  "서울": {
+    "region": "서울",
+    "districts": {
+      "강남구": {
+        "auctions": 710,
+        "sales": 213,
+        "appraisal_value": 436003537946,
+        "sale_value": 370528980714,
+        "sale_rate": 30.0,
+        "sale_price_rate": 85.0,
+        "avg_appraisal_per_case": 614089490.0647887,
+        "avg_sale_per_case": 1739572679.4084506
+      },
+      "강동구": {
+        "auctions": 744,
+        "sales": 225,
+        "appraisal_value": 129833190570,
+        "sale_value": 116235122769,
+        "sale_rate": 30.2,
+        "sale_price_rate": 89.5,
+        "avg_appraisal_per_case": 174506976.57258064,
+        "avg_sale_per_case": 516600545.64
+      },
+      "강북구": {
+        "auctions": 1121,
+        "sales": 219,
+        "appraisal_value": 106350465815,
+        "sale_value": 85331201273,
+        "sale_rate": 19.5,
+        "sale_price_rate": 80.2,
+        "avg_appraisal_per_case": 94871066.73951828,
+        "avg_sale_per_case": 389640188.46118724
+      },
+      "강서구": {
+        "auctions": 5824,
+        "sales": 1609,
+        "appraisal_value": 508599667100,
+        "sale_value": 393458480609,
+        "sale_rate": 27.6,
+        "sale_price_rate": 77.4,
+        "avg_appraisal_per_case": 87328239.54326923,
+        "avg_sale_per_case": 244536035.18272218
+      },
+      "관악구": {
+        "auctions": 2375,
+        "sales": 452,
+        "appraisal_value": 301934085470,
+        "sale_value": 229104850359,
+        "sale_rate": 19.0,
+        "sale_price_rate": 75.9,
+        "avg_appraisal_per_case": 127130141.25052631,
+        "avg_sale_per_case": 506869137.9623894
+      },
+      "광진구": {
+        "auctions": 588,
+        "sales": 147,
+        "appraisal_value": 102099668660,
+        "sale_value": 86485859770,
+        "sale_rate": 25.0,
+        "sale_price_rate": 84.7,
+        "avg_appraisal_per_case": 173638892.27891156,
+        "avg_sale_per_case": 588339182.1088436
+      },
+      "구로구": {
+        "auctions": 2029,
+        "sales": 563,
+        "appraisal_value": 190030457133,
+        "sale_value": 150635070590,
+        "sale_rate": 27.7,
+        "sale_price_rate": 79.3,
+        "avg_appraisal_per_case": 93657199.17841302,
+        "avg_sale_per_case": 267557851.8472469
+      },
+      "금천구": {
+        "auctions": 1741,
+        "sales": 498,
+        "appraisal_value": 161650867190,
+        "sale_value": 131212963393,
+        "sale_rate": 28.6,
+        "sale_price_rate": 81.2,
+        "avg_appraisal_per_case": 92849435.49109708,
+        "avg_sale_per_case": 263479846.17068273
+      },
+      "노원구": {
+        "auctions": 545,
+        "sales": 208,
+        "appraisal_value": 117777948590,
+        "sale_value": 101779394768,
+        "sale_rate": 38.2,
+        "sale_price_rate": 86.4,
+        "avg_appraisal_per_case": 216106327.6880734,
+        "avg_sale_per_case": 489324013.3076923
+      },
+      "도봉구": {
+        "auctions": 974,
+        "sales": 238,
+        "appraisal_value": 106502029209,
+        "sale_value": 82798684051,
+        "sale_rate": 24.4,
+        "sale_price_rate": 77.7,
+        "avg_appraisal_per_case": 109344999.18788502,
+        "avg_sale_per_case": 347893630.46638656
+      },
+      "동대문구": {
+        "auctions": 863,
+        "sales": 177,
+        "appraisal_value": 105819196440,
+        "sale_value": 89564871444,
+        "sale_rate": 20.5,
+        "sale_price_rate": 84.6,
+        "avg_appraisal_per_case": 122617840.60254924,
+        "avg_sale_per_case": 506016222.84745765
+      },
+      "동작구": {
+        "auctions": 1012,
+        "sales": 293,
+        "appraisal_value": 176311980293,
+        "sale_value": 147545887303,
+        "sale_rate": 29.0,
+        "sale_price_rate": 83.7,
+        "avg_appraisal_per_case": 174221324.40019763,
+        "avg_sale_per_case": 503569581.2389079
+      },
+      "마포구": {
+        "auctions": 573,
+        "sales": 156,
+        "appraisal_value": 117774398078,
+        "sale_value": 102380948265,
+        "sale_rate": 27.2,
+        "sale_price_rate": 86.9,
+        "avg_appraisal_per_case": 205539961.7417103,
+        "avg_sale_per_case": 656288129.9038461
+      },
+      "서대문구": {
+        "auctions": 665,
+        "sales": 178,
+        "appraisal_value": 126266499240,
+        "sale_value": 108825140568,
+        "sale_rate": 26.8,
+        "sale_price_rate": 86.2,
+        "avg_appraisal_per_case": 189874434.9473684,
+        "avg_sale_per_case": 611377194.2022471
+      },
+      "서초구": {
+        "auctions": 821,
+        "sales": 176,
+        "appraisal_value": 362305329438,
+        "sale_value": 336427024604,
+        "sale_rate": 21.4,
+        "sale_price_rate": 92.9,
+        "avg_appraisal_per_case": 441297599.80267966,
+        "avg_sale_per_case": 1911517185.25
+      },
+      "성동구": {
+        "auctions": 239,
+        "sales": 77,
+        "appraisal_value": 283434037480,
+        "sale_value": 276135709538,
+        "sale_rate": 32.2,
+        "sale_price_rate": 97.4,
+        "avg_appraisal_per_case": 1185916474.8117154,
+        "avg_sale_per_case": 3586178045.948052
+      },
+      "성북구": {
+        "auctions": 1325,
+        "sales": 290,
+        "appraisal_value": 177149037865,
+        "sale_value": 142166542757,
+        "sale_rate": 21.9,
+        "sale_price_rate": 80.3,
+        "avg_appraisal_per_case": 133697387.06792453,
+        "avg_sale_per_case": 490229457.7827586
+      },
+      "송파구": {
+        "auctions": 1028,
+        "sales": 249,
+        "appraisal_value": 238123532230,
+        "sale_value": 206749048554,
+        "sale_rate": 24.2,
+        "sale_price_rate": 86.8,
+        "avg_appraisal_per_case": 231637677.26653695,
+        "avg_sale_per_case": 830317464.0722891
+      },
+      "양천구": {
+        "auctions": 1526,
+        "sales": 505,
+        "appraisal_value": 199451076018,
+        "sale_value": 176299102051,
+        "sale_rate": 33.1,
+        "sale_price_rate": 88.4,
+        "avg_appraisal_per_case": 130701884.67758846,
+        "avg_sale_per_case": 349107132.7742574
+      },
+      "영등포구": {
+        "auctions": 968,
+        "sales": 262,
+        "appraisal_value": 111884173240,
+        "sale_value": 95033980578,
+        "sale_rate": 27.1,
+        "sale_price_rate": 84.9,
+        "avg_appraisal_per_case": 115582823.59504132,
+        "avg_sale_per_case": 362725116.7099237
+      },
+      "용산구": {
+        "auctions": 187,
+        "sales": 68,
+        "appraisal_value": 115313659810,
+        "sale_value": 98817811026,
+        "sale_rate": 36.4,
+        "sale_price_rate": 85.7,
+        "avg_appraisal_per_case": 616650587.2192514,
+        "avg_sale_per_case": 1453203103.3235295
+      },
+      "은평구": {
+        "auctions": 1695,
+        "sales": 349,
+        "appraisal_value": 134098997535,
+        "sale_value": 99843018463,
+        "sale_rate": 20.6,
+        "sale_price_rate": 74.5,
+        "avg_appraisal_per_case": 79114452.82300885,
+        "avg_sale_per_case": 286083147.4584527
+      },
+      "종로구": {
+        "auctions": 423,
+        "sales": 93,
+        "appraisal_value": 99601870990,
+        "sale_value": 65351927099,
+        "sale_rate": 22.0,
+        "sale_price_rate": 65.6,
+        "avg_appraisal_per_case": 235465416.05200946,
+        "avg_sale_per_case": 702708893.5376344
+      },
+      "중구": {
+        "auctions": 719,
+        "sales": 111,
+        "appraisal_value": 50882463090,
+        "sale_value": 37118495785,
+        "sale_rate": 15.4,
+        "sale_price_rate": 72.9,
+        "avg_appraisal_per_case": 70768377.03755216,
+        "avg_sale_per_case": 334400862.9279279
+      },
+      "중랑구": {
+        "auctions": 1239,
+        "sales": 253,
+        "appraisal_value": 127005896585,
+        "sale_value": 96733642168,
+        "sale_rate": 20.4,
+        "sale_price_rate": 76.2,
+        "avg_appraisal_per_case": 102506776.90476191,
+        "avg_sale_per_case": 382346411.7312253
+      },
+      "전체": {
+        "auctions": 29934,
+        "sales": 7609,
+        "appraisal_value": 4586204066015,
+        "sale_value": 3826563758499,
+        "sale_rate": 25.4,
+        "sale_price_rate": 83.4,
+        "avg_appraisal_per_case": 153210532.03764948,
+        "avg_sale_per_case": 502899692.2721777
+      }
+    },
+    "summary": {
+      "total_auctions": 59868,
+      "total_sales": 15218,
+      "total_appraisal_value": 9172408132030,
+      "total_sale_value": 7653127516998,
+      "overall_sale_rate": 25.419255695864234,
+      "overall_sale_price_rate": 83.43640412459756
+    }
+  },
+  "경기": {
+    "region": "경기",
+    "districts": {
+      "가평군": {
+        "auctions": 789,
+        "sales": 139,
+        "appraisal_value": 51152688695,
+        "sale_value": 20079902489,
+        "sale_rate": 17.6,
+        "sale_price_rate": 39.3,
+        "avg_appraisal_per_case": 64832305.06337135,
+        "avg_sale_per_case": 144459730.13669065
+      },
+      "고양시 덕양구": {
+        "auctions": 1314,
+        "sales": 317,
+        "appraisal_value": 169915002270,
+        "sale_value": 109697104226,
+        "sale_rate": 24.1,
+        "sale_price_rate": 64.6,
+        "avg_appraisal_per_case": 129311265.0456621,
+        "avg_sale_per_case": 346047647.4006309
+      },
+      "고양시 일산동구": {
+        "auctions": 1076,
+        "sales": 315,
+        "appraisal_value": 139731090740,
+        "sale_value": 104620438154,
+        "sale_rate": 29.3,
+        "sale_price_rate": 74.9,
+        "avg_appraisal_per_case": 129861608.49442379,
+        "avg_sale_per_case": 332128375.0920635
+      },
+      "고양시 일산서구": {
+        "auctions": 1026,
+        "sales": 309,
+        "appraisal_value": 152692986020,
+        "sale_value": 114089479251,
+        "sale_rate": 30.1,
+        "sale_price_rate": 74.7,
+        "avg_appraisal_per_case": 148823573.11890838,
+        "avg_sale_per_case": 369221615.69902915
+      },
+      "과천시": {
+        "auctions": 87,
+        "sales": 36,
+        "appraisal_value": 23688334100,
+        "sale_value": 17256702040,
+        "sale_rate": 41.4,
+        "sale_price_rate": 72.8,
+        "avg_appraisal_per_case": 272279702.2988506,
+        "avg_sale_per_case": 479352834.4444444
+      },
+      "광명시": {
+        "auctions": 372,
+        "sales": 122,
+        "appraisal_value": 77549791110,
+        "sale_value": 64554092994,
+        "sale_rate": 32.8,
+        "sale_price_rate": 83.2,
+        "avg_appraisal_per_case": 208467180.4032258,
+        "avg_sale_per_case": 529131909.78688526
+      },
+      "광주시": {
+        "auctions": 2005,
+        "sales": 512,
+        "appraisal_value": 192873196797,
+        "sale_value": 124785287918,
+        "sale_rate": 25.5,
+        "sale_price_rate": 64.7,
+        "avg_appraisal_per_case": 96196108.12817955,
+        "avg_sale_per_case": 243721265.46484375
+      },
+      "구리시": {
+        "auctions": 326,
+        "sales": 85,
+        "appraisal_value": 44206502000,
+        "sale_value": 36429175480,
+        "sale_rate": 26.1,
+        "sale_price_rate": 82.4,
+        "avg_appraisal_per_case": 135602766.87116563,
+        "avg_sale_per_case": 428578535.0588235
+      },
+      "군포시": {
+        "auctions": 498,
+        "sales": 131,
+        "appraisal_value": 51092399880,
+        "sale_value": 40427135602,
+        "sale_rate": 26.3,
+        "sale_price_rate": 79.1,
+        "avg_appraisal_per_case": 102595180.48192771,
+        "avg_sale_per_case": 308604088.5648855
+      },
+      "김포시": {
+        "auctions": 2048,
+        "sales": 532,
+        "appraisal_value": 224225683878,
+        "sale_value": 155242810143,
+        "sale_rate": 26.0,
+        "sale_price_rate": 69.2,
+        "avg_appraisal_per_case": 109485197.20605469,
+        "avg_sale_per_case": 291809793.5018797
+      },
+      "남양주시": {
+        "auctions": 1606,
+        "sales": 536,
+        "appraisal_value": 308733157541,
+        "sale_value": 232495115759,
+        "sale_rate": 33.4,
+        "sale_price_rate": 75.3,
+        "avg_appraisal_per_case": 192237333.4626401,
+        "avg_sale_per_case": 433759544.32649255
+      },
+      "동두천시": {
+        "auctions": 623,
+        "sales": 148,
+        "appraisal_value": 33941952635,
+        "sale_value": 17545147807,
+        "sale_rate": 23.8,
+        "sale_price_rate": 51.7,
+        "avg_appraisal_per_case": 54481464.90369181,
+        "avg_sale_per_case": 118548295.99324325
+      },
+      "부천시 소사구": {
+        "auctions": 688,
+        "sales": 197,
+        "appraisal_value": 60952947850,
+        "sale_value": 47054242894,
+        "sale_rate": 28.6,
+        "sale_price_rate": 77.2,
+        "avg_appraisal_per_case": 88594400.94476745,
+        "avg_sale_per_case": 238854024.8426396
+      },
+      "부천시 오정구": {
+        "auctions": 490,
+        "sales": 141,
+        "appraisal_value": 33000045000,
+        "sale_value": 25792710439,
+        "sale_rate": 28.8,
+        "sale_price_rate": 78.2,
+        "avg_appraisal_per_case": 67347030.6122449,
+        "avg_sale_per_case": 182927024.39007092
+      },
+      "부천시 원미구": {
+        "auctions": 936,
+        "sales": 284,
+        "appraisal_value": 77681877920,
+        "sale_value": 62411049492,
+        "sale_rate": 30.3,
+        "sale_price_rate": 80.3,
+        "avg_appraisal_per_case": 82993459.31623931,
+        "avg_sale_per_case": 219757216.52112675
+      },
+      "성남시 분당구": {
+        "auctions": 332,
+        "sales": 109,
+        "appraisal_value": 146687549860,
+        "sale_value": 116997955308,
+        "sale_rate": 32.8,
+        "sale_price_rate": 79.8,
+        "avg_appraisal_per_case": 441829969.4578313,
+        "avg_sale_per_case": 1073375736.7706422
+      },
+      "성남시 수정구": {
+        "auctions": 210,
+        "sales": 62,
+        "appraisal_value": 55006855380,
+        "sale_value": 36536839067,
+        "sale_rate": 29.5,
+        "sale_price_rate": 66.4,
+        "avg_appraisal_per_case": 261937406.57142857,
+        "avg_sale_per_case": 589303855.9193548
+      },
+      "성남시 중원구": {
+        "auctions": 292,
+        "sales": 73,
+        "appraisal_value": 38074233910,
+        "sale_value": 25491508365,
+        "sale_rate": 25.0,
+        "sale_price_rate": 67.0,
+        "avg_appraisal_per_case": 130391212.02054794,
+        "avg_sale_per_case": 349198744.72602737
+      },
+      "수원시 권선구": {
+        "auctions": 1369,
+        "sales": 431,
+        "appraisal_value": 150590958126,
+        "sale_value": 115658496554,
+        "sale_rate": 31.5,
+        "sale_price_rate": 76.8,
+        "avg_appraisal_per_case": 110000699.87289992,
+        "avg_sale_per_case": 268349179.93967518
+      },
+      "수원시 영통구": {
+        "auctions": 273,
+        "sales": 104,
+        "appraisal_value": 65227638820,
+        "sale_value": 57173857111,
+        "sale_rate": 38.1,
+        "sale_price_rate": 87.7,
+        "avg_appraisal_per_case": 238929079.92673993,
+        "avg_sale_per_case": 549748626.0673077
+      },
+      "수원시 장안구": {
+        "auctions": 380,
+        "sales": 118,
+        "appraisal_value": 46040382875,
+        "sale_value": 36446835732,
+        "sale_rate": 31.1,
+        "sale_price_rate": 79.2,
+        "avg_appraisal_per_case": 121158902.30263157,
+        "avg_sale_per_case": 308871489.2542373
+      },
+      "수원시 팔달구": {
+        "auctions": 657,
+        "sales": 157,
+        "appraisal_value": 65926024900,
+        "sale_value": 48175260564,
+        "sale_rate": 23.9,
+        "sale_price_rate": 73.1,
+        "avg_appraisal_per_case": 100344025.72298326,
+        "avg_sale_per_case": 306848793.4012739
+      },
+      "시흥시": {
+        "auctions": 2343,
+        "sales": 543,
+        "appraisal_value": 278632205010,
+        "sale_value": 186160854131,
+        "sale_rate": 23.2,
+        "sale_price_rate": 66.8,
+        "avg_appraisal_per_case": 118921128.89884762,
+        "avg_sale_per_case": 342837668.7495396
+      },
+      "안산시 단원구": {
+        "auctions": 1020,
+        "sales": 252,
+        "appraisal_value": 85441471190,
+        "sale_value": 58529475341,
+        "sale_rate": 24.7,
+        "sale_price_rate": 68.5,
+        "avg_appraisal_per_case": 83766148.2254902,
+        "avg_sale_per_case": 232259822.78174603
+      },
+      "안산시 상록구": {
+        "auctions": 1167,
+        "sales": 319,
+        "appraisal_value": 71015274080,
+        "sale_value": 51687827416,
+        "sale_rate": 27.3,
+        "sale_price_rate": 72.8,
+        "avg_appraisal_per_case": 60852848.39760069,
+        "avg_sale_per_case": 162030806.94670847
+      },
+      "안성시": {
+        "auctions": 784,
+        "sales": 283,
+        "appraisal_value": 91728192720,
+        "sale_value": 57387479309,
+        "sale_rate": 36.1,
+        "sale_price_rate": 62.6,
+        "avg_appraisal_per_case": 117000245.81632653,
+        "avg_sale_per_case": 202782612.39929327
+      },
+      "안양시 동안구": {
+        "auctions": 427,
+        "sales": 133,
+        "appraisal_value": 70769287480,
+        "sale_value": 56550974367,
+        "sale_rate": 31.1,
+        "sale_price_rate": 79.9,
+        "avg_appraisal_per_case": 165736036.2529274,
+        "avg_sale_per_case": 425195295.99248123
+      },
+      "안양시 만안구": {
+        "auctions": 754,
+        "sales": 185,
+        "appraisal_value": 67248179480,
+        "sale_value": 50590690466,
+        "sale_rate": 24.5,
+        "sale_price_rate": 75.2,
+        "avg_appraisal_per_case": 89188566.94960213,
+        "avg_sale_per_case": 273463191.7081081
+      },
+      "양주시": {
+        "auctions": 1412,
+        "sales": 371,
+        "appraisal_value": 180663750533,
+        "sale_value": 102384130970,
+        "sale_rate": 26.3,
+        "sale_price_rate": 56.7,
+        "avg_appraisal_per_case": 127948831.82223795,
+        "avg_sale_per_case": 275968008.0053908
+      },
+      "양평군": {
+        "auctions": 914,
+        "sales": 194,
+        "appraisal_value": 76183134971,
+        "sale_value": 36000950310,
+        "sale_rate": 21.2,
+        "sale_price_rate": 47.3,
+        "avg_appraisal_per_case": 83351351.17177244,
+        "avg_sale_per_case": 185571908.81443298
+      },
+      "여주시": {
+        "auctions": 428,
+        "sales": 104,
+        "appraisal_value": 33693661993,
+        "sale_value": 16497587719,
+        "sale_rate": 24.3,
+        "sale_price_rate": 49.0,
+        "avg_appraisal_per_case": 78723509.32943925,
+        "avg_sale_per_case": 158630651.14423078
+      },
+      "연천군": {
+        "auctions": 294,
+        "sales": 63,
+        "appraisal_value": 15725735659,
+        "sale_value": 10506811449,
+        "sale_rate": 21.4,
+        "sale_price_rate": 66.8,
+        "avg_appraisal_per_case": 53488896.79931973,
+        "avg_sale_per_case": 166774784.9047619
+      },
+      "오산시": {
+        "auctions": 904,
+        "sales": 231,
+        "appraisal_value": 82880451190,
+        "sale_value": 55711591853,
+        "sale_rate": 25.6,
+        "sale_price_rate": 67.2,
+        "avg_appraisal_per_case": 91681915.03318584,
+        "avg_sale_per_case": 241175722.3073593
+      },
+      "용인시 기흥구": {
+        "auctions": 881,
+        "sales": 231,
+        "appraisal_value": 188532762548,
+        "sale_value": 138415131768,
+        "sale_rate": 26.2,
+        "sale_price_rate": 73.4,
+        "avg_appraisal_per_case": 213998595.40068105,
+        "avg_sale_per_case": 599199704.6233766
+      },
+      "용인시 수지구": {
+        "auctions": 464,
+        "sales": 171,
+        "appraisal_value": 128314162710,
+        "sale_value": 103055624063,
+        "sale_rate": 36.9,
+        "sale_price_rate": 80.3,
+        "avg_appraisal_per_case": 276539143.7715517,
+        "avg_sale_per_case": 602664468.2046784
+      },
+      "용인시 처인구": {
+        "auctions": 660,
+        "sales": 205,
+        "appraisal_value": 131066528460,
+        "sale_value": 97083720819,
+        "sale_rate": 31.1,
+        "sale_price_rate": 74.1,
+        "avg_appraisal_per_case": 198585649.1818182,
+        "avg_sale_per_case": 473579125.94634145
+      },
+      "의왕시": {
+        "auctions": 293,
+        "sales": 74,
+        "appraisal_value": 46411644300,
+        "sale_value": 36652440664,
+        "sale_rate": 25.3,
+        "sale_price_rate": 79.0,
+        "avg_appraisal_per_case": 158401516.38225257,
+        "avg_sale_per_case": 495303252.2162162
+      },
+      "의정부시": {
+        "auctions": 1640,
+        "sales": 434,
+        "appraisal_value": 145166627930,
+        "sale_value": 106248377693,
+        "sale_rate": 26.5,
+        "sale_price_rate": 73.2,
+        "avg_appraisal_per_case": 88516236.54268293,
+        "avg_sale_per_case": 244811930.16820276
+      },
+      "이천시": {
+        "auctions": 625,
+        "sales": 130,
+        "appraisal_value": 45745412290,
+        "sale_value": 24335702970,
+        "sale_rate": 20.8,
+        "sale_price_rate": 53.2,
+        "avg_appraisal_per_case": 73192659.664,
+        "avg_sale_per_case": 187197715.15384614
+      },
+      "파주시": {
+        "auctions": 1142,
+        "sales": 321,
+        "appraisal_value": 155099165442,
+        "sale_value": 106177773290,
+        "sale_rate": 28.1,
+        "sale_price_rate": 68.5,
+        "avg_appraisal_per_case": 135813629.98423818,
+        "avg_sale_per_case": 330771879.4080997
+      },
+      "평택시": {
+        "auctions": 3304,
+        "sales": 645,
+        "appraisal_value": 301887749880,
+        "sale_value": 176475477788,
+        "sale_rate": 19.5,
+        "sale_price_rate": 58.5,
+        "avg_appraisal_per_case": 91370384.34624697,
+        "avg_sale_per_case": 273605391.91937983
+      },
+      "포천시": {
+        "auctions": 779,
+        "sales": 188,
+        "appraisal_value": 58825048881,
+        "sale_value": 32117847362,
+        "sale_rate": 24.1,
+        "sale_price_rate": 54.6,
+        "avg_appraisal_per_case": 75513541.5673941,
+        "avg_sale_per_case": 170839613.6276596
+      },
+      "하남시": {
+        "auctions": 1115,
+        "sales": 269,
+        "appraisal_value": 222873724950,
+        "sale_value": 134001011932,
+        "sale_rate": 24.1,
+        "sale_price_rate": 60.1,
+        "avg_appraisal_per_case": 199886748.83408073,
+        "avg_sale_per_case": 498145025.7695167
+      },
+      "화성시": {
+        "auctions": 3029,
+        "sales": 738,
+        "appraisal_value": 381562415519,
+        "sale_value": 262856882780,
+        "sale_rate": 24.4,
+        "sale_price_rate": 68.9,
+        "avg_appraisal_per_case": 125969764.11984153,
+        "avg_sale_per_case": 356174637.9132791
+      },
+      "전체": {
+        "auctions": 43847,
+        "sales": 11361,
+        "appraisal_value": 5222487863384,
+        "sale_value": 3586619284185,
+        "sale_rate": 25.9,
+        "sale_price_rate": 68.7,
+        "avg_appraisal_per_case": 119107073.76522909,
+        "avg_sale_per_case": 315695738.41959333
+      }
+    },
+    "summary": {
+      "total_auctions": 87694,
+      "total_sales": 22722,
+      "total_appraisal_value": 10444975726768,
+      "total_sale_value": 7173238568370,
+      "overall_sale_rate": 25.910552603370814,
+      "overall_sale_price_rate": 68.67645034336162
+    }
+  },
+  "부산": {
+    "region": "부산",
+    "districts": {
+      "강서구": {
+        "auctions": 875,
+        "sales": 203,
+        "appraisal_value": 111048615710,
+        "sale_value": 63092042586,
+        "sale_rate": 23.2,
+        "sale_price_rate": 56.8,
+        "avg_appraisal_per_case": 126912703.66857143,
+        "avg_sale_per_case": 310798239.3399015
+      },
+      "금정구": {
+        "auctions": 821,
+        "sales": 208,
+        "appraisal_value": 69428398220,
+        "sale_value": 46326381725,
+        "sale_rate": 25.3,
+        "sale_price_rate": 66.7,
+        "avg_appraisal_per_case": 84565649.47624847,
+        "avg_sale_per_case": 222722989.0625
+      },
+      "기장군": {
+        "auctions": 1543,
+        "sales": 247,
+        "appraisal_value": 129097812290,
+        "sale_value": 76738845818,
+        "sale_rate": 16.0,
+        "sale_price_rate": 59.4,
+        "avg_appraisal_per_case": 83666761.04342191,
+        "avg_sale_per_case": 310683586.3076923
+      },
+      "남구": {
+        "auctions": 1209,
+        "sales": 341,
+        "appraisal_value": 119100848110,
+        "sale_value": 83624367631,
+        "sale_rate": 28.2,
+        "sale_price_rate": 70.2,
+        "avg_appraisal_per_case": 98511867.75020678,
+        "avg_sale_per_case": 245232749.6510264
+      },
+      "동구": {
+        "auctions": 584,
+        "sales": 179,
+        "appraisal_value": 37539657220,
+        "sale_value": 20995679724,
+        "sale_rate": 30.7,
+        "sale_price_rate": 55.9,
+        "avg_appraisal_per_case": 64280234.96575342,
+        "avg_sale_per_case": 117294300.13407822
+      },
+      "동래구": {
+        "auctions": 1029,
+        "sales": 211,
+        "appraisal_value": 77380113900,
+        "sale_value": 58057091463,
+        "sale_rate": 20.5,
+        "sale_price_rate": 75.0,
+        "avg_appraisal_per_case": 75199333.2361516,
+        "avg_sale_per_case": 275152092.24170613
+      },
+      "부산진구": {
+        "auctions": 2134,
+        "sales": 547,
+        "appraisal_value": 122114313150,
+        "sale_value": 79472836481,
+        "sale_rate": 25.6,
+        "sale_price_rate": 65.1,
+        "avg_appraisal_per_case": 57223202.03842549,
+        "avg_sale_per_case": 145288549.32541132
+      },
+      "북구": {
+        "auctions": 743,
+        "sales": 197,
+        "appraisal_value": 47827918400,
+        "sale_value": 33920794984,
+        "sale_rate": 26.5,
+        "sale_price_rate": 70.9,
+        "avg_appraisal_per_case": 64371357.20053836,
+        "avg_sale_per_case": 172186776.5685279
+      },
+      "사상구": {
+        "auctions": 998,
+        "sales": 191,
+        "appraisal_value": 61380551370,
+        "sale_value": 38848797985,
+        "sale_rate": 19.1,
+        "sale_price_rate": 63.3,
+        "avg_appraisal_per_case": 61503558.48697395,
+        "avg_sale_per_case": 203396848.08900523
+      },
+      "사하구": {
+        "auctions": 1160,
+        "sales": 209,
+        "appraisal_value": 51474897438,
+        "sale_value": 29903739396,
+        "sale_rate": 18.0,
+        "sale_price_rate": 58.1,
+        "avg_appraisal_per_case": 44374911.58448276,
+        "avg_sale_per_case": 143080092.80382776
+      },
+      "서구": {
+        "auctions": 338,
+        "sales": 85,
+        "appraisal_value": 25986226710,
+        "sale_value": 18909508065,
+        "sale_rate": 25.1,
+        "sale_price_rate": 72.8,
+        "avg_appraisal_per_case": 76882327.5443787,
+        "avg_sale_per_case": 222464800.7647059
+      },
+      "수영구": {
+        "auctions": 881,
+        "sales": 216,
+        "appraisal_value": 90707984080,
+        "sale_value": 63893206885,
+        "sale_rate": 24.5,
+        "sale_price_rate": 70.4,
+        "avg_appraisal_per_case": 102960254.34733258,
+        "avg_sale_per_case": 295801883.7268519
+      },
+      "연제구": {
+        "auctions": 1141,
+        "sales": 198,
+        "appraisal_value": 56794505490,
+        "sale_value": 37276180636,
+        "sale_rate": 17.4,
+        "sale_price_rate": 65.6,
+        "avg_appraisal_per_case": 49776078.4312007,
+        "avg_sale_per_case": 188263538.56565657
+      },
+      "영도구": {
+        "auctions": 466,
+        "sales": 113,
+        "appraisal_value": 26068903545,
+        "sale_value": 14464690887,
+        "sale_rate": 24.2,
+        "sale_price_rate": 55.5,
+        "avg_appraisal_per_case": 55941853.10085837,
+        "avg_sale_per_case": 128006114.04424779
+      },
+      "중구": {
+        "auctions": 207,
+        "sales": 39,
+        "appraisal_value": 32604112449,
+        "sale_value": 17089765541,
+        "sale_rate": 18.8,
+        "sale_price_rate": 52.4,
+        "avg_appraisal_per_case": 157507789.60869566,
+        "avg_sale_per_case": 438199116.4358974
+      },
+      "해운대구": {
+        "auctions": 1291,
+        "sales": 365,
+        "appraisal_value": 212522238280,
+        "sale_value": 162031289951,
+        "sale_rate": 28.3,
+        "sale_price_rate": 76.2,
+        "avg_appraisal_per_case": 164618310.05422154,
+        "avg_sale_per_case": 443921342.33150685
+      },
+      "전체": {
+        "auctions": 15420,
+        "sales": 3549,
+        "appraisal_value": 1271077096362,
+        "sale_value": 844645219758,
+        "sale_rate": 23.0,
+        "sale_price_rate": 66.5,
+        "avg_appraisal_per_case": 82430421.29455253,
+        "avg_sale_per_case": 237995271.83939138
+      }
+    },
+    "summary": {
+      "total_auctions": 30840,
+      "total_sales": 7098,
+      "total_appraisal_value": 2542154192724,
+      "total_sale_value": 1689290439516,
+      "overall_sale_rate": 23.01556420233463,
+      "overall_sale_price_rate": 66.45113991712167
+    }
+  },
+  "인천": {
+    "region": "인천",
+    "districts": {
+      "강화군": {
+        "auctions": 508,
+        "sales": 97,
+        "appraisal_value": 30257998887,
+        "sale_value": 14697331794,
+        "sale_rate": 19.1,
+        "sale_price_rate": 48.6,
+        "avg_appraisal_per_case": 59562989.93503937,
+        "avg_sale_per_case": 151518884.4742268
+      },
+      "계양구": {
+        "auctions": 1097,
+        "sales": 352,
+        "appraisal_value": 70268739000,
+        "sale_value": 51020936755,
+        "sale_rate": 32.1,
+        "sale_price_rate": 72.6,
+        "avg_appraisal_per_case": 64055368.27711941,
+        "avg_sale_per_case": 144945843.05397728
+      },
+      "남동구": {
+        "auctions": 2865,
+        "sales": 805,
+        "appraisal_value": 202290169360,
+        "sale_value": 144747474702,
+        "sale_rate": 28.1,
+        "sale_price_rate": 71.6,
+        "avg_appraisal_per_case": 70607388.95636998,
+        "avg_sale_per_case": 179810527.58012423
+      },
+      "동구": {
+        "auctions": 157,
+        "sales": 38,
+        "appraisal_value": 7971705080,
+        "sale_value": 5187115970,
+        "sale_rate": 24.2,
+        "sale_price_rate": 65.1,
+        "avg_appraisal_per_case": 50775191.59235669,
+        "avg_sale_per_case": 136503051.84210527
+      },
+      "미추홀구": {
+        "auctions": 6070,
+        "sales": 1788,
+        "appraisal_value": 383603113450,
+        "sale_value": 236123467453,
+        "sale_rate": 29.5,
+        "sale_price_rate": 61.6,
+        "avg_appraisal_per_case": 63196559.05271829,
+        "avg_sale_per_case": 132060104.83948545
+      },
+      "부평구": {
+        "auctions": 2758,
+        "sales": 855,
+        "appraisal_value": 210598606080,
+        "sale_value": 152036159570,
+        "sale_rate": 31.0,
+        "sale_price_rate": 72.2,
+        "avg_appraisal_per_case": 76359175.51849166,
+        "avg_sale_per_case": 177820069.67251462
+      },
+      "서구": {
+        "auctions": 3325,
+        "sales": 979,
+        "appraisal_value": 276154811520,
+        "sale_value": 196009716502,
+        "sale_rate": 29.4,
+        "sale_price_rate": 71.0,
+        "avg_appraisal_per_case": 83054078.65263158,
+        "avg_sale_per_case": 200214215.01736465
+      },
+      "연수구": {
+        "auctions": 389,
+        "sales": 124,
+        "appraisal_value": 41968986000,
+        "sale_value": 32006215014,
+        "sale_rate": 31.9,
+        "sale_price_rate": 76.3,
+        "avg_appraisal_per_case": 107889424.16452442,
+        "avg_sale_per_case": 258114637.20967743
+      },
+      "옹진군": {
+        "auctions": 343,
+        "sales": 70,
+        "appraisal_value": 14121613785,
+        "sale_value": 5877710810,
+        "sale_rate": 20.4,
+        "sale_price_rate": 41.6,
+        "avg_appraisal_per_case": 41170885.67055394,
+        "avg_sale_per_case": 83967297.28571428
+      },
+      "중구": {
+        "auctions": 960,
+        "sales": 230,
+        "appraisal_value": 78749043391,
+        "sale_value": 50477346555,
+        "sale_rate": 24.0,
+        "sale_price_rate": 64.1,
+        "avg_appraisal_per_case": 82030253.53229167,
+        "avg_sale_per_case": 219466724.1521739
+      },
+      "전체": {
+        "auctions": 18886,
+        "sales": 5489,
+        "appraisal_value": 1420410786553,
+        "sale_value": 974082601079,
+        "sale_rate": 29.1,
+        "sale_price_rate": 68.6,
+        "avg_appraisal_per_case": 75209720.77480674,
+        "avg_sale_per_case": 177460849.16724357
+      }
+    },
+    "summary": {
+      "total_auctions": 37772,
+      "total_sales": 10978,
+      "total_appraisal_value": 2840821573106,
+      "total_sale_value": 1948165202158,
+      "overall_sale_rate": 29.063856825161494,
+      "overall_sale_price_rate": 68.57752773356977
+    }
+  }
+}

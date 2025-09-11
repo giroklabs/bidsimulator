@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전 지역 매각가율 검증</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .region-title { font-weight: bold; color: #333; margin-bottom: 10px; }
+        .district-test { margin: 5px 0; padding: 5px; background: #f5f5f5; border-radius: 3px; }
+        .result { margin-left: 10px; font-weight: bold; }
+        .success { color: green; }
+        .error { color: red; }
+        .loading { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>전 지역 매각가율 검증 테스트</h1>
+    <button onclick="runAllTests()">전체 테스트 실행</button>
+    <div id="results"></div>
+
+    <script>
+        const testRegions = {
+            '서울': ['강남구', '마포구', '강동구', '서초구', '송파구', '영등포구', '용산구', '종로구', '중구', '중랑구'],
+            '경기': ['수원시 영통구', '부천시 원미구', '부천시 오정구', '성남시 분당구', '고양시 일산동구', '용인시 기흥구', '안양시 동안구', '의정부시'],
+            '부산': ['해운대구', '부산진구', '동래구', '남구', '북구', '사하구', '금정구'],
+            '인천': ['연수구', '서구', '남동구', '부평구', '계양구', '중구']
+        };
+
+        async function testDistrict(region, district) {
+            try {
+                const response = await fetch('http://localhost:5001/api/statistics/district', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ region, district })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    return {
+                        success: true,
+                        sale_price_rate: data.data.sale_price_rate,
+                        sale_rate: data.data.sale_rate
+                    };
+                } else {
+                    return { success: false, error: data.error };
+                }
+            } catch (error) {
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function runAllTests() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>테스트 진행 중...</h2>';
+            
+            let allResults = {};
+            
+            for (const [region, districts] of Object.entries(testRegions)) {
+                allResults[region] = {};
+                
+                const regionDiv = document.createElement('div');
+                regionDiv.className = 'test-section';
+                regionDiv.innerHTML = `<div class="region-title">${region} 지역 테스트</div>`;
+                resultsDiv.appendChild(regionDiv);
+                
+                for (const district of districts) {
+                    const districtDiv = document.createElement('div');
+                    districtDiv.className = 'district-test';
+                    districtDiv.innerHTML = `${district}: <span class="loading">테스트 중...</span>`;
+                    regionDiv.appendChild(districtDiv);
+                    
+                    const result = await testDistrict(region, district);
+                    allResults[region][district] = result;
+                    
+                    if (result.success) {
+                        districtDiv.innerHTML = `${district}: <span class="result success">✓ ${result.sale_price_rate}% (매각률: ${result.sale_rate}%)</span>`;
+                    } else {
+                        districtDiv.innerHTML = `${district}: <span class="result error">✗ 오류: ${result.error}</span>`;
+                    }
+                }
+            }
+            
+            // 결과 요약
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'test-section';
+            summaryDiv.innerHTML = '<h2>테스트 결과 요약</h2>';
+            
+            let totalTests = 0;
+            let successTests = 0;
+            
+            for (const [region, districts] of Object.entries(allResults)) {
+                for (const [district, result] of Object.entries(districts)) {
+                    totalTests++;
+                    if (result.success) successTests++;
+                }
+            }
+            
+            summaryDiv.innerHTML += `
+                <p>총 테스트: ${totalTests}개</p>
+                <p>성공: <span class="success">${successTests}개</span></p>
+                <p>실패: <span class="error">${totalTests - successTests}개</span></p>
+                <p>성공률: ${((successTests / totalTests) * 100).toFixed(1)}%</p>
+            `;
+            
+            resultsDiv.appendChild(summaryDiv);
+            
+            // 상세 결과를 콘솔에 출력
+            console.log('전 지역 테스트 결과:', allResults);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>조정계수 간단 테스트</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .test-case { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .step { margin: 5px 0; font-family: monospace; }
+        .result { font-weight: bold; color: #333; }
+        .highlight { background: #ffffcc; padding: 2px 4px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>조정계수 간단 테스트</h1>
+    <button onclick="runSimpleTest()">간단 테스트 실행</button>
+    <div id="results"></div>
+
+    <script>
+        // 시장 조정 함수 (유찰조정, 시세안전성조정만)
+        function applyMarketAdjustments(baseBid, marketPrice, appraisalPrice, minimumBid, competitorCount, marketCondition, urgency, failedCount) {
+            let adjustedBid = baseBid;
+            
+            console.log('조정 전:', {
+                baseBid: baseBid.toLocaleString(),
+                marketPrice: marketPrice.toLocaleString(),
+                marketRatio: (baseBid / marketPrice * 100).toFixed(1) + '%'
+            });
+            
+            // 1. 유찰 횟수 조정 (기하급수적 하향)
+            if (failedCount > 0) {
+                const failureFactor = Math.pow(0.95, failedCount); // 유찰 1회당 5% 하향
+                const maxReduction = 0.7; // 최대 30% 하향 제한
+                const actualFactor = Math.max(failureFactor, maxReduction);
+                adjustedBid *= actualFactor;
+                
+                console.log('유찰조정 적용:', {
+                    failedCount,
+                    failureFactor: failureFactor.toFixed(4),
+                    actualFactor: actualFactor.toFixed(4),
+                    adjustedBid: adjustedBid.toLocaleString()
+                });
+            }
+            
+            // 2. 시세 대비 안전성 조정
+            const marketRatio = adjustedBid / marketPrice;
+            if (marketRatio > 0.9) {
+                // 시세의 90%를 넘으면 추가 하향 조정
+                adjustedBid *= 0.95;
+                console.log('시세안전성조정 적용:', {
+                    marketRatio: (marketRatio * 100).toFixed(1) + '%',
+                    adjustedBid: adjustedBid.toLocaleString()
+                });
+            }
+            
+            console.log('조정 후:', {
+                adjustedBid: adjustedBid.toLocaleString(),
+                marketRatio: (adjustedBid / marketPrice * 100).toFixed(1) + '%',
+                totalAdjustment: (((adjustedBid / baseBid) - 1) * 100).toFixed(2) + '%'
+            });
+            
+            return adjustedBid;
+        }
+
+        function runSimpleTest() {
+            const basePrice = 200000000; // 2억원
+            const marketPrice = 250000000; // 2.5억원 (시세)
+            const appraisalPrice = 240000000; // 2.4억원
+            const minimumBid = 170000000; // 1.7억원
+            
+            const testCases = [
+                { name: '유찰 0회', failedCount: 0 },
+                { name: '유찰 1회', failedCount: 1 },
+                { name: '유찰 2회', failedCount: 2 },
+                { name: '유찰 4회', failedCount: 4 },
+                { name: '유찰 6회 (최대 제한)', failedCount: 6 }
+            ];
+            
+            const results = testCases.map(testCase => {
+                const adjustedBid = applyMarketAdjustments(
+                    basePrice, marketPrice, appraisalPrice, minimumBid,
+                    0, 'normal', 'medium', testCase.failedCount
+                );
+                
+                const totalAdjustment = ((adjustedBid / basePrice - 1) * 100).toFixed(2);
+                const marketRatio = (adjustedBid / marketPrice * 100).toFixed(1);
+                
+                return {
+                    name: testCase.name,
+                    basePrice,
+                    adjustedBid,
+                    totalAdjustment,
+                    marketRatio
+                };
+            });
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = results.map(result => `
+                <div class="test-case">
+                    <h3>${result.name}</h3>
+                    <div class="test-result">
+                        <div class="result">
+                            <div>기준가격: ${result.basePrice.toLocaleString()}원</div>
+                            <div>조정후가격: <span class="highlight">${result.adjustedBid.toLocaleString()}원</span></div>
+                            <div>총 조정률: <span class="highlight">${result.totalAdjustment > 0 ? '+' : ''}${result.totalAdjustment}%</span></div>
+                            <div>시세 대비: <span class="highlight">${result.marketRatio}%</span></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
