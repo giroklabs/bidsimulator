@@ -289,38 +289,30 @@ class AuctionSimulator {
     // 매물 데이터 로드 (로컬 스토리지에서)
     loadProperties() {
         const saved = localStorage.getItem('auctionProperties');
-        const defaultProperties = [
-            // 서울 지역
-            { name: '서울시 강남구', caseNumber: '2024타경1', location: '서울시 강남구', type: '아파트', notes: '서울 강남구 테스트' },
-            { name: '서울시 마포구', caseNumber: '2024타경2', location: '서울시 마포구', type: '아파트', notes: '서울 마포구 테스트' },
-            { name: '서울시 강동구', caseNumber: '2024타경3', location: '서울시 강동구', type: '아파트', notes: '서울 강동구 테스트' },
-            { name: '서울시 서초구', caseNumber: '2024타경4', location: '서울시 서초구', type: '아파트', notes: '서울 서초구 테스트' },
-            { name: '서울시 송파구', caseNumber: '2024타경5', location: '서울시 송파구', type: '아파트', notes: '서울 송파구 테스트' },
-            
-            // 경기 지역
-            { name: '수원시 영통구', caseNumber: '2024타경6', location: '수원시 영통구', type: '아파트', notes: '경기 수원 영통구 테스트' },
-            { name: '부천시 원미구', caseNumber: '2024타경7', location: '부천시 원미구', type: '아파트', notes: '경기 부천 원미구 테스트' },
-            { name: '부천시 오정구', caseNumber: '2024타경8', location: '부천시 오정구', type: '아파트', notes: '경기 부천 오정구 테스트' },
-            { name: '성남시 분당구', caseNumber: '2024타경9', location: '성남시 분당구', type: '아파트', notes: '경기 성남 분당구 테스트' },
-            { name: '고양시 일산동구', caseNumber: '2024타경10', location: '고양시 일산동구', type: '아파트', notes: '경기 고양 일산동구 테스트' },
-            
-            // 부산 지역
-            { name: '부산 해운대구', caseNumber: '2024타경11', location: '부산 해운대구', type: '아파트', notes: '부산 해운대구 테스트' },
-            { name: '부산 부산진구', caseNumber: '2024타경12', location: '부산 부산진구', type: '아파트', notes: '부산 부산진구 테스트' },
-            { name: '부산 동래구', caseNumber: '2024타경13', location: '부산 동래구', type: '아파트', notes: '부산 동래구 테스트' },
-            
-            // 인천 지역
-            { name: '인천 연수구', caseNumber: '2024타경14', location: '인천 연수구', type: '아파트', notes: '인천 연수구 테스트' },
-            { name: '인천 서구', caseNumber: '2024타경15', location: '인천 서구', type: '아파트', notes: '인천 서구 테스트' },
-            { name: '인천 남동구', caseNumber: '2024타경16', location: '인천 남동구', type: '아파트', notes: '인천 남동구 테스트' }
-        ];
         
         if (saved) {
-            const parsed = JSON.parse(saved);
-            // 기존 데이터가 있으면 그대로 사용, 없으면 기본 데이터 사용
-            return parsed.length > 0 ? parsed : defaultProperties;
+            try {
+                const parsed = JSON.parse(saved);
+                // Ensure parsed is an array, otherwise default to empty array
+                if (Array.isArray(parsed)) {
+                    this.properties = parsed;
+                } else {
+                    console.warn('Parsed data is not an array, initializing as empty array');
+                    this.properties = [];
+                    // 잘못된 데이터 제거
+                    localStorage.removeItem('auctionProperties');
+                }
+            } catch (e) {
+                console.error("Error parsing auctionProperties from localStorage:", e);
+                this.properties = []; // Fallback to empty array on parse error
+                // 잘못된 데이터 제거
+                localStorage.removeItem('auctionProperties');
+            }
+        } else {
+            this.properties = []; // If nothing saved, start with empty array
         }
-        return defaultProperties;
+        
+        console.log('Properties loaded:', this.properties);
     }
 
     // 매물 데이터 저장 (로컬 스토리지에)
@@ -333,6 +325,12 @@ class AuctionSimulator {
         const tree = document.getElementById('propertyList');
         if (!tree) return;
 
+        // properties가 배열이 아닌 경우 빈 배열로 초기화
+        if (!Array.isArray(this.properties)) {
+            console.warn('this.properties is not an array, initializing as empty array');
+            this.properties = [];
+        }
+
         // 기존 트리 내용 제거
         tree.innerHTML = '';
 
@@ -340,7 +338,7 @@ class AuctionSimulator {
         if (this.properties.length === 0) {
             const noProperties = document.createElement('div');
             noProperties.className = 'no-properties';
-            noProperties.innerHTML = '<p>저장된 매물이 없습니다</p><p>+ 버튼을 클릭하여 매물을 추가하세요</p>';
+            noProperties.innerHTML = '<p>저장된 매물이 없습니다</p><p>+ 매물 추가 버튼을 클릭하여 매물을 추가하세요</p>';
             tree.appendChild(noProperties);
             return;
         }
@@ -371,6 +369,7 @@ class AuctionSimulator {
             <span class="tree-icon property-type-icon ${property.type || 'default'}">${typeIcon}</span>
             <span class="tree-label">${displayName}</span>
             <div class="property-actions">
+                <button class="save-all-btn" onclick="event.stopPropagation(); auctionSimulator.saveAllDataForProperty(${index})" title="모든 정보 저장">💾</button>
                 <button class="edit-btn" onclick="event.stopPropagation(); auctionSimulator.editProperty(${index})">✏️</button>
                 <button class="delete-btn" onclick="event.stopPropagation(); auctionSimulator.deleteProperty(${index})">🗑️</button>
             </div>
@@ -417,50 +416,129 @@ class AuctionSimulator {
         }
 
         this.selectedProperty = this.properties[index];
-        this.loadPropertyData(this.selectedProperty);
-    }
-
-    // 매물 데이터를 폼에 로드
-    loadPropertyData(property) {
-        console.log('선택된 매물:', property);
         
-        // 경매 데이터가 있다면 메인 폼에 로드
-        if (property.auctionData) {
-            this.populateFormWithAuctionData(property.auctionData);
-            console.log('경매 데이터를 메인 폼에 로드했습니다.');
+        // 1. 먼저 모든 폼을 완전히 초기화
+        this.resetAllForms();
+        
+        // 2. 선택된 매물 정보를 메인 섹션에 표시
+        this.displaySelectedPropertyInfo(this.selectedProperty);
+        
+        // 3. 저장된 데이터가 있으면 불러오기
+        const saveKey = `property_${index}_data`;
+        const savedData = localStorage.getItem(saveKey);
+        if (savedData) {
+            console.log('저장된 데이터 발견, 불러오기 시작');
+            this.loadAllDataForProperty(index);
         } else {
-            // 경매 데이터가 없는 경우 기본 정보만 표시
-            console.log('경매 데이터가 없는 매물:', {
-                caseNumber: property.caseNumber,
-                location: property.location
-            });
+            console.log('저장된 데이터 없음, 빈 폼으로 시작');
         }
         
-        // 매물 정보를 화면에 표시
-        this.displaySelectedProperty(property);
+        console.log('선택된 매물:', this.selectedProperty);
+    }
+
+    // 모든 폼 완전 초기화 (매물 선택 시 사용)
+    resetAllForms() {
+        console.log('모든 폼 초기화 시작');
+        
+        // 1. 경매 정보 폼 초기화
+        const auctionFields = [
+            'caseNumber', 'propertyLocation', 'propertyType', 'court', 'auctionDate',
+            'auctionStatus', 'bidPrice', 'marketPrice', 'appraisalPrice', 'minimumBid',
+            'renovationCost', 'competitorCount', 'marketCondition', 'urgency',
+            'auctionType', 'failedCount'
+        ];
+        
+        auctionFields.forEach(fieldName => {
+            const element = document.getElementById(fieldName);
+            if (element) {
+                element.value = '';
+            }
+        });
+        
+        // 2. 물건조사 폼 초기화
+        const inspectionFields = [
+            'preservationRegistry', 'buildingAge', 'meters', 'mailCheck', 'slope',
+            'lightingDirection', 'structureFloor', 'parking', 'waterLeakage',
+            'unpaidUtilities', 'gasType', 'gasUnpaid', 'residentsCheck',
+            'currentResidents', 'busRoutes', 'subway', 'shopping', 'schools',
+            'molitPrice', 'naverPrice', 'kbPrice', 'fieldPrice', 'specialNotes',
+            'finalScore', 'inspectionDate'
+        ];
+        
+        inspectionFields.forEach(fieldName => {
+            const element = document.getElementById(fieldName);
+            if (element) {
+                element.value = '';
+            }
+        });
+        
+        // 3. 시뮬레이션 결과 숨기기
+        const simulationSection = document.querySelector('.simulation-results-section');
+        if (simulationSection) {
+            simulationSection.style.display = 'none';
+        }
+        
+        // 4. 매각가율 정보 숨기기
+        const saleRateInfo = document.getElementById('saleRateInfo');
+        if (saleRateInfo) {
+            saleRateInfo.style.display = 'none';
+        }
+        
+        console.log('모든 폼 초기화 완료');
+    }
+
+    // 매물 데이터를 폼에 로드 (비활성화됨 - 자동 입력 방지)
+    loadPropertyData(property) {
+        console.log('선택된 매물 (자동 로드 비활성화):', property);
+        
+        // 자동 폼 입력 기능 비활성화
+        // 사용자가 직접 매물 정보를 입력하도록 함
+        console.log('매물 선택됨 - 사용자가 직접 정보를 입력하세요');
+    }
+
+    // 선택된 매물 정보를 메인 섹션에 표시
+    displaySelectedPropertyInfo(property) {
+        console.log('선택된 매물 정보 표시:', property);
+        
+        // 입력 필드 먼저 초기화
+        this.resetMainFormInputs();
+        
+        // 기본 매물 정보를 메인 폼에 표시
+        if (property.caseNumber) {
+            document.getElementById('caseNumber').value = property.caseNumber;
+        }
+        if (property.location) {
+            document.getElementById('propertyLocation').value = property.location;
+        }
+        if (property.type) {
+            document.getElementById('propertyType').value = property.type;
+        }
+        
+        // 저장된 데이터 불러오기 제거 - 매물 선택 시에는 기본 정보만 표시
         
         // 매각가율 정보 로드
-        this.loadSaleRateInfoForMainForm(property.location);
-        
-        // 모든 지역에 대해 강제로 매각가율 정보 표시
         if (property.location) {
-            console.log('매물 위치 감지, 강제로 매각가율 정보 표시:', property.location);
+            this.loadSaleRateInfoForMainForm(property.location);
+            
+            // 지역별 매각가율 정보 표시
             const region = this.extractRegionFromLocation(property.location);
             const district = this.extractDistrictFromLocation(property.location);
             
-            console.log('지역 추출 결과:', { location: property.location, region, district });
-            
             if (region && district) {
-                console.log('지역 정보 추출 성공, 강제 표시 실행');
                 this.forceShowSaleRateInfo(region, district);
-            } else {
-                console.log('지역 정보 추출 실패, 기본 매각가율 정보 로드 시도');
-                this.loadSaleRateInfoForMainForm(property.location);
             }
         }
+        
+        // 매물 정보를 콘솔에 표시
+        console.log('매물 정보:', {
+            사건번호: property.caseNumber,
+            매물명: property.name,
+            유형: property.type,
+            위치: property.location
+        });
     }
 
-    // 선택된 매물 정보 표시
+    // 선택된 매물 정보 표시 (기존 함수 유지)
     displaySelectedProperty(property) {
         // 매물 정보를 표시할 영역이 있다면 여기에 표시
         console.log('매물 정보:', {
@@ -473,30 +551,414 @@ class AuctionSimulator {
 
     // 매물 추가 모달 표시
     showPropertyModal() {
+        console.log('매물 추가 모달 표시 시작');
         const modal = document.getElementById('propertyModal');
         if (modal) {
+            const isEditMode = modal.dataset.editIndex !== undefined;
+            
+            if (!isEditMode) {
+                // 새 매물 추가 모드일 때만 초기화
+                // 편집 모드 초기화
+                delete modal.dataset.editIndex;
+                modal.querySelector('h3').textContent = '매물 추가';
+                console.log('편집 모드 초기화 완료');
+                
+                // 현재 경매 데이터 초기화
+                this.currentAuctionData = null;
+                console.log('경매 데이터 초기화 완료');
+                
+                // 폼 초기화 (reset() 먼저 실행)
+                const form = document.getElementById('propertyForm');
+                if (form) {
+                    form.reset();
+                    console.log('폼 reset() 완료');
+                }
+                
+                // 메인 폼 먼저 초기화
+                this.resetMainForm();
+                
+                // 모달 폼 개별 초기화 (DOM 업데이트 후 실행)
+                setTimeout(() => {
+                    this.resetModalForm();
+                }, 100);
+            } else {
+                console.log('편집 모드 - 폼 초기화 건너뜀');
+            }
+            
+            // 모달 표시
             modal.style.display = 'block';
-            // 폼 초기화
-            document.getElementById('propertyForm').reset();
-            // 현재 경매 데이터 초기화
-            this.currentAuctionData = null;
-            // 모달 폼 초기화
-            this.resetModalForm();
+            console.log('매물 추가 모달 표시 완료');
+        } else {
+            console.error('propertyModal을 찾을 수 없습니다');
         }
     }
 
     resetModalForm() {
+        console.log('모달 폼 초기화 시작');
+        
+        // 사건번호 초기화
+        const caseNumber = document.getElementById('caseNumber');
+        if (caseNumber) {
+            caseNumber.value = '';
+            console.log('사건번호 초기화 완료');
+        }
+        
+        // 매물명 초기화
+        const propertyName = document.getElementById('propertyName');
+        if (propertyName) {
+            propertyName.value = '';
+            console.log('매물명 초기화 완료');
+        }
+        
+        // 상세위치 초기화
+        const modalPropertyLocation = document.getElementById('modalPropertyLocation');
+        if (modalPropertyLocation) {
+            modalPropertyLocation.value = '';
+            console.log('상세위치 초기화 완료');
+        }
+        
+        // 매물유형 초기화
+        const modalPropertyType = document.getElementById('modalPropertyType');
+        if (modalPropertyType) {
+            modalPropertyType.value = '';
+            console.log('매물유형 초기화 완료');
+        }
+        
+        // 메모 초기화
+        const notes = document.getElementById('notes');
+        if (notes) {
+            notes.value = '';
+            console.log('메모 초기화 완료');
+        }
+        
+        // 지역 선택 초기화
+        const regionSelect = document.getElementById('regionSelect');
+        if (regionSelect) {
+            regionSelect.value = '';
+            console.log('지역선택 초기화 완료');
+        }
+        
         // 구/군 선택 초기화
         const districtSelect = document.getElementById('districtSelect');
         if (districtSelect) {
             districtSelect.innerHTML = '<option value="">먼저 지역을 선택하세요</option>';
+            console.log('구/군선택 초기화 완료');
         }
         
         // 매각통계 정보 초기화
         const statisticsInfo = document.getElementById('saleStatisticsInfo');
         if (statisticsInfo) {
             statisticsInfo.innerHTML = '<p>지역을 선택하면 매각통계 정보가 표시됩니다.</p>';
+            console.log('매각통계정보 초기화 완료');
         }
+        
+        console.log('모든 모달 폼 초기화 완료');
+    }
+
+    // 메인 폼 초기화 (매물 추가 시에만 사용)
+    resetMainForm() {
+        console.log('메인 폼 초기화 시작');
+        
+        // 메인 폼의 모든 입력 필드 초기화
+        const mainFormFields = [
+            'caseNumber',
+            'propertyLocation',
+            'propertyType',
+            'court',
+            'auctionDate',
+            'auctionStatus',
+            'bidPrice',
+            'marketPrice',
+            'appraisalPrice',
+            'minimumBid',
+            'renovationCost',
+            'competitorCount',
+            'marketCondition',
+            'urgency',
+            'auctionType',
+            'failedCount'
+        ];
+        
+        mainFormFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.value = '';
+                console.log(`${fieldId} 초기화 완료`);
+            }
+        });
+        
+        // 매각통계 정보 초기화
+        const saleRateInfo = document.getElementById('saleRateInfo');
+        if (saleRateInfo) {
+            saleRateInfo.style.display = 'none';
+        }
+        
+        // 선택된 매물 초기화 (매물 추가 시에만)
+        this.selectedProperty = null;
+        
+        // 이전 선택 해제 (매물 추가 시에만)
+        document.querySelectorAll('.tree-item.selected').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        console.log('메인 폼 초기화 완료');
+    }
+
+    // 메인 폼의 입력 필드만 초기화 (매물 선택 시에는 사용하지 않음)
+    resetMainFormInputs() {
+        console.log('메인 폼 입력 필드만 초기화 시작');
+        
+        // 입력 필드만 초기화 (기본 정보는 유지)
+        const inputFields = [
+            'court',
+            'auctionDate',
+            'auctionStatus',
+            'bidPrice',
+            'marketPrice',
+            'appraisalPrice',
+            'minimumBid',
+            'renovationCost',
+            'competitorCount',
+            'marketCondition',
+            'urgency',
+            'auctionType',
+            'failedCount'
+        ];
+        
+        inputFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.value = '';
+                console.log(`${fieldId} 초기화 완료`);
+            }
+        });
+        
+        console.log('메인 폼 입력 필드 초기화 완료');
+    }
+
+    // 특정 매물의 저장된 경매 정보 불러오기
+    loadSavedAuctionDataForProperty(property) {
+        console.log('저장된 경매 정보 불러오기 시작:', property);
+        
+        // localStorage에서 해당 매물의 저장된 데이터 찾기
+        const savedData = this.findSavedDataForProperty(property);
+        
+        if (savedData && savedData.auctionInfo) {
+            console.log('저장된 경매 정보 발견:', savedData.auctionInfo);
+            
+            // 경매 정보를 메인 폼에 로드
+            this.populateFormWithAuctionInfo(savedData.auctionInfo);
+            
+            // 시뮬레이션 결과가 있다면 로드
+            if (savedData.simulationResult) {
+                console.log('저장된 시뮬레이션 결과 발견:', savedData.simulationResult);
+                this.populateFormWithSimulationResult(savedData.simulationResult);
+            }
+            
+            // 물건조사 정보가 있다면 로드
+            if (savedData.inspectionData) {
+                console.log('저장된 물건조사 정보 발견:', savedData.inspectionData);
+                this.populateFormWithInspectionData(savedData.inspectionData);
+            }
+            
+        } else {
+            console.log('저장된 경매 정보가 없습니다. 기본 정보만 표시됩니다.');
+        }
+    }
+
+    // localStorage에서 특정 매물의 저장된 데이터 찾기
+    findSavedDataForProperty(property) {
+        const propertyKey = property.caseNumber || property.name || property.location;
+        if (!propertyKey) return null;
+        
+        // localStorage의 모든 키를 검색
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('property_all_')) {
+                try {
+                    const savedData = JSON.parse(localStorage.getItem(key));
+                    if (savedData && savedData.property) {
+                        // 매물 정보 비교
+                        const savedProperty = savedData.property;
+                        if ((savedProperty.caseNumber && savedProperty.caseNumber === property.caseNumber) ||
+                            (savedProperty.name && savedProperty.name === property.name) ||
+                            (savedProperty.location && savedProperty.location === property.location)) {
+                            console.log('매칭되는 저장된 데이터 발견:', key);
+                            return savedData;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('저장된 데이터 파싱 오류:', key, e);
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    // 경매 정보를 메인 폼에 채우기
+    populateFormWithAuctionInfo(auctionInfo) {
+        console.log('경매 정보를 메인 폼에 채우기:', auctionInfo);
+        
+        // 기본 정보는 이미 설정되었으므로 추가 정보만 설정
+        if (auctionInfo.court) {
+            document.getElementById('court').value = auctionInfo.court;
+        }
+        if (auctionInfo.auctionDate) {
+            document.getElementById('auctionDate').value = auctionInfo.auctionDate;
+        }
+        if (auctionInfo.auctionStatus) {
+            document.getElementById('auctionStatus').value = auctionInfo.auctionStatus;
+        }
+        if (auctionInfo.bidPrice) {
+            document.getElementById('bidPrice').value = auctionInfo.bidPrice;
+        }
+        if (auctionInfo.marketPrice) {
+            document.getElementById('marketPrice').value = auctionInfo.marketPrice;
+        }
+        if (auctionInfo.appraisalPrice) {
+            document.getElementById('appraisalPrice').value = auctionInfo.appraisalPrice;
+        }
+        if (auctionInfo.minimumBid) {
+            document.getElementById('minimumBid').value = auctionInfo.minimumBid;
+        }
+        if (auctionInfo.renovationCost) {
+            document.getElementById('renovationCost').value = auctionInfo.renovationCost;
+        }
+        if (auctionInfo.competitorCount) {
+            document.getElementById('competitorCount').value = auctionInfo.competitorCount;
+        }
+        if (auctionInfo.marketCondition) {
+            document.getElementById('marketCondition').value = auctionInfo.marketCondition;
+        }
+        if (auctionInfo.urgency) {
+            document.getElementById('urgency').value = auctionInfo.urgency;
+        }
+        if (auctionInfo.auctionType) {
+            document.getElementById('auctionType').value = auctionInfo.auctionType;
+        }
+        if (auctionInfo.failedCount) {
+            document.getElementById('failedCount').value = auctionInfo.failedCount;
+        }
+        
+        console.log('경매 정보 폼 채우기 완료');
+    }
+
+    // 시뮬레이션 결과를 폼에 채우기
+    populateFormWithSimulationResult(simulationResult) {
+        console.log('시뮬레이션 결과를 폼에 채우기:', simulationResult);
+        
+        // 시뮬레이션 결과 필드들 채우기
+        if (simulationResult.recommendedPrice) {
+            document.getElementById('recommendedPrice').textContent = simulationResult.recommendedPrice;
+        }
+        if (simulationResult.winProbability) {
+            document.getElementById('winProbability').textContent = simulationResult.winProbability;
+        }
+        if (simulationResult.expectedProfit) {
+            document.getElementById('expectedProfit').textContent = simulationResult.expectedProfit;
+        }
+        if (simulationResult.totalCost) {
+            document.getElementById('totalCost').textContent = simulationResult.totalCost;
+        }
+        if (simulationResult.riskAdjustedProfit) {
+            document.getElementById('riskAdjustedProfit').textContent = simulationResult.riskAdjustedProfit;
+        }
+        if (simulationResult.modelConfidence) {
+            document.getElementById('modelConfidence').textContent = simulationResult.modelConfidence;
+        }
+        
+        console.log('시뮬레이션 결과 로드 완료');
+    }
+
+    // 물건조사 정보를 폼에 채우기
+    populateFormWithInspectionData(inspectionData) {
+        console.log('물건조사 정보를 폼에 채우기:', inspectionData);
+        
+        // 물건조사 필드들 채우기
+        if (inspectionData.preservationRegistry) {
+            document.getElementById('preservationRegistry').value = inspectionData.preservationRegistry;
+        }
+        if (inspectionData.buildingAge) {
+            document.getElementById('buildingAge').value = inspectionData.buildingAge;
+        }
+        if (inspectionData.meters) {
+            document.getElementById('meters').value = inspectionData.meters;
+        }
+        if (inspectionData.mailCheck) {
+            document.getElementById('mailCheck').value = inspectionData.mailCheck;
+        }
+        if (inspectionData.slope) {
+            document.getElementById('slope').value = inspectionData.slope;
+        }
+        if (inspectionData.lightingDirection) {
+            document.getElementById('lightingDirection').value = inspectionData.lightingDirection;
+        }
+        if (inspectionData.structureFloor) {
+            document.getElementById('structureFloor').value = inspectionData.structureFloor;
+        }
+        if (inspectionData.parking) {
+            document.getElementById('parking').value = inspectionData.parking;
+        }
+        if (inspectionData.waterLeakage) {
+            document.getElementById('waterLeakage').value = inspectionData.waterLeakage;
+        }
+        if (inspectionData.unpaidUtilities) {
+            document.getElementById('unpaidUtilities').value = inspectionData.unpaidUtilities;
+        }
+        if (inspectionData.gasType) {
+            document.getElementById('gasType').value = inspectionData.gasType;
+        }
+        if (inspectionData.gasUnpaid) {
+            document.getElementById('gasUnpaid').value = inspectionData.gasUnpaid;
+        }
+        if (inspectionData.residentsCheck) {
+            document.getElementById('residentsCheck').value = inspectionData.residentsCheck;
+        }
+        if (inspectionData.currentResidents) {
+            document.getElementById('currentResidents').value = inspectionData.currentResidents;
+        }
+        
+        // 주변조사 필드들 채우기
+        if (inspectionData.busRoutes) {
+            document.getElementById('busRoutes').value = inspectionData.busRoutes;
+        }
+        if (inspectionData.subway) {
+            document.getElementById('subway').value = inspectionData.subway;
+        }
+        if (inspectionData.shopping) {
+            document.getElementById('shopping').value = inspectionData.shopping;
+        }
+        if (inspectionData.schools) {
+            document.getElementById('schools').value = inspectionData.schools;
+        }
+        
+        // 시세조사 필드들 채우기
+        if (inspectionData.molitPrice) {
+            document.getElementById('molitPrice').value = inspectionData.molitPrice;
+        }
+        if (inspectionData.naverPrice) {
+            document.getElementById('naverPrice').value = inspectionData.naverPrice;
+        }
+        if (inspectionData.kbPrice) {
+            document.getElementById('kbPrice').value = inspectionData.kbPrice;
+        }
+        if (inspectionData.fieldPrice) {
+            document.getElementById('fieldPrice').value = inspectionData.fieldPrice;
+        }
+        
+        // 기타 필드들 채우기
+        if (inspectionData.specialNotes) {
+            document.getElementById('specialNotes').value = inspectionData.specialNotes;
+        }
+        if (inspectionData.finalScore) {
+            document.getElementById('finalScore').value = inspectionData.finalScore;
+        }
+        if (inspectionData.inspectionDate) {
+            document.getElementById('inspectionDate').value = inspectionData.inspectionDate;
+        }
+        
+        console.log('물건조사 정보 로드 완료');
     }
 
     onRegionChange() {
@@ -858,9 +1320,37 @@ class AuctionSimulator {
 
     // 매물 추가 모달 숨기기
     hidePropertyModal() {
+        console.log('매물 추가 모달 숨김 시작');
         const modal = document.getElementById('propertyModal');
         if (modal) {
+            // 모달 숨기기
             modal.style.display = 'none';
+            console.log('모달 숨김 완료');
+            
+            // 편집 모드 초기화
+            delete modal.dataset.editIndex;
+            modal.querySelector('h3').textContent = '매물 추가';
+            console.log('편집 모드 초기화 완료');
+            
+            // 경매 데이터 초기화
+            this.currentAuctionData = null;
+            console.log('경매 데이터 초기화 완료');
+            
+            // 폼 reset() 실행
+            const form = document.getElementById('propertyForm');
+            if (form) {
+                form.reset();
+                console.log('폼 reset() 완료');
+            }
+            
+            // 모달 폼 개별 초기화 (DOM 업데이트 후 실행)
+            setTimeout(() => {
+                this.resetModalForm();
+            }, 100);
+            
+            console.log('모달 숨김 및 모든 초기화 완료');
+        } else {
+            console.error('propertyModal을 찾을 수 없습니다');
         }
     }
 
@@ -884,7 +1374,13 @@ class AuctionSimulator {
         // 저장 버튼
         const saveBtn = document.getElementById('savePropertyBtn');
         if (saveBtn) {
-            saveBtn.addEventListener('click', () => this.saveProperty());
+            saveBtn.addEventListener('click', () => {
+                console.log('저장 버튼 클릭됨');
+                this.saveProperty();
+            });
+            console.log('저장 버튼 이벤트 리스너 등록 완료');
+        } else {
+            console.error('savePropertyBtn 요소를 찾을 수 없습니다');
         }
 
         // 경매 데이터 가져오기 버튼 (모달 내부)
@@ -921,8 +1417,12 @@ class AuctionSimulator {
 
     // 매물 저장
     saveProperty() {
+        console.log('saveProperty 함수 호출됨');
         const form = document.getElementById('propertyForm');
-        if (!form) return;
+        if (!form) {
+            console.error('propertyForm을 찾을 수 없습니다');
+            return;
+        }
 
         const modal = document.getElementById('propertyModal');
         const isEdit = modal.dataset.editIndex !== undefined;
@@ -932,8 +1432,8 @@ class AuctionSimulator {
             id: isEdit ? this.properties[editIndex].id : Date.now(),
             caseNumber: document.getElementById('caseNumber').value || '',
             name: document.getElementById('propertyName').value || '',
-            type: document.getElementById('propertyType').value || '',
-            location: document.getElementById('propertyLocation').value || '',
+            type: document.getElementById('modalPropertyType').value || '',
+            location: document.getElementById('modalPropertyLocation').value || '',
             region: document.getElementById('regionSelect').value || '',
             district: document.getElementById('districtSelect').value || '',
             notes: document.getElementById('notes').value || '',
@@ -965,18 +1465,31 @@ class AuctionSimulator {
             this.properties[editIndex] = property;
             alert('매물이 성공적으로 수정되었습니다.');
         } else {
+            // properties가 배열이 아닌 경우 초기화
+            if (!Array.isArray(this.properties)) {
+                console.warn('this.properties is not an array, initializing as empty array');
+                this.properties = [];
+            }
+            
             // 매물 추가
             this.properties.push(property);
             alert('매물이 성공적으로 추가되었습니다.');
+            
+            // 새로 추가된 매물을 자동으로 선택
+            const newIndex = this.properties.length - 1;
+            setTimeout(() => {
+                this.selectProperty(newIndex);
+            }, 100);
         }
 
         this.saveProperties();
         this.renderPropertyTree();
         this.hidePropertyModal();
-
-        // 편집 모드 초기화
-        delete modal.dataset.editIndex;
-        modal.querySelector('h3').textContent = '새 매물 추가';
+        
+        // 편집이 아닌 경우에만 메인 폼 초기화 (새 매물 추가 시)
+        if (!isEdit) {
+            this.resetMainForm();
+        }
     }
 
     // 매물 편집
@@ -984,18 +1497,50 @@ class AuctionSimulator {
         const property = this.properties[index];
         if (!property) return;
 
-        // 모달에 기존 데이터 로드
-        document.getElementById('caseNumber').value = property.caseNumber;
-        document.getElementById('propertyName').value = property.name;
-        document.getElementById('propertyType').value = property.type;
-        document.getElementById('propertyLocation').value = property.location;
+        console.log('매물 편집 시작:', property);
 
         // 편집 모드로 설정
         const modal = document.getElementById('propertyModal');
         modal.dataset.editIndex = index;
         modal.querySelector('h3').textContent = '매물 편집';
 
+        // 모달 표시
         this.showPropertyModal();
+
+        // 모달이 완전히 로드된 후 기존 데이터 로드
+        setTimeout(() => {
+            // 1. 기본 매물 정보 로드
+            document.getElementById('propertyName').value = property.name || '';
+            document.getElementById('modalPropertyType').value = property.type || '';
+            document.getElementById('modalPropertyLocation').value = property.location || '';
+
+            // 2. 저장된 모든 데이터가 있으면 불러오기
+            const saveKey = `property_${index}_data`;
+            const savedData = localStorage.getItem(saveKey);
+            
+            if (savedData) {
+                try {
+                    const allData = JSON.parse(savedData);
+                    console.log('편집용 저장된 데이터 불러오기:', allData);
+                    
+                    // 경매 정보를 모달 필드에 직접 입력
+                    if (allData.auctionInfo) {
+                        this.loadAuctionInfoToModalForm(allData.auctionInfo);
+                    }
+                    
+                    // 물건조사 정보를 모달 필드에 직접 입력
+                    if (allData.inspectionData) {
+                        this.loadInspectionDataToModalForm(allData.inspectionData);
+                    }
+                    
+                    console.log('편집용 모든 데이터 불러오기 완료');
+                } catch (error) {
+                    console.error('편집용 데이터 불러오기 실패:', error);
+                }
+            } else {
+                console.log('저장된 데이터 없음 - 기본 정보만 편집');
+            }
+        }, 100);
     }
 
     // 매물 삭제
@@ -1713,7 +2258,7 @@ class AuctionSimulator {
         );
         
         // 4. 낙찰 확률 계산 (개선된 버전)
-        const priceRatio = recommendedBid / appraisalPrice;
+        const priceRatio = (appraisalPrice > 0) ? recommendedBid / appraisalPrice : 1.0;
         const winProbability = this.calculateAdvancedWinProbability(
             priceRatio, 
             competitorCount, 
@@ -1989,6 +2534,20 @@ class AuctionSimulator {
 
     // 개선된 낙찰 확률 계산
     calculateAdvancedWinProbability(priceRatio, competitorCount, marketCondition, urgency, failedCount) {
+        // 입력값 검증
+        if (isNaN(priceRatio) || priceRatio === null || priceRatio === undefined) {
+            console.error('유효하지 않은 priceRatio:', priceRatio);
+            return 0.5; // 기본값 반환
+        }
+        
+        if (isNaN(competitorCount) || competitorCount === null || competitorCount === undefined) {
+            competitorCount = 5; // 기본값
+        }
+        
+        if (isNaN(failedCount) || failedCount === null || failedCount === undefined) {
+            failedCount = 0; // 기본값
+        }
+        
         // 기본 확률 (가격 비율 기반)
         let baseProbability = 0.5;
         if (priceRatio < 0.7) baseProbability = 0.2;
@@ -2305,10 +2864,20 @@ class AuctionSimulator {
                 recommendedPriceEl.textContent = this.formatNumber(Math.round(bidCalculation.recommendedBidPrice));
             }
             if (winProbabilityEl) {
-                winProbabilityEl.textContent = Math.round(result.winProbability * 100) + '%';
+                const winProb = result.winProbability;
+                if (isNaN(winProb) || winProb === null || winProb === undefined) {
+                    winProbabilityEl.textContent = '계산 불가';
+                } else {
+                    winProbabilityEl.textContent = Math.round(winProb * 100) + '%';
+                }
             }
             if (expectedProfitEl) {
-                expectedProfitEl.textContent = Math.round(result.expectedProfit) + '%';
+                const expectedProfit = result.expectedProfit;
+                if (isNaN(expectedProfit) || expectedProfit === null || expectedProfit === undefined) {
+                    expectedProfitEl.textContent = '계산 불가';
+                } else {
+                    expectedProfitEl.textContent = Math.round(expectedProfit) + '%';
+                }
             }
             
             // 매각가율 기반 상세 계산 결과 표시
@@ -2323,10 +2892,20 @@ class AuctionSimulator {
                 recommendedPriceEl.textContent = this.formatNumber(Math.round(result.recommendedBid));
             }
             if (winProbabilityEl) {
-                winProbabilityEl.textContent = Math.round(result.winProbability * 100) + '%';
+                const winProb = result.winProbability;
+                if (isNaN(winProb) || winProb === null || winProb === undefined) {
+                    winProbabilityEl.textContent = '계산 불가';
+                } else {
+                    winProbabilityEl.textContent = Math.round(winProb * 100) + '%';
+                }
             }
             if (expectedProfitEl) {
-                expectedProfitEl.textContent = Math.round(result.expectedProfit) + '%';
+                const expectedProfit = result.expectedProfit;
+                if (isNaN(expectedProfit) || expectedProfit === null || expectedProfit === undefined) {
+                    expectedProfitEl.textContent = '계산 불가';
+                } else {
+                    expectedProfitEl.textContent = Math.round(expectedProfit) + '%';
+                }
             }
         }
         
@@ -2445,6 +3024,13 @@ class AuctionSimulator {
     extractRegionFromLocation(location) {
         if (!location) return null;
         
+        // location이 문자열이 아닌 경우 문자열로 변환
+        const locationStr = String(location);
+        if (!locationStr || locationStr === 'null' || locationStr === 'undefined') {
+            console.log('유효하지 않은 location:', location);
+            return null;
+        }
+        
         // 경기도 지역들 (행정구 포함)
         const gyeonggiDistricts = [
             '수원시', '성남시', '의정부시', '안양시', '부천시', '광명시', '평택시', '과천시', '오산시', '시흥시', '군포시', '의왕시', '하남시', '용인시', '파주시', '이천시', '안성시', '김포시', '화성시', '광주시', '여주시', '양평군', '고양시', '의정부시', '동두천시', '가평군', '연천군'
@@ -2467,28 +3053,28 @@ class AuctionSimulator {
         
         // 경기도 지역 확인
         for (const district of gyeonggiDistricts) {
-            if (location.includes(district)) {
+            if (locationStr.includes(district)) {
                 return '경기';
             }
         }
         
         // 서울 지역 확인
         for (const district of seoulDistricts) {
-            if (location.includes(district)) {
+            if (locationStr.includes(district)) {
                 return '서울';
             }
         }
         
         // 부산 지역 확인
         for (const district of busanDistricts) {
-            if (location.includes(district)) {
+            if (locationStr.includes(district)) {
                 return '부산';
             }
         }
         
         // 인천 지역 확인
         for (const district of incheonDistricts) {
-            if (location.includes(district)) {
+            if (locationStr.includes(district)) {
                 return '인천';
             }
         }
@@ -2498,6 +3084,13 @@ class AuctionSimulator {
     
     extractDistrictFromLocation(location) {
         if (!location) return null;
+        
+        // location이 문자열이 아닌 경우 문자열로 변환
+        const locationStr = String(location);
+        if (!locationStr || locationStr === 'null' || locationStr === 'undefined') {
+            console.log('유효하지 않은 location:', location);
+            return null;
+        }
         
         // 경기 시/군 추출 (세분화된 구/군 포함) - 정확한 매칭을 위해 정렬된 순서로 검사
         const gyeonggiDistricts = [
@@ -2522,7 +3115,7 @@ class AuctionSimulator {
         ];
         
         for (const district of gyeonggiDistricts) {
-            if (location.includes(district)) return district;
+            if (locationStr.includes(district)) return district;
         }
         
         // 서울 구/군 추출
@@ -2532,7 +3125,7 @@ class AuctionSimulator {
                                '종로구', '중구', '중랑구'];
         
         for (const district of seoulDistricts) {
-            if (location.includes(district)) return district;
+            if (locationStr.includes(district)) return district;
         }
         
         // 부산 구/군 추출
@@ -2541,7 +3134,7 @@ class AuctionSimulator {
                                '기장군'];
         
         for (const district of busanDistricts) {
-            if (location.includes(district)) return district;
+            if (locationStr.includes(district)) return district;
         }
         
         // 인천 구/군 추출
@@ -2549,7 +3142,7 @@ class AuctionSimulator {
                                  '서구', '강화군', '옹진군'];
         
         for (const district of incheonDistricts) {
-            if (location.includes(district)) return district;
+            if (locationStr.includes(district)) return district;
         }
         
         return null;
@@ -2679,40 +3272,276 @@ class AuctionSimulator {
         }
     }
 
-    // 저장/불러오기 기능 초기화
+    // 저장/불러오기 기능 초기화 (개별 저장 버튼 제거, 불러오기만 유지)
     initializeSaveButtons() {
-        // 경매정보 저장/불러오기
-        const saveAuctionInfoBtn = document.getElementById('saveAuctionInfoBtn');
+        // 경매정보 불러오기만 유지
         const loadAuctionInfoBtn = document.getElementById('loadAuctionInfoBtn');
-        
-        if (saveAuctionInfoBtn) {
-            saveAuctionInfoBtn.addEventListener('click', saveAuctionInfo);
-        }
         if (loadAuctionInfoBtn) {
             loadAuctionInfoBtn.addEventListener('click', loadAuctionInfo);
         }
 
-        // 시뮬레이션 결과 저장/불러오기
-        const saveSimulationResultBtn = document.getElementById('saveSimulationResultBtn');
+        // 시뮬레이션 결과 불러오기만 유지
         const loadSimulationResultBtn = document.getElementById('loadSimulationResultBtn');
-        
-        if (saveSimulationResultBtn) {
-            saveSimulationResultBtn.addEventListener('click', saveSimulationResult);
-        }
         if (loadSimulationResultBtn) {
             loadSimulationResultBtn.addEventListener('click', loadSimulationResult);
         }
 
-        // 물건조사 저장/불러오기
-        const saveInspectionBtn = document.getElementById('saveInspectionBtn');
+        // 물건조사 불러오기만 유지
         const loadInspectionBtn = document.getElementById('loadInspectionBtn');
-        
-        if (saveInspectionBtn) {
-            saveInspectionBtn.addEventListener('click', saveInspectionData);
-        }
         if (loadInspectionBtn) {
             loadInspectionBtn.addEventListener('click', loadInspectionData);
         }
+    }
+
+    // 매물별 모든 정보 저장 (새로운 간단한 시스템)
+    saveAllDataForProperty(propertyIndex) {
+        console.log('매물별 저장 시작:', propertyIndex);
+        
+        // 매물 존재 확인
+        if (!this.properties || !this.properties[propertyIndex]) {
+            alert('매물을 찾을 수 없습니다.');
+            return;
+        }
+        
+        const property = this.properties[propertyIndex];
+        console.log('저장할 매물:', property);
+        
+        // 현재 입력된 모든 데이터 수집
+        const allData = {
+            // 매물 기본 정보
+            property: property,
+            
+            // 경매 정보 (현재 폼에서 입력된 값들)
+            auctionInfo: {
+                caseNumber: document.getElementById('caseNumber')?.value || '',
+                propertyLocation: document.getElementById('propertyLocation')?.value || '',
+                propertyType: document.getElementById('propertyType')?.value || '',
+                court: document.getElementById('court')?.value || '',
+                auctionDate: document.getElementById('auctionDate')?.value || '',
+                auctionStatus: document.getElementById('auctionStatus')?.value || '',
+                bidPrice: document.getElementById('bidPrice')?.value || '',
+                marketPrice: document.getElementById('marketPrice')?.value || '',
+                appraisalPrice: document.getElementById('appraisalPrice')?.value || '',
+                minimumBid: document.getElementById('minimumBid')?.value || '',
+                renovationCost: document.getElementById('renovationCost')?.value || '',
+                competitorCount: document.getElementById('competitorCount')?.value || '',
+                marketCondition: document.getElementById('marketCondition')?.value || '',
+                urgency: document.getElementById('urgency')?.value || '',
+                auctionType: document.getElementById('auctionType')?.value || '',
+                failedCount: document.getElementById('failedCount')?.value || ''
+            },
+            
+            // 시뮬레이션 결과 (현재 화면에 표시된 값들)
+            simulationResult: {
+                recommendedPrice: document.getElementById('recommendedPrice')?.textContent || '',
+                winProbability: document.getElementById('winProbability')?.textContent || '',
+                expectedProfit: document.getElementById('expectedProfit')?.textContent || '',
+                totalCost: document.getElementById('totalCost')?.textContent || '',
+                riskAdjustedProfit: document.getElementById('riskAdjustedProfit')?.textContent || '',
+                modelConfidence: document.getElementById('modelConfidence')?.textContent || ''
+            },
+            
+            // 물건조사 정보 (현재 입력된 값들)
+            inspectionData: {
+                preservationRegistry: document.getElementById('preservationRegistry')?.value || '',
+                buildingAge: document.getElementById('buildingAge')?.value || '',
+                meters: document.getElementById('meters')?.value || '',
+                mailCheck: document.getElementById('mailCheck')?.value || '',
+                slope: document.getElementById('slope')?.value || '',
+                lightingDirection: document.getElementById('lightingDirection')?.value || '',
+                structureFloor: document.getElementById('structureFloor')?.value || '',
+                parking: document.getElementById('parking')?.value || '',
+                waterLeakage: document.getElementById('waterLeakage')?.value || '',
+                unpaidUtilities: document.getElementById('unpaidUtilities')?.value || '',
+                gasType: document.getElementById('gasType')?.value || '',
+                gasUnpaid: document.getElementById('gasUnpaid')?.value || '',
+                residentsCheck: document.getElementById('residentsCheck')?.value || '',
+                currentResidents: document.getElementById('currentResidents')?.value || '',
+                busRoutes: document.getElementById('busRoutes')?.value || '',
+                subway: document.getElementById('subway')?.value || '',
+                shopping: document.getElementById('shopping')?.value || '',
+                schools: document.getElementById('schools')?.value || '',
+                molitPrice: document.getElementById('molitPrice')?.value || '',
+                naverPrice: document.getElementById('naverPrice')?.value || '',
+                kbPrice: document.getElementById('kbPrice')?.value || '',
+                fieldPrice: document.getElementById('fieldPrice')?.value || '',
+                specialNotes: document.getElementById('specialNotes')?.value || '',
+                finalScore: document.getElementById('finalScore')?.value || '',
+                inspectionDate: document.getElementById('inspectionDate')?.value || ''
+            },
+            
+            // 저장 시간
+            savedAt: new Date().toISOString()
+        };
+        
+        // 저장 키 생성 (매물 인덱스 기반)
+        const saveKey = `property_${propertyIndex}_data`;
+        
+        // localStorage에 저장
+        try {
+            localStorage.setItem(saveKey, JSON.stringify(allData));
+            const propertyName = property.name || property.caseNumber || property.location || '이름없음';
+            alert(`${propertyName}의 모든 정보가 저장되었습니다!`);
+            console.log('저장 완료:', saveKey, allData);
+        } catch (error) {
+            console.error('저장 실패:', error);
+            alert('저장 중 오류가 발생했습니다: ' + error.message);
+        }
+    }
+
+    // 매물별 모든 정보 불러오기 (새로운 간단한 시스템)
+    loadAllDataForProperty(propertyIndex) {
+        console.log('매물별 불러오기 시작:', propertyIndex);
+        
+        // 저장된 데이터 확인
+        const saveKey = `property_${propertyIndex}_data`;
+        const savedData = localStorage.getItem(saveKey);
+        
+        if (!savedData) {
+            alert('저장된 데이터가 없습니다.');
+            return;
+        }
+        
+        try {
+            const allData = JSON.parse(savedData);
+            console.log('불러온 데이터:', allData);
+            
+            // 매물 기본 정보 표시
+            if (allData.property) {
+                this.displaySelectedPropertyInfo(allData.property);
+            }
+            
+            // 경매 정보 불러오기
+            if (allData.auctionInfo) {
+                this.loadAuctionInfoToForm(allData.auctionInfo);
+            }
+            
+            // 시뮬레이션 결과 불러오기
+            if (allData.simulationResult) {
+                this.loadSimulationResultToDisplay(allData.simulationResult);
+            }
+            
+            // 물건조사 정보 불러오기
+            if (allData.inspectionData) {
+                this.loadInspectionDataToForm(allData.inspectionData);
+            }
+            
+            const propertyName = allData.property?.name || allData.property?.caseNumber || allData.property?.location || '이름없음';
+            alert(`${propertyName}의 모든 정보가 불러와졌습니다!`);
+            
+        } catch (error) {
+            console.error('불러오기 실패:', error);
+            alert('데이터를 불러오는 중 오류가 발생했습니다: ' + error.message);
+        }
+    }
+
+    // 경매 정보를 폼에 불러오기
+    loadAuctionInfoToForm(auctionInfo) {
+        const fields = [
+            'caseNumber', 'propertyLocation', 'propertyType', 'court', 'auctionDate',
+            'auctionStatus', 'bidPrice', 'marketPrice', 'appraisalPrice', 'minimumBid',
+            'renovationCost', 'competitorCount', 'marketCondition', 'urgency',
+            'auctionType', 'failedCount'
+        ];
+        
+        fields.forEach(fieldName => {
+            const element = document.getElementById(fieldName);
+            if (element && auctionInfo[fieldName] !== undefined) {
+                element.value = auctionInfo[fieldName];
+            }
+        });
+    }
+
+    // 경매 정보를 모달 폼에 불러오기 (편집용)
+    loadAuctionInfoToModalForm(auctionInfo) {
+        console.log('모달 폼에 경매 정보 로드:', auctionInfo);
+        
+        // 모달의 사건번호 필드에 직접 입력
+        const modalCaseNumber = document.getElementById('caseNumber');
+        if (modalCaseNumber && auctionInfo.caseNumber) {
+            modalCaseNumber.value = auctionInfo.caseNumber;
+            console.log('모달 사건번호 설정:', auctionInfo.caseNumber);
+        }
+        
+        // 다른 필드들도 모달에서 접근 가능한 것들만 설정
+        const modalFields = [
+            { field: 'bidPrice', value: auctionInfo.bidPrice },
+            { field: 'marketPrice', value: auctionInfo.marketPrice },
+            { field: 'appraisalPrice', value: auctionInfo.appraisalPrice },
+            { field: 'minimumBid', value: auctionInfo.minimumBid },
+            { field: 'renovationCost', value: auctionInfo.renovationCost },
+            { field: 'competitorCount', value: auctionInfo.competitorCount }
+        ];
+        
+        modalFields.forEach(({ field, value }) => {
+            const element = document.getElementById(field);
+            if (element && value !== undefined && value !== '') {
+                element.value = value;
+                console.log(`모달 ${field} 설정:`, value);
+            }
+        });
+    }
+
+    // 물건조사 정보를 모달 폼에 불러오기 (편집용)
+    loadInspectionDataToModalForm(inspectionData) {
+        console.log('모달 폼에 물건조사 정보 로드:', inspectionData);
+        
+        const inspectionFields = [
+            'preservationRegistry', 'buildingAge', 'meters', 'mailCheck', 'slope',
+            'lightingDirection', 'structureFloor', 'parking', 'waterLeakage',
+            'unpaidUtilities', 'gasType', 'gasUnpaid', 'residentsCheck',
+            'currentResidents', 'busRoutes', 'subway', 'shopping', 'schools',
+            'molitPrice', 'naverPrice', 'kbPrice', 'fieldPrice', 'specialNotes',
+            'finalScore', 'inspectionDate'
+        ];
+        
+        inspectionFields.forEach(fieldName => {
+            const element = document.getElementById(fieldName);
+            if (element && inspectionData[fieldName] !== undefined && inspectionData[fieldName] !== '') {
+                element.value = inspectionData[fieldName];
+                console.log(`모달 ${fieldName} 설정:`, inspectionData[fieldName]);
+            }
+        });
+    }
+
+    // 시뮬레이션 결과를 화면에 표시
+    loadSimulationResultToDisplay(simulationResult) {
+        const fields = [
+            'recommendedPrice', 'winProbability', 'expectedProfit', 'totalCost',
+            'riskAdjustedProfit', 'modelConfidence'
+        ];
+        
+        fields.forEach(fieldName => {
+            const element = document.getElementById(fieldName);
+            if (element && simulationResult[fieldName] !== undefined) {
+                element.textContent = simulationResult[fieldName];
+            }
+        });
+        
+        // 시뮬레이션 결과 섹션 표시
+        const simulationSection = document.querySelector('.simulation-results-section');
+        if (simulationSection) {
+            simulationSection.style.display = 'block';
+        }
+    }
+
+    // 물건조사 정보를 폼에 불러오기
+    loadInspectionDataToForm(inspectionData) {
+        const fields = [
+            'preservationRegistry', 'buildingAge', 'meters', 'mailCheck', 'slope',
+            'lightingDirection', 'structureFloor', 'parking', 'waterLeakage',
+            'unpaidUtilities', 'gasType', 'gasUnpaid', 'residentsCheck',
+            'currentResidents', 'busRoutes', 'subway', 'shopping', 'schools',
+            'molitPrice', 'naverPrice', 'kbPrice', 'fieldPrice', 'specialNotes',
+            'finalScore', 'inspectionDate'
+        ];
+        
+        fields.forEach(fieldName => {
+            const element = document.getElementById(fieldName);
+            if (element && inspectionData[fieldName] !== undefined) {
+                element.value = inspectionData[fieldName];
+            }
+        });
     }
 }
 
@@ -2804,6 +3633,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM 로드 완료, 시뮬레이터 초기화 시작');
     try {
         auctionSimulator = new AuctionSimulator();
+        window.auctionSimulator = auctionSimulator; // 전역 접근 가능하도록 설정
         console.log('시뮬레이터 초기화 완료');
         
         // 조정계수 검증 테스트를 전역에서 호출할 수 있도록 설정
@@ -2962,171 +3792,34 @@ async function fetchAPIKeyInfo() {
 }
 
 
-// 경매정보 저장
+// 경매정보 저장 (매물별 통합 저장 사용)
 function saveAuctionInfo() {
-    const auctionData = {
-        caseNumber: document.getElementById('caseNumber').value,
-        propertyLocation: document.getElementById('propertyLocation').value,
-        bidPrice: document.getElementById('bidPrice').value,
-        marketPrice: document.getElementById('marketPrice').value,
-        appraisalPrice: document.getElementById('appraisalPrice').value,
-        minimumBid: document.getElementById('minimumBid').value,
-        renovationCost: document.getElementById('renovationCost').value,
-        competitorCount: document.getElementById('competitorCount').value,
-        marketCondition: document.getElementById('marketCondition').value,
-        urgency: document.getElementById('urgency').value,
-        failedCount: document.getElementById('failedCount').value,
-        auctionType: document.getElementById('auctionType').value
-    };
-    
-    const timestamp = new Date().toISOString();
-    const saveKey = `auction_info_${timestamp}`;
-    
-    localStorage.setItem(saveKey, JSON.stringify(auctionData));
-    
-    // 저장된 항목 목록 업데이트
-    updateSavedItemsList('auction_info', saveKey, `경매정보 ${new Date().toLocaleString()}`);
-    
-    alert('경매정보가 저장되었습니다!');
+    alert('매물별 통합 저장을 사용하세요. 사이드바에서 매물을 선택한 후 "💾" 버튼을 클릭하세요.');
 }
 
-// 경매정보 불러오기
+// 경매정보 불러오기 (매물별 통합 불러오기 사용)
 function loadAuctionInfo() {
-    const savedItems = getSavedItems('auction_info');
-    
-    if (savedItems.length === 0) {
-        alert('저장된 경매정보가 없습니다.');
-        return;
-    }
-    
-    // 저장된 항목 선택 모달 표시
-    showLoadModal('경매정보 불러오기', savedItems, (selectedData) => {
-        // 폼에 데이터 채우기
-        Object.keys(selectedData).forEach(key => {
-            const element = document.getElementById(key);
-            if (element) {
-                element.value = selectedData[key];
-            }
-        });
-        alert('경매정보가 불러와졌습니다!');
-    });
+    alert('매물별 통합 불러오기를 사용하세요. 사이드바에서 매물을 선택하면 자동으로 불러와집니다.');
 }
 
-// 시뮬레이션 결과 저장
+// 시뮬레이션 결과 저장 (매물별 통합 저장 사용)
 function saveSimulationResult() {
-    const resultData = {
-        recommendedBid: document.getElementById('recommendedPrice')?.textContent || '0',
-        winProbability: document.getElementById('winProbability')?.textContent || '0%',
-        expectedProfit: document.getElementById('expectedProfit')?.textContent || '0%',
-        riskAdjustedProfit: document.getElementById('riskAdjustedProfit')?.textContent || '0%',
-        modelConfidence: document.getElementById('modelConfidence')?.textContent || '0%',
-        totalCost: document.getElementById('totalCost')?.textContent || '0원',
-        auctionFee: document.getElementById('auctionFee')?.textContent || '0원',
-        registrationFee: document.getElementById('registrationFee')?.textContent || '0원',
-        tax: document.getElementById('tax')?.textContent || '0원',
-        renovationCostDisplay: document.getElementById('renovationCostDisplay')?.textContent || '0원',
-        totalInvestment: document.getElementById('totalInvestment')?.textContent || '0원',
-        appraisalRatio: document.getElementById('appraisalRatio')?.textContent || '0%',
-        marketRatio: document.getElementById('marketRatio')?.textContent || '0%',
-        minimumRatio: document.getElementById('minimumRatio')?.textContent || '0%',
-        marketProfit: document.getElementById('marketProfit')?.textContent || '0원',
-        strategyAdvice: document.getElementById('strategyAdvice')?.textContent || ''
-    };
-    
-    const timestamp = new Date().toISOString();
-    const saveKey = `simulation_result_${timestamp}`;
-    
-    localStorage.setItem(saveKey, JSON.stringify(resultData));
-    
-    // 저장된 항목 목록 업데이트
-    updateSavedItemsList('simulation_result', saveKey, `시뮬레이션 결과 ${new Date().toLocaleString()}`);
-    
-    alert('시뮬레이션 결과가 저장되었습니다!');
+    alert('매물별 통합 저장을 사용하세요. 사이드바에서 매물을 선택한 후 "💾" 버튼을 클릭하세요.');
 }
 
-// 시뮬레이션 결과 불러오기
+// 시뮬레이션 결과 불러오기 (매물별 통합 불러오기 사용)
 function loadSimulationResult() {
-    const savedItems = getSavedItems('simulation_result');
-    
-    if (savedItems.length === 0) {
-        alert('저장된 시뮬레이션 결과가 없습니다.');
-        return;
-    }
-    
-    // 저장된 항목 선택 모달 표시
-    showLoadModal('시뮬레이션 결과 불러오기', savedItems, (selectedData) => {
-        // 결과 표시 영역에 데이터 채우기
-        Object.keys(selectedData).forEach(key => {
-            const element = document.getElementById(key);
-            if (element) {
-                element.textContent = selectedData[key];
-            }
-        });
-        alert('시뮬레이션 결과가 불러와졌습니다!');
-    });
+    alert('매물별 통합 불러오기를 사용하세요. 사이드바에서 매물을 선택하면 자동으로 불러와집니다.');
 }
 
-// 물건조사 데이터 저장
+// 물건조사 데이터 저장 (매물별 통합 저장 사용)
 function saveInspectionData() {
-    const inspectionData = {
-        preservationRegistry: document.getElementById('preservationRegistry').value,
-        buildingAge: document.getElementById('buildingAge').value,
-        meters: document.getElementById('meters').value,
-        mailCheck: document.getElementById('mailCheck').value,
-        slope: document.getElementById('slope').value,
-        lightingDirection: document.getElementById('lightingDirection').value,
-        structureFloor: document.getElementById('structureFloor').value,
-        parking: document.getElementById('parking').value,
-        waterLeakage: document.getElementById('waterLeakage').value,
-        unpaidUtilities: document.getElementById('unpaidUtilities').value,
-        gasType: document.getElementById('gasType').value,
-        gasUnpaid: document.getElementById('gasUnpaid').value,
-        residentsCheck: document.getElementById('residentsCheck').value,
-        currentResidents: document.getElementById('currentResidents').value,
-        busRoutes: document.getElementById('busRoutes').value,
-        subway: document.getElementById('subway').value,
-        shopping: document.getElementById('shopping').value,
-        schools: document.getElementById('schools').value,
-        molitPrice: document.getElementById('molitPrice').value,
-        naverPrice: document.getElementById('naverPrice').value,
-        kbPrice: document.getElementById('kbPrice').value,
-        fieldPrice: document.getElementById('fieldPrice').value,
-        specialNotes: document.getElementById('specialNotes').value,
-        finalScore: document.getElementById('finalScore').value,
-        inspectionDate: document.getElementById('inspectionDate').value
-    };
-    
-    const timestamp = new Date().toISOString();
-    const saveKey = `inspection_data_${timestamp}`;
-    
-    localStorage.setItem(saveKey, JSON.stringify(inspectionData));
-    
-    // 저장된 항목 목록 업데이트
-    updateSavedItemsList('inspection_data', saveKey, `물건조사 ${new Date().toLocaleString()}`);
-    
-    alert('물건조사 데이터가 저장되었습니다!');
+    alert('매물별 통합 저장을 사용하세요. 사이드바에서 매물을 선택한 후 "💾" 버튼을 클릭하세요.');
 }
 
-// 물건조사 데이터 불러오기
+// 물건조사 데이터 불러오기 (매물별 통합 불러오기 사용)
 function loadInspectionData() {
-    const savedItems = getSavedItems('inspection_data');
-    
-    if (savedItems.length === 0) {
-        alert('저장된 물건조사 데이터가 없습니다.');
-        return;
-    }
-    
-    // 저장된 항목 선택 모달 표시
-    showLoadModal('물건조사 데이터 불러오기', savedItems, (selectedData) => {
-        // 폼에 데이터 채우기
-        Object.keys(selectedData).forEach(key => {
-            const element = document.getElementById(key);
-            if (element) {
-                element.value = selectedData[key];
-            }
-        });
-        alert('물건조사 데이터가 불러와졌습니다!');
-    });
+    alert('매물별 통합 불러오기를 사용하세요. 사이드바에서 매물을 선택하면 자동으로 불러와집니다.');
 }
 
 // 저장된 항목 목록 가져오기
@@ -3150,6 +3843,120 @@ function getSavedItems(type) {
 function updateSavedItemsList(type, key, displayName) {
     // 실제 구현에서는 저장된 항목 목록을 표시하는 UI를 업데이트할 수 있습니다
     console.log(`저장 완료: ${displayName}`);
+}
+
+// 새로운 매물별 저장/불러오기 시스템 테스트 함수들
+
+// 테스트용 매물 추가 함수
+function addTestProperty() {
+    if (window.auctionSimulator) {
+        const testProperty = {
+            caseNumber: '2024타경12345',
+            name: '테스트 아파트',
+            location: '서울시 강남구 테헤란로 123',
+            type: '아파트',
+            notes: '테스트용 매물입니다.'
+        };
+        
+        if (!Array.isArray(window.auctionSimulator.properties)) {
+            window.auctionSimulator.properties = [];
+        }
+        
+        window.auctionSimulator.properties.push(testProperty);
+        window.auctionSimulator.renderPropertyTree();
+        console.log('테스트 매물이 추가되었습니다:', testProperty);
+        console.log('현재 매물 개수:', window.auctionSimulator.properties.length);
+    } else {
+        console.error('auctionSimulator가 초기화되지 않았습니다.');
+    }
+}
+
+// 매물별 저장 테스트 함수
+function testPropertySave() {
+    if (window.auctionSimulator) {
+        console.log('=== 매물별 저장 테스트 시작 ===');
+        console.log('현재 매물 개수:', window.auctionSimulator.properties.length);
+        
+        if (window.auctionSimulator.properties.length === 0) {
+            console.log('매물이 없습니다. 테스트 매물을 추가합니다.');
+            addTestProperty();
+        }
+        
+        // 첫 번째 매물의 저장 기능 테스트
+        const firstPropertyIndex = 0;
+        console.log(`매물 ${firstPropertyIndex} 저장 테스트 시작`);
+        window.auctionSimulator.saveAllDataForProperty(firstPropertyIndex);
+    } else {
+        console.error('auctionSimulator가 초기화되지 않았습니다.');
+    }
+}
+
+// 매물별 불러오기 테스트 함수
+function testPropertyLoad() {
+    if (window.auctionSimulator) {
+        console.log('=== 매물별 불러오기 테스트 시작 ===');
+        
+        if (window.auctionSimulator.properties.length === 0) {
+            console.log('매물이 없습니다. 테스트 매물을 추가합니다.');
+            addTestProperty();
+        }
+        
+        // 첫 번째 매물의 불러오기 기능 테스트
+        const firstPropertyIndex = 0;
+        console.log(`매물 ${firstPropertyIndex} 불러오기 테스트 시작`);
+        window.auctionSimulator.loadAllDataForProperty(firstPropertyIndex);
+    } else {
+        console.error('auctionSimulator가 초기화되지 않았습니다.');
+    }
+}
+
+// localStorage 내용 확인 함수 (새로운 키 형식)
+function checkLocalStorage() {
+    console.log('=== localStorage 내용 확인 ===');
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('property_') && key.endsWith('_data')) {
+            console.log(`키: ${key}`);
+            try {
+                const data = JSON.parse(localStorage.getItem(key));
+                console.log('데이터:', data);
+            } catch (error) {
+                console.error('파싱 오류:', error);
+            }
+        }
+    }
+}
+
+// 전체 시스템 테스트 함수
+function testFullSystem() {
+    console.log('=== 전체 시스템 테스트 시작 ===');
+    
+    // 1. 테스트 매물 추가
+    addTestProperty();
+    
+    // 2. 매물 선택 (자동 불러오기 테스트)
+    if (window.auctionSimulator.properties.length > 0) {
+        console.log('매물 선택 테스트...');
+        window.auctionSimulator.selectProperty(0);
+    }
+    
+    // 3. 저장 테스트
+    setTimeout(() => {
+        console.log('저장 테스트...');
+        testPropertySave();
+    }, 1000);
+    
+    // 4. 불러오기 테스트
+    setTimeout(() => {
+        console.log('불러오기 테스트...');
+        testPropertyLoad();
+    }, 2000);
+    
+    // 5. localStorage 확인
+    setTimeout(() => {
+        console.log('localStorage 확인...');
+        checkLocalStorage();
+    }, 3000);
 }
 
 // 불러오기 모달 표시

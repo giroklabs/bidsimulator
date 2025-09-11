@@ -19,7 +19,7 @@
             <!-- 사이드바 -->
             <div class="sidebar">
                 <div class="sidebar-header">
-                    <h3>📋 경매 매물 관리</h3>
+                    <h3>📋 매물 선택</h3>
                     <button class="add-property-btn" id="addPropertyBtn">+ 매물 추가</button>
                 </div>
                 <div class="property-list" id="propertyList">
@@ -55,7 +55,8 @@
                             <div class="form-group">
                                 <label for="propertyType">물건 종류</label>
                                 <select id="propertyType" required>
-                                    <option value="아파트" selected>아파트</option>
+                                    <option value="">물건 종류를 선택하세요</option>
+                                    <option value="아파트">아파트</option>
                                     <option value="오피스텔">오피스텔</option>
                                     <option value="빌라">빌라</option>
                                     <option value="단독주택">단독주택</option>
@@ -80,7 +81,8 @@
                     <div class="form-group">
                                 <label for="auctionStatus">경매 상태</label>
                                 <select id="auctionStatus" required>
-                                    <option value="진행중" selected>진행중</option>
+                                    <option value="">경매 상태를 선택하세요</option>
+                                    <option value="진행중">진행중</option>
                                     <option value="예정">예정</option>
                                     <option value="종료">종료</option>
                                     <option value="유찰">유찰</option>
@@ -114,30 +116,30 @@
                         
                         <div class="form-group">
                             <label for="bidPrice">입찰가격 (원)</label>
-                            <input type="number" id="bidPrice" value="200000000" placeholder="예: 200000000" required>
+                            <input type="number" id="bidPrice" placeholder="예: 200000000" required>
                             <small class="help-text">입찰하고자 하는 가격을 입력하세요</small>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="marketPrice">시세 (원)</label>
-                                <input type="number" id="marketPrice" value="250000000" placeholder="예: 250000000" required>
+                                <input type="number" id="marketPrice" placeholder="예: 250000000" required>
                                 <small class="help-text">현재 시장에서 거래되는 가격</small>
                             </div>
                             <div class="form-group">
                                 <label for="appraisalPrice">감정가 (원)</label>
-                                <input type="number" id="appraisalPrice" value="243000000" placeholder="예: 243000000" required>
+                                <input type="number" id="appraisalPrice" placeholder="예: 243000000" required>
                                 <small class="help-text">경매원이 책정한 감정가</small>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="minimumBid">최저입찰가 (원)</label>
-                                <input type="number" id="minimumBid" value="170100000" placeholder="예: 170100000" required>
+                                <input type="number" id="minimumBid" placeholder="예: 170100000" required>
                                 <small class="help-text">경매에서 시작하는 최저 가격</small>
                             </div>
                     <div class="form-group">
                                 <label for="renovationCost">리모델링 비용 (원)</label>
-                                <input type="number" id="renovationCost" value="10000000" placeholder="예: 10000000" required>
+                                <input type="number" id="renovationCost" placeholder="예: 10000000" required>
                                 <small class="help-text">필요한 리모델링 비용</small>
                             </div>
                         </div>
@@ -149,12 +151,13 @@
                         <div class="form-row">
                     <div class="form-group">
                         <label for="competitorCount">예상 경쟁자 수</label>
-                        <input type="number" id="competitorCount" value="5" placeholder="예: 5" min="1" max="50" required>
+                        <input type="number" id="competitorCount" placeholder="예: 5" min="1" max="50" required>
                     </div>
                     <div class="form-group">
                         <label for="marketCondition">시장 상황</label>
                         <select id="marketCondition" required>
-                            <option value="hot" selected>활발한 시장</option>
+                            <option value="">시장 상황을 선택하세요</option>
+                            <option value="hot">활발한 시장</option>
                             <option value="normal">보통 시장</option>
                             <option value="cold">침체된 시장</option>
                         </select>
@@ -164,7 +167,8 @@
                     <div class="form-group">
                         <label for="urgency">입찰 긴급도</label>
                         <select id="urgency" required>
-                            <option value="high" selected>높음 (반드시 낙찰 필요)</option>
+                            <option value="">입찰 긴급도를 선택하세요</option>
+                            <option value="high">높음 (반드시 낙찰 필요)</option>
                             <option value="medium">보통</option>
                             <option value="low">낮음 (적당한 가격에만)</option>
                         </select>
@@ -172,7 +176,8 @@
                     <div class="form-group">
                                 <label for="auctionType">경매 유형</label>
                                 <select id="auctionType" required>
-                                    <option value="realEstate" selected>부동산 경매</option>
+                                    <option value="">경매 유형을 선택하세요</option>
+                                    <option value="realEstate">부동산 경매</option>
                                     <option value="vehicle">자동차 경매</option>
                                     <option value="art">예술품 경매</option>
                                     <option value="general">일반 물건 경매</option>
@@ -187,8 +192,9 @@
                     <div class="form-group">
                         <label for="failedCount">유찰 횟수</label>
                         <select id="failedCount" required>
+                            <option value="">유찰 횟수를 선택하세요</option>
                             <option value="0">1회차 (첫 경매)</option>
-                            <option value="1" selected>2회차 (1회 유찰)</option>
+                            <option value="1">2회차 (1회 유찰)</option>
                             <option value="2">3회차 (2회 유찰)</option>
                             <option value="3">4회차 (3회 유찰)</option>
                             <option value="4">5회차 이상 (4회 이상 유찰)</option>
@@ -200,11 +206,14 @@
                     <button type="submit" class="simulate-btn">시뮬레이션 실행</button>
                 </form>
                 
-                        <!-- 경매정보 저장 버튼 -->
+                        <!-- 경매정보 저장 안내 -->
                         <div class="save-section">
-                            <button type="button" id="saveAuctionInfoBtn" class="save-btn">💾 경매정보 저장</button>
+                            <div class="save-info">
+                                <p>💡 <strong>저장 안내:</strong> 모든 정보는 매물별로 통합 저장됩니다.</p>
+                                <p>사이드바에서 매물을 선택한 후 "💾" 버튼을 클릭하세요.</p>
+                            </div>
                             <button type="button" id="loadAuctionInfoBtn" class="load-btn">📂 경매정보 불러오기</button>
-                </div>
+                        </div>
                     </div>
 
                     <!-- 물건조사 카드 -->
@@ -355,9 +364,12 @@
                                 </div>
                             </div>
                             
-                            <!-- 물건조사 저장 버튼 -->
+                            <!-- 물건조사 저장 안내 -->
                             <div class="save-section">
-                                <button type="button" id="saveInspectionBtn" class="save-btn">💾 물건조사 저장</button>
+                                <div class="save-info">
+                                    <p>💡 <strong>저장 안내:</strong> 물건조사 정보는 매물별로 통합 저장됩니다.</p>
+                                    <p>사이드바에서 매물을 선택한 후 "💾" 버튼을 클릭하세요.</p>
+                                </div>
                                 <button type="button" id="loadInspectionBtn" class="load-btn">📂 물건조사 불러오기</button>
                             </div>
                         </div>
@@ -480,9 +492,12 @@
                     <div id="strategyAdvice" class="strategy-advice"></div>
                 </div>
                         
-                        <!-- 시뮬레이션 결과 저장 버튼 -->
+                        <!-- 시뮬레이션 결과 저장 안내 -->
                         <div class="save-section" style="display: none;">
-                            <button type="button" id="saveSimulationResultBtn" class="save-btn">💾 시뮬레이션 결과 저장</button>
+                            <div class="save-info">
+                                <p>💡 <strong>저장 안내:</strong> 시뮬레이션 결과는 매물별로 통합 저장됩니다.</p>
+                                <p>사이드바에서 매물을 선택한 후 "💾" 버튼을 클릭하세요.</p>
+                            </div>
                             <button type="button" id="loadSimulationResultBtn" class="load-btn">📂 시뮬레이션 결과 불러오기</button>
                         </div>
                     </div>
@@ -530,8 +545,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="propertyLocation">상세 위치</label>
-                        <input type="text" id="propertyLocation" placeholder="예: 강남구 역삼동">
+                        <label for="modalPropertyLocation">상세 위치</label>
+                        <input type="text" id="modalPropertyLocation" placeholder="예: 강남구 역삼동">
                     </div>
                     <div class="form-group">
                         <label>매각통계 정보</label>
@@ -540,8 +555,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="propertyType">매물 유형</label>
-                        <select id="propertyType">
+                        <label for="modalPropertyType">매물 유형</label>
+                        <select id="modalPropertyType">
                             <option value="">매물 유형을 선택하세요</option>
                             <option value="아파트">아파트</option>
                             <option value="오피스텔">오피스텔</option>

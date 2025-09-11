@@ -43,7 +43,7 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1600px; /* 추가로 넓혀서 1600px */
     margin: 0 auto;
     padding: 20px;
     width: 100%;
@@ -76,7 +76,7 @@ header p {
 }
 
 .sidebar {
-    width: 420px;
+    width: 550px; /* 추가로 더 넓게 */
     background: white;
     border-radius: 20px;
     padding: 30px;
@@ -195,6 +195,11 @@ header p {
 .tree-label {
     flex: 1;
     font-weight: 500;
+    writing-mode: horizontal-tb; /* 가로 텍스트 강제 */
+    text-orientation: mixed; /* 텍스트 방향 정상화 */
+    white-space: nowrap; /* 한 줄로 표시 */
+    overflow: hidden; /* 넘치는 텍스트 숨김 */
+    text-overflow: ellipsis; /* 넘치는 텍스트에 ... 표시 */
 }
 
 .tree-count {
@@ -226,6 +231,10 @@ header p {
     transition: all 0.3s ease;
 }
 
+.property-actions .save-all-btn {
+    color: #2ecc71;
+}
+
 .property-actions .edit-btn {
     color: #28a745;
 }
@@ -236,6 +245,11 @@ header p {
 
 .property-actions button:hover {
     background: rgba(0, 0, 0, 0.1);
+}
+
+.property-actions .save-all-btn:hover {
+    background: rgba(46, 204, 113, 0.1);
+    transform: scale(1.1);
 }
 
 .main-content {
@@ -254,11 +268,11 @@ header p {
     min-width: 0; /* flex 컨테이너가 줄어들 수 있도록 */
 }
 
-/* 각 섹션의 너비를 완전히 동일하게 설정 (크롬 최적화) */
+/* 각 섹션의 너비를 완전히 동일하게 설정 (크롬 최적화) - 더 넓게 */
 .input-section {
     flex: 1 1 0%; /* 퍼센트 단위로 명확하게 지정 */
     min-width: 0;
-    width: 100%;
+    width: 130%; /* 추가로 더 넓게 */
     max-width: none; /* 크롬에서 최대 너비 제한 제거 */
     box-sizing: border-box;
 }
@@ -266,7 +280,7 @@ header p {
 .property-inspection-card {
     flex: 1 1 0%; /* 퍼센트 단위로 명확하게 지정 */
     min-width: 0;
-    width: 100%;
+    width: 130%; /* 추가로 더 넓게 */
     max-width: none; /* 크롬에서 최대 너비 제한 제거 */
     box-sizing: border-box;
 }
@@ -274,7 +288,7 @@ header p {
 .simulation-results-section {
     flex: 1 1 0%; /* 퍼센트 단위로 명확하게 지정 */
     min-width: 0;
-    width: 100%;
+    width: 130%; /* 추가로 더 넓게 */
     max-width: none; /* 크롬에서 최대 너비 제한 제거 */
     box-sizing: border-box;
 }
@@ -1541,6 +1555,26 @@ header p {
 .load-item-btn:hover {
     background: #5a6fd8;
     transform: translateY(-1px);
+}
+
+/* 저장 안내 스타일 */
+.save-info {
+    background: #e8f4fd;
+    border: 1px solid #b8daff;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+}
+
+.save-info p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #0066cc;
+    line-height: 1.4;
+}
+
+.save-info strong {
+    color: #004499;
 }
 
 .close-load-modal {
