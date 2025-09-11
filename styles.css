@@ -143,6 +143,20 @@ header p {
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
+.button-help {
+    margin-top: 8px;
+    text-align: center;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.button-help small {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.75rem;
+    line-height: 1.2;
+}
+
 .property-list, .property-tree {
     max-height: 500px;
     overflow-y: auto;
@@ -231,6 +245,10 @@ header p {
     transition: all 0.3s ease;
 }
 
+.property-actions .load-btn {
+    color: #3498db;
+}
+
 .property-actions .save-all-btn {
     color: #2ecc71;
 }
@@ -245,6 +263,11 @@ header p {
 
 .property-actions button:hover {
     background: rgba(0, 0, 0, 0.1);
+}
+
+.property-actions .load-btn:hover {
+    background: rgba(52, 152, 219, 0.1);
+    transform: scale(1.1);
 }
 
 .property-actions .save-all-btn:hover {
