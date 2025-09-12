@@ -21,8 +21,23 @@
                 <div class="sidebar-header">
                     <h3>📋 매물 선택</h3>
                     <button class="add-property-btn" id="addPropertyBtn">+ 매물 추가</button>
-                    <div class="button-help">
-                        <small>📂 불러오기 | 💾 저장 | ✏️ 편집 | 🗑️ 삭제</small>
+                    <div class="cloud-storage-controls" style="margin-top: 10px;">
+                        <select id="cloudProviderSelect" style="width: 100%; padding: 8px; margin-bottom: 5px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.8rem;">
+                            <option value="">클라우드 서비스 선택</option>
+                            <option value="google">☁️ 구글 드라이브</option>
+                            <option value="kakao">💛 카카오 드라이브</option>
+                            <option value="naver">🟢 네이버 클라우드</option>
+                            <option value="naverDB">🗄️ 네이버 클라우드 DB</option>
+                        </select>
+                        <button class="cloud-connect-btn" id="cloudConnectBtn" style="background: #4285f4; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; width: 100%; margin-bottom: 5px;">
+                            🔗 클라우드 연동
+                        </button>
+                        <button class="backup-btn" id="backupBtn" style="background: #34a853; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; width: 48%; margin-right: 2%;">
+                            📦 백업
+                        </button>
+                        <button class="import-btn" id="importBtn" style="background: #ea4335; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; width: 48%;">
+                            📥 가져오기
+                        </button>
                     </div>
                 </div>
                 <div class="property-list" id="propertyList">
@@ -241,14 +256,6 @@
                     <button type="submit" class="simulate-btn">시뮬레이션 실행</button>
                 </form>
                 
-                        <!-- 경매정보 저장 안내 -->
-                        <div class="save-section">
-                            <div class="save-info">
-                                <p>💡 <strong>저장 안내:</strong> 모든 정보는 매물별로 통합 저장됩니다.</p>
-                                <p>사이드바에서 매물을 선택한 후 "💾" 버튼을 클릭하세요.</p>
-            </div>
-                            <button type="button" id="loadAuctionInfoBtn" class="load-btn">📂 경매정보 불러오기</button>
-                </div>
                     </div>
 
                     <!-- 물건조사 카드 -->
@@ -399,14 +406,6 @@
                                 </div>
                             </div>
                             
-                            <!-- 물건조사 저장 안내 -->
-                            <div class="save-section">
-                                <div class="save-info">
-                                    <p>💡 <strong>저장 안내:</strong> 물건조사 정보는 매물별로 통합 저장됩니다.</p>
-                                    <p>사이드바에서 매물을 선택한 후 "💾" 버튼을 클릭하세요.</p>
-                                </div>
-                                <button type="button" id="loadInspectionBtn" class="load-btn">📂 물건조사 불러오기</button>
-                            </div>
                         </div>
                     </div>
 
@@ -527,14 +526,6 @@
                     <div id="strategyAdvice" class="strategy-advice"></div>
                 </div>
                         
-                        <!-- 시뮬레이션 결과 저장 안내 -->
-                        <div class="save-section" style="display: none;">
-                            <div class="save-info">
-                                <p>💡 <strong>저장 안내:</strong> 시뮬레이션 결과는 매물별로 통합 저장됩니다.</p>
-                                <p>사이드바에서 매물을 선택한 후 "💾" 버튼을 클릭하세요.</p>
-                            </div>
-                            <button type="button" id="loadSimulationResultBtn" class="load-btn">📂 시뮬레이션 결과 불러오기</button>
-                        </div>
                     </div>
                 </div>
 
@@ -623,6 +614,13 @@
     <script src="check-storage.js"></script>
     <script src="emergency-fix.js"></script>
     <script src="fix-sale-rate.js"></script>
+    <script src="google-drive-storage.js"></script>
+    <script src="google-sheets-storage.js"></script>
+    <script src="integrate-google-drive.js"></script>
+    <script src="kakao-drive-storage.js"></script>
+    <script src="naver-cloud-storage.js"></script>
+    <script src="naver-cloud-db.js"></script>
+    <script src="unified-cloud-storage.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

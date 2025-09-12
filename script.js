@@ -280,6 +280,90 @@ class AuctionSimulator {
             console.error('addPropertyBtn 요소를 찾을 수 없습니다');
         }
 
+        // 클라우드 서비스 선택 및 연동 버튼 이벤트
+        const cloudProviderSelect = document.getElementById('cloudProviderSelect');
+        const cloudConnectBtn = document.getElementById('cloudConnectBtn');
+        
+        if (cloudProviderSelect && cloudConnectBtn) {
+            cloudConnectBtn.addEventListener('click', async () => {
+                try {
+                    const selectedProvider = cloudProviderSelect.value;
+                    if (!selectedProvider) {
+                        alert('클라우드 서비스를 선택해주세요.');
+                        return;
+                    }
+
+                    const providerNames = {
+                        google: '구글 드라이브',
+                        kakao: '카카오 드라이브',
+                        naver: '네이버 클라우드',
+                        naverDB: '네이버 클라우드 DB'
+                    };
+
+                    console.log(`${providerNames[selectedProvider]} 연동 시작...`);
+                    await window.cloudStorageHelpers.switchProvider(selectedProvider);
+                } catch (error) {
+                    console.error('클라우드 서비스 연동 실패:', error);
+                }
+            });
+            console.log('클라우드 서비스 연동 버튼 이벤트 리스너 등록 완료');
+        }
+
+        // 백업 버튼 이벤트
+        const backupBtn = document.getElementById('backupBtn');
+        if (backupBtn) {
+            backupBtn.addEventListener('click', async () => {
+                try {
+                    // 현재 활성 클라우드 서비스에 백업
+                    const activeProvider = window.cloudStorageHelpers.getActiveProvider();
+                    if (activeProvider) {
+                        // 현재 로컬 데이터 수집
+                        const allData = {
+                            properties: window.simpleStorage ? window.simpleStorage.getProperties() : [],
+                            timestamp: new Date().toISOString(),
+                            version: '1.0'
+                        };
+                        await window.cloudStorageHelpers.createBackup(allData);
+                    } else {
+                        alert('클라우드 서비스가 연동되지 않았습니다. 먼저 클라우드 서비스를 선택하고 연동해주세요.');
+                    }
+                } catch (error) {
+                    console.error('백업 생성 실패:', error);
+                }
+            });
+            console.log('백업 버튼 이벤트 리스너 등록 완료');
+        }
+
+        // 가져오기 버튼 이벤트
+        const importBtn = document.getElementById('importBtn');
+        if (importBtn) {
+            importBtn.addEventListener('click', async () => {
+                try {
+                    // 현재 활성 클라우드 서비스에서 가져오기
+                    const activeProvider = window.cloudStorageHelpers.getActiveProvider();
+                    if (activeProvider) {
+                        const properties = await window.cloudStorageHelpers.loadAllProperties();
+                        
+                        // 로컬 저장소에 데이터 복원
+                        if (window.simpleStorage && properties.length > 0) {
+                            properties.forEach((property, index) => {
+                                window.simpleStorage.savePropertyData(index, property);
+                            });
+                        }
+                        
+                        // 매물 목록 새로고침
+                        this.renderPropertyTree();
+                        alert(`${activeProvider.name}에서 ${properties.length}개의 매물 데이터를 가져왔습니다!`);
+                    } else {
+                        alert('클라우드 서비스가 연동되지 않았습니다. 먼저 클라우드 서비스를 선택하고 연동해주세요.');
+                    }
+                } catch (error) {
+                    console.error('데이터 가져오기 실패:', error);
+                }
+            });
+            console.log('가져오기 버튼 이벤트 리스너 등록 완료');
+        }
+
         // 물건지 주소 입력 시 매각가율 정보 로드
         const propertyLocationInput = document.getElementById('propertyLocation');
         if (propertyLocationInput) {
@@ -3655,25 +3739,10 @@ class AuctionSimulator {
         }
     }
 
-    // 저장/불러오기 기능 초기화 (개별 저장 버튼 제거, 불러오기만 유지)
+    // 저장/불러오기 기능 초기화 (삭제된 버튼들 제거)
     initializeSaveButtons() {
-        // 경매정보 불러오기만 유지
-        const loadAuctionInfoBtn = document.getElementById('loadAuctionInfoBtn');
-        if (loadAuctionInfoBtn) {
-            loadAuctionInfoBtn.addEventListener('click', loadAuctionInfo);
-        }
-
-        // 시뮬레이션 결과 불러오기만 유지
-        const loadSimulationResultBtn = document.getElementById('loadSimulationResultBtn');
-        if (loadSimulationResultBtn) {
-            loadSimulationResultBtn.addEventListener('click', loadSimulationResult);
-        }
-
-        // 물건조사 불러오기만 유지
-        const loadInspectionBtn = document.getElementById('loadInspectionBtn');
-        if (loadInspectionBtn) {
-            loadInspectionBtn.addEventListener('click', loadInspectionData);
-        }
+        // 개별 불러오기 버튼들이 삭제되었으므로 이벤트 리스너 제거
+        console.log('개별 저장/불러오기 버튼들이 삭제됨 - 이벤트 리스너 초기화 완료');
     }
 
     // 매물별 모든 정보 저장 (새로운 간단한 시스템)
@@ -3898,17 +3967,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const waitForManagers = () => {
         if (window.storageManager && window.formDataManager) {
             console.log('StorageManager와 FormDataManager 준비 완료');
-            try {
+    try {
                 auctionSimulator = new AuctionSimulator();
                 window.auctionSimulator = auctionSimulator; // 전역 접근 가능하도록 설정
-                console.log('시뮬레이터 초기화 완료');
+        console.log('시뮬레이터 초기화 완료');
                 
                 // 조정계수 검증 테스트를 전역에서 호출할 수 있도록 설정
                 window.testAdjustmentFactors = () => auctionSimulator.testAdjustmentFactors();
                 console.log('조정계수 검증 테스트 함수 등록 완료: testAdjustmentFactors()');
-            } catch (error) {
-                console.error('시뮬레이터 초기화 오류:', error);
-            }
+    } catch (error) {
+        console.error('시뮬레이터 초기화 오류:', error);
+    }
         } else {
             console.log('StorageManager와 FormDataManager 대기 중...');
             setTimeout(waitForManagers, 100);

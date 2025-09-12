@@ -43,7 +43,7 @@ body {
 }
 
 .container {
-    max-width: 1600px; /* 추가로 넓혀서 1600px */
+    max-width: 2024px; /* 10% 추가 증가: 1840px → 2024px */
     margin: 0 auto;
     padding: 20px;
     width: 100%;
@@ -143,19 +143,6 @@ header p {
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
-.button-help {
-    margin-top: 8px;
-    text-align: center;
-    padding: 4px 8px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-}
-
-.button-help small {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.75rem;
-    line-height: 1.2;
-}
 
 .property-list, .property-tree {
     max-height: 500px;
@@ -291,28 +278,14 @@ header p {
     min-width: 0; /* flex 컨테이너가 줄어들 수 있도록 */
 }
 
-/* 각 섹션의 너비를 완전히 동일하게 설정 (크롬 최적화) - 더 넓게 */
-.input-section {
-    flex: 1 1 0%; /* 퍼센트 단위로 명확하게 지정 */
-    min-width: 0;
-    width: 130%; /* 추가로 더 넓게 */
-    max-width: none; /* 크롬에서 최대 너비 제한 제거 */
-    box-sizing: border-box;
-}
-
-.property-inspection-card {
-    flex: 1 1 0%; /* 퍼센트 단위로 명확하게 지정 */
-    min-width: 0;
-    width: 130%; /* 추가로 더 넓게 */
-    max-width: none; /* 크롬에서 최대 너비 제한 제거 */
-    box-sizing: border-box;
-}
-
+/* 모든 섹션의 너비를 일관되게 설정 (시뮬레이션 실행과 무관) */
+.input-section,
+.property-inspection-card,
 .simulation-results-section {
     flex: 1 1 0%; /* 퍼센트 단위로 명확하게 지정 */
     min-width: 0;
-    width: 130%; /* 추가로 더 넓게 */
-    max-width: none; /* 크롬에서 최대 너비 제한 제거 */
+    width: 100%; /* 모든 섹션을 동일한 너비로 설정 */
+    max-width: none; /* 최대 너비 제한 제거 */
     box-sizing: border-box;
 }
 
@@ -598,6 +571,9 @@ header p {
 
 .detailed-results, .price-analysis {
     margin-bottom: 30px;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
 }
 
 .price-analysis {
@@ -646,6 +622,9 @@ header p {
     background: #f8f9fa;
     padding: 25px;
     border-radius: 15px;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
 }
 
 .chart-container h3 {
@@ -658,6 +637,12 @@ header p {
 
 #probabilityChart {
     max-height: 400px;
+}
+
+.strategy-section {
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
 }
 
 .strategy-section h3 {
@@ -978,6 +963,9 @@ header p {
     background: #f0f8ff;
     border-radius: 10px;
     border-left: 4px solid #4a90e2;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
 }
 
 .statistics-section h3 {
@@ -1222,6 +1210,9 @@ header p {
     border-radius: 15px;
     margin: 25px 0;
     box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
 }
 
 .sale-rate-calculation h3 {
@@ -1291,6 +1282,9 @@ header p {
     display: flex;
     gap: 20px;
     margin-top: 20px;
+    width: 100%;
+    max-width: none; /* 최대 너비 제한 제거 */
+    box-sizing: border-box;
 }
 
 .simulation-results-card {
@@ -1422,49 +1416,6 @@ header p {
     width: 150px;
 }
 
-/* 저장 버튼 스타일 */
-.save-section {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px solid #f0f0f0;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
-
-.save-btn, .load-btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Noto Sans KR', sans-serif;
-}
-
-.save-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.save-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
-
-.load-btn {
-    background: #f8f9fa;
-    color: #667eea;
-    border: 2px solid #667eea;
-}
-
-.load-btn:hover {
-    background: #667eea;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-}
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
@@ -1492,14 +1443,6 @@ header p {
         padding: 15px;
     }
     
-    .save-section {
-        flex-direction: column;
-        gap: 8px;
-    }
-    
-    .save-btn, .load-btn {
-        width: 100%;
-    }
 }
 
 /* 불러오기 모달 스타일 */
@@ -1580,25 +1523,6 @@ header p {
     transform: translateY(-1px);
 }
 
-/* 저장 안내 스타일 */
-.save-info {
-    background: #e8f4fd;
-    border: 1px solid #b8daff;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 15px;
-}
-
-.save-info p {
-    margin: 5px 0;
-    font-size: 14px;
-    color: #0066cc;
-    line-height: 1.4;
-}
-
-.save-info strong {
-    color: #004499;
-}
 
 .close-load-modal {
     width: 100%;
