@@ -9,7 +9,7 @@ window.githubStorage = {
     GIST_API_URL: 'https://api.github.com/gists',
     
     // OAuth 설정 (GitHub OAuth App에서 생성)
-    CLIENT_ID: 'Iv1.8a61f9b3a7aba766', // GitHub OAuth App Client ID
+    CLIENT_ID: 'Ov23li0YV8FzJ8qY3K5H', // GitHub OAuth App Client ID (실제 생성 후 업데이트 필요)
     REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator/', // GitHub Pages URL
     OAUTH_URL: 'https://github.com/login/oauth/authorize',
     
@@ -113,15 +113,11 @@ window.githubStorage = {
         }
     },
     
-    // GitHub OAuth 로그인 시작
+    // GitHub OAuth 로그인 시작 (현재는 토큰 방식으로 대체)
     connectToGitHub() {
-        const state = 'github_oauth';
-        const scope = 'gist';
-        
-        const authUrl = `${this.OAUTH_URL}?client_id=${this.CLIENT_ID}&redirect_uri=${encodeURIComponent(this.REDIRECT_URI)}&scope=${scope}&state=${state}`;
-        
-        console.log('GitHub OAuth 로그인 시작');
-        window.location.href = authUrl;
+        // OAuth App이 아직 생성되지 않았으므로 토큰 방식으로 대체
+        alert('OAuth 로그인은 아직 설정 중입니다.\n\n토큰 방식으로 로그인해주세요.');
+        this.connectToGitHubWithToken();
     },
     
     // 인증 코드를 액세스 토큰으로 교환
@@ -153,8 +149,26 @@ window.githubStorage = {
     
     // GitHub 인증 시작 (토큰 방식 - 백업)
     async connectToGitHubWithToken() {
-        const token = prompt('GitHub Personal Access Token을 입력하세요:\n\n1. GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)\n2. Generate new token (classic)\n3. "gist" 권한 체크\n4. 생성된 토큰을 여기에 입력');
+        // 토큰 생성 가이드 표시
+        const showGuide = confirm('GitHub Personal Access Token이 필요합니다.\n\n토큰 생성 가이드를 보시겠습니까?');
         
+        if (showGuide) {
+            // GitHub 토큰 생성 페이지 열기
+            window.open('https://github.com/settings/tokens/new?scopes=gist&description=경매시뮬레이션', '_blank');
+            
+            // 잠시 후 토큰 입력 요청
+            setTimeout(() => {
+                const token = prompt('GitHub Personal Access Token을 입력하세요:\n\n위에서 생성한 토큰을 복사해서 붙여넣어주세요.');
+                this.processToken(token);
+            }, 2000);
+        } else {
+            const token = prompt('GitHub Personal Access Token을 입력하세요:\n\n1. GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)\n2. Generate new token (classic)\n3. "gist" 권한 체크\n4. 생성된 토큰을 여기에 입력');
+            this.processToken(token);
+        }
+    },
+    
+    // 토큰 처리
+    async processToken(token) {
         if (!token || token.trim() === '') {
             alert('토큰이 입력되지 않았습니다.');
             return false;
