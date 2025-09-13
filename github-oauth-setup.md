@@ -65,25 +65,40 @@ REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator/', // GitHub Pages URL
 
 ## 6. 404 에러 해결 방법
 
-### 일반적인 원인들
-1. **URL 끝의 슬래시**: `https://giroklabs.github.io/bidsimulator/` ❌ → `https://giroklabs.github.io/bidsimulator` ✅
-2. **잘못된 Client ID**: OAuth App에서 정확한 Client ID 확인
-3. **Callback URL 불일치**: OAuth App 설정과 코드의 REDIRECT_URI가 정확히 일치해야 함
+### 현재 발생 중인 문제
+**GitHub OAuth App 자체에서 404 에러 발생** - Client ID가 잘못되었거나 OAuth App이 존재하지 않음
 
-### 해결 단계
-1. **GitHub OAuth App 설정 확인**:
-   - https://github.com/settings/applications/0v231iLVfDCFuPGVfmpu 접속
-   - Authorization callback URL이 `https://giroklabs.github.io/bidsimulator`인지 확인
-   - 끝에 슬래시가 없어야 함
+### 해결 방법
 
-2. **코드 확인**:
-   ```javascript
-   REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator' // 슬래시 없음
+#### 방법 1: 새로운 OAuth App 생성 (권장)
+1. **OAuth App 삭제 후 재생성**:
+   - https://github.com/settings/applications 접속
+   - 기존 OAuth App 삭제
+   - 새로운 OAuth App 생성
+
+2. **올바른 정보 입력**:
+   ```
+   Application name: 경매 입찰가격 시뮬레이션
+   Homepage URL: https://giroklabs.github.io/bidsimulator
+   Authorization callback URL: https://giroklabs.github.io/bidsimulator
    ```
 
-3. **브라우저 개발자 도구 확인**:
-   - F12 → Console 탭에서 OAuth URL 확인
-   - Network 탭에서 404 에러 상세 정보 확인
+3. **새 Client ID로 코드 업데이트**:
+   ```javascript
+   CLIENT_ID: '새로_생성된_Client_ID', // OAuth App에서 복사
+   ```
+
+#### 방법 2: 토큰 방식 사용 (즉시 해결)
+현재 OAuth App 문제로 인해 **Personal Access Token 방식**을 사용하는 것이 더 안정적입니다.
+
+1. **"🔗 GitHub 로그인 (토큰 방식)"** 버튼 클릭
+2. **토큰 생성 가이드** 따라하기
+3. **토큰 입력**하여 즉시 연결
+
+### 일반적인 404 원인들
+1. **OAuth App 존재하지 않음**: Client ID가 잘못되었거나 삭제됨
+2. **URL 끝의 슬래시**: `https://giroklabs.github.io/bidsimulator/` ❌ → `https://giroklabs.github.io/bidsimulator` ✅
+3. **Callback URL 불일치**: OAuth App 설정과 코드의 REDIRECT_URI가 정확히 일치해야 함
 
 ## 7. 보안 고려사항
 

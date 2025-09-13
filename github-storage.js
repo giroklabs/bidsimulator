@@ -134,43 +134,19 @@ window.githubStorage = {
         }
     },
     
-    // GitHub OAuth 로그인 시작
+    // GitHub OAuth 로그인 시작 (현재 OAuth App 문제로 토큰 방식 사용)
     connectToGitHub() {
-        const state = 'github_oauth';
-        const scope = 'gist';
+        // OAuth App 404 에러 문제로 인해 토큰 방식으로 대체
+        const useToken = confirm('현재 GitHub OAuth App에 문제가 있습니다.\n\n더 안정적인 Personal Access Token 방식으로 로그인하시겠습니까?\n\n(토큰 방식이 더 간편하고 안정적입니다)');
         
-        const authUrl = `${this.OAUTH_URL}?client_id=${this.CLIENT_ID}&redirect_uri=${encodeURIComponent(this.REDIRECT_URI)}&scope=${scope}&state=${state}`;
-        
-        console.log('GitHub OAuth 로그인 시작');
-        console.log('OAuth URL:', authUrl);
-        console.log('Client ID:', this.CLIENT_ID);
-        console.log('Redirect URI:', this.REDIRECT_URI);
-        
-        // URL 유효성 검사
-        if (!this.CLIENT_ID || this.CLIENT_ID === '') {
-            alert('OAuth Client ID가 설정되지 않았습니다.');
-            return;
-        }
-        
-        // OAuth URL 테스트
-        try {
-            new URL(authUrl);
-        } catch (error) {
-            console.error('잘못된 OAuth URL:', error);
-            alert('OAuth URL이 올바르지 않습니다. 설정을 확인해주세요.');
-            return;
-        }
-        
-        // 사용자에게 OAuth 로그인 안내
-        const proceed = confirm('GitHub OAuth 로그인을 시작합니다.\n\n새 탭에서 GitHub 로그인 페이지가 열립니다.\n\n계속하시겠습니까?');
-        
-        if (proceed) {
-            try {
-                // OAuth URL로 이동
-                window.location.href = authUrl;
-            } catch (error) {
-                console.error('OAuth 리디렉션 실패:', error);
-                alert('OAuth 로그인 중 오류가 발생했습니다.\n\n토큰 방식으로 로그인해주세요.');
+        if (useToken) {
+            this.connectToGitHubWithToken();
+        } else {
+            // OAuth App 생성 가이드 제공
+            const createApp = confirm('GitHub OAuth App을 새로 생성하시겠습니까?\n\nOAuth App 생성 페이지가 열립니다.');
+            if (createApp) {
+                window.open('https://github.com/settings/applications/new', '_blank');
+                alert('OAuth App 생성 후 Client ID를 코드에 업데이트해야 합니다.\n\n현재는 토큰 방식을 사용해주세요.');
                 this.connectToGitHubWithToken();
             }
         }
