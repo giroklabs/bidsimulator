@@ -8,8 +8,16 @@ window.githubStorage = {
     GITHUB_API_BASE: 'https://api.github.com',
     GIST_API_URL: 'https://api.github.com/gists',
     
-    // 인증 토큰 (사용자가 입력)
+    // OAuth 설정 (GitHub OAuth App에서 생성)
+    CLIENT_ID: 'Iv1.8a61f9b3a7aba766', // GitHub OAuth App Client ID
+    REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator/', // GitHub Pages URL
+    OAUTH_URL: 'https://github.com/login/oauth/authorize',
+    
+    // 인증 토큰 (OAuth로 획득)
     accessToken: null,
+    
+    // 사용자 정보
+    userInfo: null,
     
     // Gist ID (저장된 데이터의 고유 ID)
     gistId: null,
@@ -17,6 +25,9 @@ window.githubStorage = {
     // 초기화
     init() {
         console.log('GitHub Storage 초기화 시작');
+        
+        // URL에서 OAuth 콜백 처리
+        this.handleOAuthCallback();
         
         // 저장된 토큰과 Gist ID 불러오기
         this.loadStoredCredentials();
@@ -27,10 +38,26 @@ window.githubStorage = {
         console.log('GitHub Storage 초기화 완료');
     },
     
+    // OAuth 콜백 처리
+    handleOAuthCallback() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        
+        if (code && state === 'github_oauth') {
+            console.log('OAuth 콜백 감지됨, 토큰 교환 시작');
+            this.exchangeCodeForToken(code);
+            
+            // URL에서 인증 코드 제거
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    },
+    
     // 저장된 인증 정보 불러오기
     loadStoredCredentials() {
         this.accessToken = localStorage.getItem('github_access_token');
         this.gistId = localStorage.getItem('github_gist_id');
+        this.userInfo = JSON.parse(localStorage.getItem('github_user_info') || 'null');
         
         if (this.accessToken && this.gistId) {
             console.log('저장된 GitHub 인증 정보 발견');
@@ -38,12 +65,16 @@ window.githubStorage = {
     },
     
     // 인증 정보 저장
-    saveCredentials(token, gistId) {
+    saveCredentials(token, gistId, userInfo = null) {
         this.accessToken = token;
         this.gistId = gistId;
+        this.userInfo = userInfo;
         
         localStorage.setItem('github_access_token', token);
         localStorage.setItem('github_gist_id', gistId);
+        if (userInfo) {
+            localStorage.setItem('github_user_info', JSON.stringify(userInfo));
+        }
         
         console.log('GitHub 인증 정보 저장 완료');
         this.updateUI();
@@ -69,7 +100,8 @@ window.githubStorage = {
         const syncButtons = document.getElementById('github-sync-buttons');
         
         if (this.accessToken && this.gistId) {
-            if (statusElement) statusElement.textContent = '✅ GitHub 연동됨';
+            const userName = this.userInfo ? this.userInfo.login : '사용자';
+            if (statusElement) statusElement.textContent = `✅ ${userName}님 로그인됨`;
             if (connectButton) connectButton.style.display = 'none';
             if (disconnectButton) disconnectButton.style.display = 'inline-block';
             if (syncButtons) syncButtons.style.display = 'block';
@@ -81,8 +113,46 @@ window.githubStorage = {
         }
     },
     
-    // GitHub 인증 시작
-    async connectToGitHub() {
+    // GitHub OAuth 로그인 시작
+    connectToGitHub() {
+        const state = 'github_oauth';
+        const scope = 'gist';
+        
+        const authUrl = `${this.OAUTH_URL}?client_id=${this.CLIENT_ID}&redirect_uri=${encodeURIComponent(this.REDIRECT_URI)}&scope=${scope}&state=${state}`;
+        
+        console.log('GitHub OAuth 로그인 시작');
+        window.location.href = authUrl;
+    },
+    
+    // 인증 코드를 액세스 토큰으로 교환
+    async exchangeCodeForToken(code) {
+        try {
+            // GitHub OAuth 토큰 교환 (프록시 서버 필요)
+            const response = await fetch('https://github.com/login/oauth/access_token', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    client_id: this.CLIENT_ID,
+                    client_secret: 'GitHub OAuth App Client Secret', // 실제 환경에서는 서버에서 처리
+                    code: code
+                })
+            });
+            
+            // CORS 문제로 인해 직접 호출이 불가능하므로 대안 방법 사용
+            // GitHub OAuth는 보안상 클라이언트에서 직접 토큰 교환을 할 수 없음
+            alert('OAuth 인증이 완료되었지만, 토큰 교환을 위해서는 서버가 필요합니다.\n\n현재는 Personal Access Token 방식을 사용해주세요.');
+            
+        } catch (error) {
+            console.error('토큰 교환 오류:', error);
+            alert('인증 중 오류가 발생했습니다. Personal Access Token 방식을 사용해주세요.');
+        }
+    },
+    
+    // GitHub 인증 시작 (토큰 방식 - 백업)
+    async connectToGitHubWithToken() {
         const token = prompt('GitHub Personal Access Token을 입력하세요:\n\n1. GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)\n2. Generate new token (classic)\n3. "gist" 권한 체크\n4. 생성된 토큰을 여기에 입력');
         
         if (!token || token.trim() === '') {
@@ -95,12 +165,15 @@ window.githubStorage = {
             const isValid = await this.validateToken(token.trim());
             
             if (isValid) {
+                // 사용자 정보 가져오기
+                const userInfo = await this.getUserInfo(token.trim());
+                
                 // 새 Gist 생성 또는 기존 Gist 사용
                 const gistId = await this.createOrGetGist(token.trim());
                 
                 if (gistId) {
-                    this.saveCredentials(token.trim(), gistId);
-                    alert('GitHub 연동이 완료되었습니다!');
+                    this.saveCredentials(token.trim(), gistId, userInfo);
+                    alert(`GitHub 연동이 완료되었습니다!\n환영합니다, ${userInfo.login}님!`);
                     return true;
                 } else {
                     alert('Gist 생성에 실패했습니다.');
@@ -131,6 +204,27 @@ window.githubStorage = {
         } catch (error) {
             console.error('토큰 검증 오류:', error);
             return false;
+        }
+    },
+    
+    // 사용자 정보 가져오기
+    async getUserInfo(token) {
+        try {
+            const response = await fetch(`${this.GITHUB_API_BASE}/user`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (response.ok) {
+                return await response.json();
+            } else {
+                throw new Error('사용자 정보를 가져올 수 없습니다.');
+            }
+        } catch (error) {
+            console.error('사용자 정보 가져오기 오류:', error);
+            throw error;
         }
     },
     
@@ -332,11 +426,19 @@ window.githubStorage = {
 
 // UI 이벤트 리스너 등록
 document.addEventListener('DOMContentLoaded', () => {
-    // GitHub 연결 버튼
+    // GitHub OAuth 로그인 버튼
     const connectButton = document.getElementById('github-connect-btn');
     if (connectButton) {
         connectButton.addEventListener('click', () => {
             window.githubStorage.connectToGitHub();
+        });
+    }
+    
+    // GitHub 토큰 연결 버튼
+    const tokenButton = document.getElementById('github-token-btn');
+    if (tokenButton) {
+        tokenButton.addEventListener('click', () => {
+            window.githubStorage.connectToGitHubWithToken();
         });
     }
     
