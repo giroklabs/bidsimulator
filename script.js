@@ -1141,16 +1141,7 @@ class AuctionSimulator {
     populateFormWithSimulationResult(simulationResult) {
         console.log('시뮬레이션 결과를 폼에 채우기:', simulationResult);
         
-        // 시뮬레이션 결과 필드들 채우기
-        if (simulationResult.recommendedPrice) {
-            document.getElementById('recommendedPrice').textContent = simulationResult.recommendedPrice;
-        }
-        if (simulationResult.winProbability) {
-            document.getElementById('winProbability').textContent = simulationResult.winProbability;
-        }
-        if (simulationResult.expectedProfit) {
-            document.getElementById('expectedProfit').textContent = simulationResult.expectedProfit;
-        }
+        // 시뮬레이션 결과 필드들 채우기 (권장가격 제거)
         if (simulationResult.totalCost) {
             document.getElementById('totalCost').textContent = simulationResult.totalCost;
         }
@@ -3810,61 +3801,7 @@ class AuctionSimulator {
             }
         });
         
-        // 통합된 권장 입찰가만 표시 (매각가율 기반 계산 결과 사용)
-        if (bidCalculation) {
-            // 통합된 권장 입찰가를 메인 결과에 표시
-            const recommendedPriceEl = document.getElementById('recommendedPrice');
-            const winProbabilityEl = document.getElementById('winProbability');
-            const expectedProfitEl = document.getElementById('expectedProfit');
-            
-            if (recommendedPriceEl) {
-                recommendedPriceEl.textContent = this.formatNumber(Math.round(bidCalculation.recommendedBidPrice));
-            }
-            if (winProbabilityEl) {
-                const winProb = result.winProbability;
-                if (isNaN(winProb) || winProb === null || winProb === undefined) {
-                    winProbabilityEl.textContent = '계산 불가';
-                } else {
-                    winProbabilityEl.textContent = Math.round(winProb * 100) + '%';
-                }
-            }
-            if (expectedProfitEl) {
-                const expectedProfit = result.expectedProfit;
-                if (isNaN(expectedProfit) || expectedProfit === null || expectedProfit === undefined) {
-                    expectedProfitEl.textContent = '계산 불가';
-                } else {
-                    expectedProfitEl.textContent = Math.round(expectedProfit) + '%';
-                }
-            }
-            
-            // 매각가율 기반 상세 계산 결과 표시
-            this.displaySaleRateBasedCalculation(bidCalculation);
-        } else {
-            // 매각가율 기반 계산이 없는 경우 기존 방식 사용
-            const recommendedPriceEl = document.getElementById('recommendedPrice');
-            const winProbabilityEl = document.getElementById('winProbability');
-            const expectedProfitEl = document.getElementById('expectedProfit');
-            
-            if (recommendedPriceEl) {
-                recommendedPriceEl.textContent = this.formatNumber(Math.round(result.recommendedBid));
-            }
-            if (winProbabilityEl) {
-                const winProb = result.winProbability;
-                if (isNaN(winProb) || winProb === null || winProb === undefined) {
-                    winProbabilityEl.textContent = '계산 불가';
-                } else {
-                    winProbabilityEl.textContent = Math.round(winProb * 100) + '%';
-                }
-            }
-            if (expectedProfitEl) {
-                const expectedProfit = result.expectedProfit;
-                if (isNaN(expectedProfit) || expectedProfit === null || expectedProfit === undefined) {
-                    expectedProfitEl.textContent = '계산 불가';
-                } else {
-                    expectedProfitEl.textContent = Math.round(expectedProfit) + '%';
-                }
-            }
-        }
+        // 통합된 권장 입찰가 표시 제거 - 그래프만 표시
         
         // 상세 비용 (원 단위로 표시)
         const totalCostInWon = costInfo.totalCost;

@@ -441,31 +441,12 @@
                     <!-- 시뮬레이션 결과 카드 -->
                     <div class="simulation-results-section" style="display: none;">
                         <h2>시뮬레이션 결과</h2>
-                        <div class="result-cards">
-                            <div class="result-card main-result">
-                                <h3>🎯 통합 권장 입찰가격</h3>
-                                <div class="price-display" id="recommendedPrice">0</div>
-                                <p class="price-unit">원</p>
-                                <div class="result-summary">
-                                    <div class="summary-item">
-                                        <span class="label">낙찰 확률</span>
-                                        <span class="value" id="winProbability">0%</span>
-                                    </div>
-                                    <div class="summary-item">
-                                        <span class="label">예상 수익률</span>
-                                        <span class="value" id="expectedProfit">0%</span>
-                                    </div>
-                                    <div class="summary-item">
-                                        <span class="label">리스크 조정 수익률</span>
-                                        <span class="value" id="riskAdjustedProfit">0%</span>
-                                    </div>
-                                    <div class="summary-item">
-                                        <span class="label">모델 신뢰도</span>
-                                        <span class="value" id="modelConfidence">0%</span>
-                    </div>
-                    </div>
-                    </div>
-                </div>
+                        
+                        <!-- 입찰가격별 낙찰 확률 그래프 (최상단으로 이동) -->
+                        <div class="chart-container">
+                            <h3>입찰가격별 낙찰 확률</h3>
+                            <canvas id="probabilityChart"></canvas>
+                        </div>
 
                 <div class="detailed-results" style="display: none;">
                     <h3>상세 비용 분석</h3>
@@ -668,10 +649,6 @@
                     </div>
                 </div>
 
-                <div class="chart-container" style="display: none;">
-                    <h3>입찰가격별 낙찰 확률</h3>
-                    <canvas id="probabilityChart"></canvas>
-                </div>
 
                 <div class="strategy-section" style="display: none;">
                     <h3>입찰 전략</h3>
