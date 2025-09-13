@@ -27,6 +27,29 @@
                 <div class="sidebar-header">
                     <h3>📋 매물 선택</h3>
                     <button class="add-property-btn" id="addPropertyBtn">+ 매물 추가</button>
+                    <!-- GitHub 연동 섹션 -->
+                    <div class="github-storage-section" style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 0.9rem; color: #333;">🐙 GitHub 연동</h4>
+                        <div id="github-status" style="font-size: 0.8rem; margin-bottom: 8px; color: #666;">❌ GitHub 미연동</div>
+                        
+                        <button id="github-connect-btn" style="background: #24292e; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; width: 100%; margin-bottom: 5px;">
+                            🔗 GitHub 연결
+                        </button>
+                        
+                        <button id="github-disconnect-btn" style="background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; width: 100%; margin-bottom: 5px; display: none;">
+                            🔌 연결 해제
+                        </button>
+                        
+                        <div style="display: none;" id="github-sync-buttons">
+                            <button id="github-sync-to-btn" style="background: #28a745; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; width: 48%; margin-right: 2%;">
+                                ⬆️ 업로드
+                            </button>
+                            <button id="github-sync-from-btn" style="background: #007bff; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; font-size: 0.7rem; width: 48%;">
+                                ⬇️ 다운로드
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="cloud-storage-controls" style="margin-top: 10px;">
                         <select id="cloudProviderSelect" style="width: 100%; padding: 8px; margin-bottom: 5px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.8rem;">
                             <option value="">클라우드 서비스 선택</option>
@@ -614,6 +637,7 @@
     </div>
 
     <script src="simple-storage.js"></script>
+    <script src="github-storage.js"></script>
     <script src="storage-manager.js"></script>
     <script src="form-data-manager.js"></script>
     <script src="debug-save-load.js"></script>
