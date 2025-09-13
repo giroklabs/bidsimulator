@@ -3225,18 +3225,23 @@ class AuctionSimulator {
             console.log('최적 입찰가격 계산 완료:', result);
             
             console.log('총 비용 계산 시작');
-            // 총 비용 계산 (원 단위로 계산)
-            const costInfo = this.calculateTotalCost(result.recommendedBid, auctionType, renovationCost);
-            console.log('총 비용 계산 완료:', costInfo);
+            // 총 비용 계산 (사용자가 입력한 입찰가격 기준으로 계산)
+            const userBidPrice = bidPrice > 0 ? bidPrice : result.recommendedBid; // 사용자가 입력한 가격 우선, 없으면 권장가격 사용
+            const costInfo = this.calculateTotalCost(userBidPrice, auctionType, renovationCost);
+            console.log('총 비용 계산 완료 (사용자 입력 가격 기준):', {
+                사용자입력가격: bidPrice.toLocaleString(),
+                비용계산기준: userBidPrice.toLocaleString(),
+                비용정보: costInfo
+            });
             
             console.log('시세 대비 수익성 분석 시작');
-            // 시세 대비 수익성 분석 (원 단위로 계산)
-            const marketProfitability = this.calculateMarketProfitability(result.recommendedBid, marketPrice, costInfo.totalCost);
+            // 시세 대비 수익성 분석 (사용자가 입력한 입찰가격 기준으로 계산)
+            const marketProfitability = this.calculateMarketProfitability(userBidPrice, marketPrice, costInfo.totalCost);
             console.log('시세 대비 수익성 분석 완료:', marketProfitability);
             
             console.log('결과 표시 시작');
-            // 결과 표시 (원 단위로 표시)
-            this.displayResults(result, costInfo, targetPrice, competitorCount, marketCondition, urgency,
+            // 결과 표시 (원 단위로 표시) - 비용은 사용자가 입력한 입찰가격 기준으로 계산됨
+            this.displayResults(result, costInfo, userBidPrice, competitorCount, marketCondition, urgency,
                               marketPrice, appraisalPrice, minimumBid, marketProfitability, failedCount, renovationCost, targetProfitRate, result.saleRateBasedCalculation);
             console.log('결과 표시 완료');
             
@@ -3394,10 +3399,10 @@ class AuctionSimulator {
             totalInvestmentEl.textContent = this.formatNumber(Math.round(totalInvestment)) + '원';
         }
         
-        // 가격 분석 (원 단위 기준으로 계산)
-        const appraisalRatio = ((result.recommendedBid / appraisalPrice) * 100).toFixed(1);
-        const marketRatio = ((result.recommendedBid / marketPrice) * 100).toFixed(1);
-        const minimumRatio = ((result.recommendedBid / minimumBid) * 100).toFixed(1);
+        // 가격 분석 (사용자 입력 가격 기준으로 계산)
+        const appraisalRatio = ((bidPrice / appraisalPrice) * 100).toFixed(1);
+        const marketRatio = ((bidPrice / marketPrice) * 100).toFixed(1);
+        const minimumRatio = ((bidPrice / minimumBid) * 100).toFixed(1);
         
         const appraisalRatioEl = document.getElementById('appraisalRatio');
         const marketRatioEl = document.getElementById('marketRatio');
@@ -3414,7 +3419,7 @@ class AuctionSimulator {
         const calculatedTargetPriceEl = document.getElementById('calculatedTargetPrice');
         
         if (targetProfitRateDisplayEl) targetProfitRateDisplayEl.textContent = targetProfitRate + '%';
-        if (calculatedTargetPriceEl) calculatedTargetPriceEl.textContent = this.formatNumber(Math.round(bidPrice)) + '원';
+        if (calculatedTargetPriceEl) calculatedTargetPriceEl.textContent = this.formatNumber(Math.round(bidPrice)) + '원 (사용자 입력)';
         
         // 전략 조언
         const strategyAdvice = this.generateStrategyAdvice(
