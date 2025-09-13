@@ -73,6 +73,90 @@ header p {
     display: flex;
     gap: 20px;
     min-height: auto; /* 높이 제한 제거 */
+    position: relative;
+}
+
+/* GitHub 연동 레이어 */
+.github-integration-layer {
+    position: absolute;
+    top: -80px;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.github-storage-section h4 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.github-storage-section #github-status {
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    color: #666;
+    padding: 5px 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #dc3545;
+}
+
+.github-storage-section button {
+    background: #24292e;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    width: 100%;
+    margin-bottom: 5px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.github-storage-section button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.github-storage-section button:active {
+    transform: translateY(0);
+}
+
+.github-storage-section #github-token-btn {
+    background: #6c757d;
+    font-size: 0.75rem;
+    padding: 6px 10px;
+}
+
+.github-storage-section #github-disconnect-btn {
+    background: #dc3545;
+}
+
+.github-storage-section #github-sync-buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.github-storage-section #github-sync-to-btn {
+    background: #28a745;
+    width: 48%;
+    margin-bottom: 0;
+}
+
+.github-storage-section #github-sync-from-btn {
+    background: #007bff;
+    width: 48%;
+    margin-bottom: 0;
 }
 
 .sidebar {
@@ -292,6 +376,13 @@ header p {
 @media (max-width: 1024px) {
     .layout {
         flex-direction: column;
+    }
+    
+    .github-integration-layer {
+        position: static;
+        top: auto;
+        margin-bottom: 20px;
+        border-radius: 12px;
     }
     
     .sidebar {
