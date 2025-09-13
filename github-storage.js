@@ -35,7 +35,28 @@ window.githubStorage = {
         // UI 업데이트
         this.updateUI();
         
+        // 에러 처리 설정
+        this.setupErrorHandling();
+        
         console.log('GitHub Storage 초기화 완료');
+    },
+    
+    // 에러 처리 설정
+    setupErrorHandling() {
+        // CSP 에러 모니터링
+        window.addEventListener('error', (event) => {
+            if (event.message && event.message.includes('Content Security Policy')) {
+                console.warn('CSP 에러 감지됨:', event.message);
+                // CSP 에러가 발생해도 OAuth는 계속 시도
+            }
+        });
+        
+        // 리소스 로딩 실패 모니터링
+        window.addEventListener('unhandledrejection', (event) => {
+            if (event.reason && event.reason.message && event.reason.message.includes('CSP')) {
+                console.warn('CSP 관련 Promise rejection:', event.reason.message);
+            }
+        });
     },
     
     // OAuth 콜백 처리
@@ -144,7 +165,14 @@ window.githubStorage = {
         const proceed = confirm('GitHub OAuth 로그인을 시작합니다.\n\n새 탭에서 GitHub 로그인 페이지가 열립니다.\n\n계속하시겠습니까?');
         
         if (proceed) {
-            window.location.href = authUrl;
+            try {
+                // OAuth URL로 이동
+                window.location.href = authUrl;
+            } catch (error) {
+                console.error('OAuth 리디렉션 실패:', error);
+                alert('OAuth 로그인 중 오류가 발생했습니다.\n\n토큰 방식으로 로그인해주세요.');
+                this.connectToGitHubWithToken();
+            }
         }
     },
     
