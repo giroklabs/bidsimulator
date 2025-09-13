@@ -492,31 +492,46 @@ header p {
     margin-bottom: 25px;
 }
 
-.form-group label {
+/* 중복 제거 - 위의 통합 라벨 스타일 사용 */
+
+/* 통합된 라벨 스타일 */
+.form-group label,
+.inspection-item label {
     display: block;
     margin-bottom: 8px;
-    font-weight: 500;
-    color: #34495e;
+    font-weight: 600;
+    color: #2c3e50;
     font-size: 1rem;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
+/* 통합된 입력박스 스타일 */
 .form-group input,
-.form-group select {
+.form-group select,
+.inspection-item input,
+.inspection-item select,
+.inspection-item textarea {
     width: 100%;
     padding: 15px;
     border: 2px solid #e1e8ed;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 1rem;
+    font-family: 'Noto Sans KR', sans-serif;
     transition: all 0.3s ease;
     background: #f8f9fa;
+    box-sizing: border-box;
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.inspection-item input:focus,
+.inspection-item select:focus,
+.inspection-item textarea:focus {
     outline: none;
     border-color: #667eea;
     background: white;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
 }
 
 .help-text {
@@ -1552,36 +1567,75 @@ header p {
     font-size: 0.9rem;
 }
 
-.inspection-item input,
-.inspection-item select,
-.inspection-item textarea {
-    padding: 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    font-family: 'Noto Sans KR', sans-serif;
-}
-
-.inspection-item input:focus,
-.inspection-item select:focus,
-.inspection-item textarea:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
+/* 중복 제거 - 위의 통합 스타일 사용 */
 
 .inspection-item textarea {
     resize: vertical;
     min-height: 80px;
 }
 
-.inspection-item input[type="number"] {
-    width: 120px;
+/* 특수 입력박스 스타일 통일 */
+input[type="number"] {
+    text-align: right;
 }
 
-.inspection-item input[type="date"] {
-    width: 150px;
+input[type="date"] {
+    cursor: pointer;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Placeholder 스타일 통일 */
+input::placeholder,
+select::placeholder,
+textarea::placeholder {
+    color: #a0a0a0;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+input:focus::placeholder,
+select:focus::placeholder,
+textarea:focus::placeholder {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+/* 호버 효과 및 비활성화 상태 */
+input:hover:not(:disabled),
+select:hover:not(:disabled),
+textarea:hover:not(:disabled) {
+    border-color: #667eea;
+    background: white;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 선택박스 화살표 스타일 */
+select {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 
