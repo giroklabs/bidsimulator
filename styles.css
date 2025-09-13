@@ -95,63 +95,93 @@ header p {
 
 .github-storage-section #github-status {
     font-size: 0.8rem;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     color: #666;
-    padding: 5px 8px;
+    padding: 6px 10px;
     background: #f8f9fa;
-    border-radius: 4px;
-    border-left: 3px solid #dc3545;
-}
-
-.github-storage-section button {
-    background: #24292e;
-    color: white;
-    border: none;
-    padding: 8px 12px;
     border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    width: 100%;
-    margin-bottom: 5px;
-    transition: all 0.3s ease;
+    border-left: 3px solid #dc3545;
     font-weight: 500;
 }
 
-.github-storage-section button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+/* GitHub 버튼 통일성 향상 */
+.github-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-bottom: 8px;
+    font-family: 'Noto Sans KR', sans-serif;
 }
 
-.github-storage-section button:active {
+.github-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.github-btn:active {
     transform: translateY(0);
 }
 
-.github-storage-section #github-token-btn {
-    background: #6c757d;
-    font-size: 0.75rem;
+/* GitHub 버튼 타입별 스타일 */
+.github-btn.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.github-btn.primary:hover {
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.github-btn.secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    font-size: 0.8rem;
     padding: 6px 10px;
 }
 
-.github-storage-section #github-disconnect-btn {
-    background: #dc3545;
+.github-btn.secondary:hover {
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+}
+
+.github-btn.danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+}
+
+.github-btn.danger:hover {
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+
+.github-btn.success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    width: 48%;
+    margin-right: 2%;
+}
+
+.github-btn.success:hover {
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.github-btn.info {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    width: 48%;
+}
+
+.github-btn.info:hover {
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
 }
 
 .github-storage-section #github-sync-buttons {
     display: flex;
-    gap: 5px;
-    margin-top: 5px;
-}
-
-.github-storage-section #github-sync-to-btn {
-    background: #28a745;
-    width: 48%;
-    margin-bottom: 0;
-}
-
-.github-storage-section #github-sync-from-btn {
-    background: #007bff;
-    width: 48%;
-    margin-bottom: 0;
+    gap: 0;
+    margin-top: 8px;
 }
 
 .sidebar {
