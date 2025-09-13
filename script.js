@@ -700,8 +700,7 @@ class AuctionSimulator {
         }
     }
 
-    // 지역별 매각가율 강제 수정 함수 (모든 지역 지원)
-    // 개선된 매각가율 정보 설정 함수
+    // 지역별 매각가율 강제 수정 함수 (간단화된 버전)
     forceCorrectRegionalSaleRate() {
         const locationField = document.getElementById('propertyLocation');
         
@@ -720,19 +719,54 @@ class AuctionSimulator {
             console.log('=== 정확한 매각가율 정보 설정 ===');
             console.log('현재 주소:', location);
             
-            // 개선된 수정 도구 사용
-            if (window.fixSaleRateData) {
-                const success = window.fixSaleRateData.setAccurateSaleRateInfo(location);
-                if (success) {
-                    console.log('✅ 정확한 매각가율 정보 설정 완료');
+            // 지역 정보 추출하여 직접 매각가율 정보 설정
+            this.loadSaleRateFromLocation(location);
+        }
+    }
+
+    // 주소에서 직접 매각가율 정보 로드
+    loadSaleRateFromLocation(location) {
+        console.log('주소에서 매각가율 정보 로드:', location);
+        
+        try {
+            const region = this.extractRegionFromLocation(location);
+            const district = this.extractDistrictFromLocation(location);
+            
+            console.log('추출된 지역 정보:', { region, district });
+            
+            if (region && district) {
+                // 지역별 데이터에서 직접 찾기
+                const regionalData = this.getRegionalSaleRateData();
+                const fullDistrictName = region === '경기' ? district : `${region} ${district}`;
+                
+                console.log('검색할 지역명:', fullDistrictName);
+                
+                if (regionalData[fullDistrictName]) {
+                    console.log('✅ 지역별 데이터에서 찾음:', regionalData[fullDistrictName]);
+                    
+                    // 매각가율 정보 직접 표시
+                    this.displaySaleRateInfo({
+                        saleRate: regionalData[fullDistrictName].saleRate,
+                        investmentRec: regionalData[fullDistrictName].investmentRec,
+                        region: region,
+                        district: district
+                    });
+                    this.showSaleRateInfo();
+                    console.log('✅ 매각가율 정보 표시 완료');
                 } else {
-                    console.log('❌ 정확한 데이터 없음 - API 데이터 사용');
-                    this.loadSaleRateFromAPI(location);
+                    console.log('❌ 지역별 데이터 없음 - 기본값 사용');
+                    this.setDefaultSaleRateInfo();
+                    this.showSaleRateInfo();
                 }
             } else {
-                console.log('수정 도구 없음 - 기본 로직 사용');
-                this.loadSaleRateFromAPI(location);
+                console.log('❌ 지역 정보 추출 실패');
+                this.setDefaultSaleRateInfo();
+                this.showSaleRateInfo();
             }
+        } catch (error) {
+            console.error('매각가율 정보 로드 오류:', error);
+            this.setDefaultSaleRateInfo();
+            this.showSaleRateInfo();
         }
     }
     
@@ -1416,19 +1450,19 @@ class AuctionSimulator {
         };
     }
 
-    // 새로운 매각가율 정보 로드 함수
+    // 새로운 매각가율 정보 로드 함수 (간단화된 버전)
     async loadSaleRateInfo(region, district) {
         console.log('매각가율 정보 로드 시작:', region, district);
         
         try {
-            // 지역별 데이터에서 찾기
+            // 지역별 데이터에서 직접 찾기
             const regionalData = this.getRegionalSaleRateData();
             const fullDistrictName = region === '경기' ? district : `${region} ${district}`;
             
             console.log('검색할 지역명:', fullDistrictName);
             
             if (regionalData[fullDistrictName]) {
-                console.log('지역별 데이터에서 찾음:', regionalData[fullDistrictName]);
+                console.log('✅ 지역별 데이터에서 찾음:', regionalData[fullDistrictName]);
                 
                 // 매각가율 정보 표시
                 this.displaySaleRateInfo({
@@ -1438,35 +1472,12 @@ class AuctionSimulator {
                     district: district
                 });
                 this.showSaleRateInfo();
+                console.log('✅ 매각가율 정보 표시 완료');
                 return;
             }
             
-            // API 호출 시도 (GitHub Pages에서는 실패할 수 있음)
-            try {
-                const response = await fetch('http://localhost:5001/api/statistics/district', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ region, district })
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('API 응답:', data);
-                    
-                    if (data.success && data.statistics) {
-                        this.displaySaleRateInfo(data.statistics);
-                        this.showSaleRateInfo();
-                        return;
-                    }
-                }
-            } catch (apiError) {
-                console.log('API 호출 실패 (예상됨 - GitHub Pages 환경):', apiError.message);
-            }
-            
-            // 모든 방법이 실패하면 기본값 사용
-            console.log('지역별 데이터 없음 - 기본값 사용');
+            // 지역별 데이터가 없으면 기본값 사용
+            console.log('❌ 지역별 데이터 없음 - 기본값 사용');
             this.setDefaultSaleRateInfo();
             this.showSaleRateInfo();
             
