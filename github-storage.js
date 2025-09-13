@@ -9,7 +9,7 @@ window.githubStorage = {
     GIST_API_URL: 'https://api.github.com/gists',
     
     // OAuth 설정 (GitHub OAuth App에서 생성)
-    CLIENT_ID: 'Ov23li0YV8FzJ8qY3K5H', // GitHub OAuth App Client ID (실제 생성 후 업데이트 필요)
+    CLIENT_ID: '0v231iLVfDCFuPGVfmpu', // GitHub OAuth App Client ID
     REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator/', // GitHub Pages URL
     OAUTH_URL: 'https://github.com/login/oauth/authorize',
     
@@ -113,11 +113,15 @@ window.githubStorage = {
         }
     },
     
-    // GitHub OAuth 로그인 시작 (현재는 토큰 방식으로 대체)
+    // GitHub OAuth 로그인 시작
     connectToGitHub() {
-        // OAuth App이 아직 생성되지 않았으므로 토큰 방식으로 대체
-        alert('OAuth 로그인은 아직 설정 중입니다.\n\n토큰 방식으로 로그인해주세요.');
-        this.connectToGitHubWithToken();
+        const state = 'github_oauth';
+        const scope = 'gist';
+        
+        const authUrl = `${this.OAUTH_URL}?client_id=${this.CLIENT_ID}&redirect_uri=${encodeURIComponent(this.REDIRECT_URI)}&scope=${scope}&state=${state}`;
+        
+        console.log('GitHub OAuth 로그인 시작');
+        window.location.href = authUrl;
     },
     
     // 인증 코드를 액세스 토큰으로 교환
@@ -139,7 +143,15 @@ window.githubStorage = {
             
             // CORS 문제로 인해 직접 호출이 불가능하므로 대안 방법 사용
             // GitHub OAuth는 보안상 클라이언트에서 직접 토큰 교환을 할 수 없음
-            alert('OAuth 인증이 완료되었지만, 토큰 교환을 위해서는 서버가 필요합니다.\n\n현재는 Personal Access Token 방식을 사용해주세요.');
+            
+            const userChoice = confirm('GitHub OAuth 인증이 완료되었습니다!\n\n현재는 서버가 필요하여 완전한 OAuth 로그인이 제한됩니다.\n\nPersonal Access Token 방식으로 로그인하시겠습니까?\n\n(더 간편한 방법입니다)');
+            
+            if (userChoice) {
+                // 토큰 방식으로 전환
+                setTimeout(() => {
+                    this.connectToGitHubWithToken();
+                }, 500);
+            }
             
         } catch (error) {
             console.error('토큰 교환 오류:', error);
