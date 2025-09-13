@@ -3084,8 +3084,13 @@ class AuctionSimulator {
                 목표범위: '50~60%'
             });
             
-            // 목표 확률 55%를 기준으로 역산
-            const targetProbability = 0.55;
+            // 현재 확률에 따라 목표 확률 동적 설정
+            let targetProbability;
+            if (winProbability < 0.50) {
+                targetProbability = 0.52; // 낮은 확률일 때는 52% 목표
+            } else {
+                targetProbability = 0.58; // 높은 확률일 때는 58% 목표
+            }
             const adjustedPriceRatio = this.calculatePriceRatioForTargetProbability(
                 targetProbability, 
                 competitorCount, 
@@ -3387,37 +3392,37 @@ class AuctionSimulator {
     testBidProbabilityAdjustment() {
         console.log('\n=== 낙찰확률 50~60% 조정 기능 테스트 시작 ===');
         
-        // 테스트 케이스들
+        // 테스트 케이스들 (현실적인 시나리오)
         const testCases = [
             {
-                name: '낮은 확률 케이스 (30%)',
-                marketPrice: 300000000,
-                appraisalPrice: 300000000,
-                minimumBid: 200000000,
-                competitorCount: 3,
-                marketCondition: 'normal',
-                urgency: 'normal',
-                failedCount: 0
-            },
-            {
-                name: '높은 확률 케이스 (80%)',
-                marketPrice: 300000000,
-                appraisalPrice: 300000000,
-                minimumBid: 200000000,
-                competitorCount: 8,
-                marketCondition: 'hot',
-                urgency: 'low',
-                failedCount: 2
-            },
-            {
-                name: '정상 범위 케이스 (55%)',
+                name: '스크린샷 케이스 (현재 23%)',
                 marketPrice: 300000000,
                 appraisalPrice: 300000000,
                 minimumBid: 200000000,
                 competitorCount: 5,
                 marketCondition: 'normal',
                 urgency: 'normal',
+                failedCount: 0
+            },
+            {
+                name: '높은 경쟁 케이스',
+                marketPrice: 300000000,
+                appraisalPrice: 300000000,
+                minimumBid: 200000000,
+                competitorCount: 8,
+                marketCondition: 'hot',
+                urgency: 'high',
                 failedCount: 1
+            },
+            {
+                name: '낮은 경쟁 케이스',
+                marketPrice: 300000000,
+                appraisalPrice: 300000000,
+                minimumBid: 200000000,
+                competitorCount: 3,
+                marketCondition: 'cold',
+                urgency: 'low',
+                failedCount: 2
             }
         ];
         
@@ -3469,17 +3474,28 @@ class AuctionSimulator {
             failedCount = 0; // 기본값
         }
         
-        // 기본 확률 (가격 비율 기반)
+        // 기본 확률 (가격 비율 기반) - 50~60% 목표에 맞게 조정
         let baseProbability = 0.5;
-        if (priceRatio < 0.7) baseProbability = 0.2;
-        else if (priceRatio < 0.8) baseProbability = 0.4;
-        else if (priceRatio < 0.9) baseProbability = 0.6;
-        else if (priceRatio < 1.0) baseProbability = 0.8;
-        else if (priceRatio < 1.1) baseProbability = 0.9;
-        else baseProbability = 0.95;
+        if (priceRatio < 0.65) baseProbability = 0.15;  // 65% 미만: 15%
+        else if (priceRatio < 0.75) baseProbability = 0.35;  // 65-75%: 35%
+        else if (priceRatio < 0.83) baseProbability = 0.50;  // 75-83%: 50%
+        else if (priceRatio < 0.90) baseProbability = 0.65;  // 83-90%: 65%
+        else if (priceRatio < 0.97) baseProbability = 0.80;  // 90-97%: 80%
+        else if (priceRatio < 1.05) baseProbability = 0.90;  // 97-105%: 90%
+        else if (priceRatio < 1.15) baseProbability = 0.95;  // 105-115%: 95%
+        else baseProbability = 0.98;  // 115% 이상: 98%
         
-        // 경쟁자 수 조정 (지수적 감소)
-        const competitionPenalty = Math.pow(0.85, Math.max(0, competitorCount - 1));
+        // 경쟁자 수 조정 (완화된 조정)
+        let competitionPenalty = 1.0;
+        if (competitorCount <= 2) competitionPenalty = 1.0;
+        else if (competitorCount === 3) competitionPenalty = 0.9;
+        else if (competitorCount === 4) competitionPenalty = 0.8;
+        else if (competitorCount === 5) competitionPenalty = 0.75;
+        else if (competitorCount === 6) competitionPenalty = 0.7;
+        else if (competitorCount === 7) competitionPenalty = 0.65;
+        else if (competitorCount === 8) competitionPenalty = 0.6;
+        else competitionPenalty = 0.55; // 9명 이상
+        
         baseProbability *= competitionPenalty;
         
         // 시장 상황 조정 제거 (유찰조정만 적용)
