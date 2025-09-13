@@ -414,6 +414,14 @@ class AuctionSimulator {
             this.forceCorrectRegionalSaleRate();
         }, 3000);
         
+        // 낙찰확률 50~60% 조정 기능 테스트 (개발/테스트 환경에서만)
+        if (window.location.hostname.includes('github.io') || window.location.hostname === 'localhost') {
+            setTimeout(() => {
+                console.log('낙찰확률 조정 기능 테스트 실행 중...');
+                this.testBidProbabilityAdjustment();
+            }, 2000);
+        }
+        
         // 버튼 클릭 이벤트 (백업)
         const button = document.querySelector('.simulate-btn');
         if (button) {
@@ -3375,6 +3383,76 @@ class AuctionSimulator {
         console.log('\n=== 조정계수 검증 테스트 완료 ===');
     }
 
+    // 낙찰확률 50~60% 조정 기능 테스트
+    testBidProbabilityAdjustment() {
+        console.log('\n=== 낙찰확률 50~60% 조정 기능 테스트 시작 ===');
+        
+        // 테스트 케이스들
+        const testCases = [
+            {
+                name: '낮은 확률 케이스 (30%)',
+                marketPrice: 300000000,
+                appraisalPrice: 300000000,
+                minimumBid: 200000000,
+                competitorCount: 3,
+                marketCondition: 'normal',
+                urgency: 'normal',
+                failedCount: 0
+            },
+            {
+                name: '높은 확률 케이스 (80%)',
+                marketPrice: 300000000,
+                appraisalPrice: 300000000,
+                minimumBid: 200000000,
+                competitorCount: 8,
+                marketCondition: 'hot',
+                urgency: 'low',
+                failedCount: 2
+            },
+            {
+                name: '정상 범위 케이스 (55%)',
+                marketPrice: 300000000,
+                appraisalPrice: 300000000,
+                minimumBid: 200000000,
+                competitorCount: 5,
+                marketCondition: 'normal',
+                urgency: 'normal',
+                failedCount: 1
+            }
+        ];
+        
+        testCases.forEach((testCase, index) => {
+            console.log(`\n--- 테스트 케이스 ${index + 1}: ${testCase.name} ---`);
+            
+            try {
+                const result = this.calculateOptimalBid(
+                    250000000, // bidPrice
+                    '아파트', // auctionType
+                    testCase.competitorCount,
+                    testCase.marketCondition,
+                    testCase.urgency,
+                    testCase.marketPrice,
+                    testCase.appraisalPrice,
+                    testCase.minimumBid,
+                    testCase.failedCount,
+                    0 // renovationCost
+                );
+                
+                console.log('테스트 결과:', {
+                    권장입찰가: Math.round(result.recommendedBid).toLocaleString() + '원',
+                    낙찰확률: Math.round(result.winProbability * 100) + '%',
+                    가격비율: Math.round((result.recommendedBid / testCase.appraisalPrice) * 100) + '%',
+                    범위내여부: (result.winProbability >= 0.50 && result.winProbability <= 0.60) ? '✅ 범위내' : '❌ 범위밖'
+                });
+                
+            } catch (error) {
+                console.error('테스트 실패:', error);
+            }
+        });
+        
+        console.log('\n=== 낙찰확률 50~60% 조정 기능 테스트 완료 ===');
+    }
+
     // 개선된 낙찰 확률 계산
     calculateAdvancedWinProbability(priceRatio, competitorCount, marketCondition, urgency, failedCount) {
         // 입력값 검증
@@ -3411,7 +3489,22 @@ class AuctionSimulator {
         baseProbability *= failureBonus;
         
         // 최종 확률 제한 (0.1 ~ 0.95)
-        return Math.max(0.1, Math.min(0.95, baseProbability));
+        const finalProbability = Math.max(0.1, Math.min(0.95, baseProbability));
+        
+        // 디버깅 로그 (개발 시에만)
+        if (window.location.hostname === 'localhost' || window.location.hostname.includes('github.io')) {
+            console.log('낙찰확률 계산 상세:', {
+                priceRatio: Math.round(priceRatio * 100) + '%',
+                baseProbability: Math.round(baseProbability * 100) + '%',
+                competitionPenalty: Math.round(competitionPenalty * 100) + '%',
+                failureBonus: Math.round(failureBonus * 100) + '%',
+                finalProbability: Math.round(finalProbability * 100) + '%',
+                competitorCount,
+                failedCount
+            });
+        }
+        
+        return finalProbability;
     }
 
     // 입찰 전략 조언 생성
