@@ -3498,20 +3498,35 @@ class AuctionSimulator {
         
         // 시장 상황 조정 제거 (유찰조정만 적용)
         
-        // 유찰 횟수 조정 (유찰이 많을수록 낙찰 확률 증가)
-        const failureBonus = Math.min(1 + (failedCount * 0.1), 1.5);
+        // 유찰 횟수 조정 (연구 논문 기반: 3회차에서 최고 낙찰가)
+        let failureBonus = 1.0;
+        if (failedCount === 0) {
+            failureBonus = 0.9; // 1회차: 낙찰 확률 10% 감소
+        } else if (failedCount === 1) {
+            failureBonus = 1.1; // 2회차: 낙찰 확률 10% 증가
+        } else if (failedCount === 2) {
+            failureBonus = 1.25; // 3회차: 낙찰 확률 25% 증가 (최고점)
+        } else if (failedCount === 3) {
+            failureBonus = 1.15; // 4회차: 낙찰 확률 15% 증가
+        } else {
+            failureBonus = 1.05; // 5회차 이상: 낙찰 확률 5% 증가
+        }
         baseProbability *= failureBonus;
         
-        // 매각가율 조정 (지역별 경매 성공률 반영)
+        // 매각가율 조정 (연구 논문 기반 지역별 경매 성공률 반영)
         let saleRateAdjustment = 1.0;
         if (salePriceRate < 70) {
-            saleRateAdjustment = 0.8; // 매각가율 70% 미만: 낙찰 확률 20% 감소
+            saleRateAdjustment = 0.75; // 지방 도시(70% 미만): 낙찰 확률 25% 감소
         } else if (salePriceRate < 75) {
-            saleRateAdjustment = 0.9; // 매각가율 70-75%: 낙찰 확률 10% 감소
-        } else if (salePriceRate > 85) {
-            saleRateAdjustment = 1.15; // 매각가율 85% 초과: 낙찰 확률 15% 증가
-        } else if (salePriceRate > 80) {
-            saleRateAdjustment = 1.1; // 매각가율 80-85%: 낙찰 확률 10% 증가
+            saleRateAdjustment = 0.85; // 지방 도시(70-75%): 낙찰 확률 15% 감소
+        } else if (salePriceRate < 80) {
+            saleRateAdjustment = 0.95; // 경기도(75-80%): 낙찰 확률 5% 감소
+        } else if (salePriceRate < 85) {
+            saleRateAdjustment = 1.05; // 서울 기타 지역(80-85%): 낙찰 확률 5% 증가
+        } else if (salePriceRate < 90) {
+            saleRateAdjustment = 1.15; // 서울 강남권(85-90%): 낙찰 확률 15% 증가
+        } else {
+            saleRateAdjustment = 1.25; // 초고가 지역(90% 이상): 낙찰 확률 25% 증가
         }
         
         baseProbability *= saleRateAdjustment;
@@ -3535,6 +3550,145 @@ class AuctionSimulator {
         }
         
         return finalProbability;
+    }
+
+    // 연구 논문 기반 낙찰가 분석 함수
+    analyzeBidPriceFactors(bidPrice, marketPrice, appraisalPrice, minimumBid, salePriceRate, competitorCount, failedCount) {
+        console.log('\n=== 연구 논문 기반 낙찰가 분석 ===');
+        
+        // 1. 가격 비율 분석
+        const appraisalRatio = (appraisalPrice > 0) ? (bidPrice / appraisalPrice) : 0;
+        const marketRatio = (marketPrice > 0) ? (bidPrice / marketPrice) : 0;
+        const minimumRatio = (minimumBid > 0) ? (bidPrice / minimumBid) : 0;
+        
+        // 2. 연구 기준 대비 분석
+        const analysis = {
+            // 가격 비율 평가
+            appraisalRatio: {
+                value: Math.round(appraisalRatio * 100) + '%',
+                status: appraisalRatio >= 0.8 && appraisalRatio <= 0.95 ? '적정' : 
+                        appraisalRatio < 0.8 ? '낮음' : '높음',
+                recommendation: appraisalRatio < 0.8 ? '가격 상향 조정 권장' :
+                               appraisalRatio > 0.95 ? '가격 하향 조정 권장' : '현재 가격 적정'
+            },
+            
+            // 시세 대비 평가
+            marketRatio: {
+                value: Math.round(marketRatio * 100) + '%',
+                status: marketRatio >= 0.75 && marketRatio <= 0.90 ? '적정' :
+                        marketRatio < 0.75 ? '낮음' : '높음',
+                recommendation: marketRatio < 0.75 ? '시세 대비 낮음, 경쟁 우위' :
+                               marketRatio > 0.90 ? '시세 대비 높음, 경쟁 불리' : '시세 대비 적정'
+            },
+            
+            // 최저입찰가 대비 평가
+            minimumRatio: {
+                value: Math.round(minimumRatio * 100) + '%',
+                status: minimumRatio >= 1.1 && minimumRatio <= 1.3 ? '적정' :
+                        minimumRatio < 1.1 ? '낮음' : '높음',
+                recommendation: minimumRatio < 1.1 ? '최저입찰가 대비 낮음, 낙찰 어려움' :
+                               minimumRatio > 1.3 ? '최저입찰가 대비 높음, 경쟁력 있음' : '최저입찰가 대비 적정'
+            },
+            
+            // 매각가율 기반 지역 평가
+            regionalAnalysis: {
+                saleRate: salePriceRate + '%',
+                regionType: salePriceRate >= 85 ? '고매각가율 지역 (서울 강남권 등)' :
+                           salePriceRate >= 80 ? '중상위 매각가율 지역 (서울 기타)' :
+                           salePriceRate >= 75 ? '중간 매각가율 지역 (경기도)' :
+                           '저매각가율 지역 (지방 도시)',
+                competitiveness: salePriceRate >= 85 ? '매우 높음' :
+                                salePriceRate >= 80 ? '높음' :
+                                salePriceRate >= 75 ? '보통' : '낮음'
+            },
+            
+            // 경쟁자 수 분석
+            competitionAnalysis: {
+                count: competitorCount + '명',
+                level: competitorCount <= 3 ? '낮음' :
+                       competitorCount <= 6 ? '보통' :
+                       competitorCount <= 8 ? '높음' : '매우 높음',
+                impact: competitorCount <= 3 ? '낙찰 확률 높음' :
+                        competitorCount <= 6 ? '적정 경쟁' :
+                        '경쟁 치열, 가격 경쟁력 중요'
+            },
+            
+            // 유찰 횟수 분석
+            failureAnalysis: {
+                count: failedCount + '회',
+                stage: failedCount === 0 ? '1회차 (첫 경매)' :
+                       failedCount === 1 ? '2회차 (1회 유찰)' :
+                       failedCount === 2 ? '3회차 (2회 유찰) - 최적 시점' :
+                       failedCount === 3 ? '4회차 (3회 유찰)' : '5회차 이상',
+                opportunity: failedCount === 2 ? '최고 낙찰 확률 시점' :
+                            failedCount <= 1 ? '초기 단계, 조심스러운 접근' :
+                            '후반 단계, 가격 조정 필요'
+            }
+        };
+        
+        // 3. 종합 평가
+        const overallScore = this.calculateOverallBidScore(analysis);
+        analysis.overallEvaluation = {
+            score: overallScore,
+            grade: overallScore >= 80 ? 'A' :
+                   overallScore >= 70 ? 'B' :
+                   overallScore >= 60 ? 'C' :
+                   overallScore >= 50 ? 'D' : 'F',
+            recommendation: this.generateOverallRecommendation(analysis, overallScore)
+        };
+        
+        console.log('낙찰가 분석 결과:', analysis);
+        return analysis;
+    }
+    
+    // 종합 입찰 점수 계산
+    calculateOverallBidScore(analysis) {
+        let score = 50; // 기본 점수
+        
+        // 가격 비율 점수 (30점 만점)
+        const appraisalRatio = parseFloat(analysis.appraisalRatio.value.replace('%', ''));
+        if (appraisalRatio >= 80 && appraisalRatio <= 95) score += 30;
+        else if (appraisalRatio >= 75 && appraisalRatio <= 100) score += 20;
+        else score += 10;
+        
+        // 매각가율 점수 (25점 만점)
+        const saleRate = parseFloat(analysis.regionalAnalysis.saleRate.replace('%', ''));
+        if (saleRate >= 85) score += 25;
+        else if (saleRate >= 80) score += 20;
+        else if (saleRate >= 75) score += 15;
+        else score += 10;
+        
+        // 경쟁자 수 점수 (25점 만점)
+        const competitorCount = parseInt(analysis.competitionAnalysis.count.replace('명', ''));
+        if (competitorCount <= 3) score += 25;
+        else if (competitorCount <= 6) score += 20;
+        else if (competitorCount <= 8) score += 15;
+        else score += 10;
+        
+        // 유찰 횟수 점수 (20점 만점)
+        const failedCount = parseInt(analysis.failureAnalysis.count.replace('회', ''));
+        if (failedCount === 2) score += 20; // 3회차 최적
+        else if (failedCount === 1) score += 15;
+        else if (failedCount === 3) score += 15;
+        else if (failedCount === 0) score += 10;
+        else score += 5;
+        
+        return Math.min(100, score);
+    }
+    
+    // 종합 추천사항 생성
+    generateOverallRecommendation(analysis, score) {
+        if (score >= 80) {
+            return '현재 입찰가격이 매우 적정합니다. 높은 낙찰 확률을 기대할 수 있습니다.';
+        } else if (score >= 70) {
+            return '현재 입찰가격이 적정합니다. 경쟁 상황에 따라 조정을 고려해보세요.';
+        } else if (score >= 60) {
+            return '현재 입찰가격이 보통 수준입니다. 경쟁력 향상을 위해 가격 조정을 권장합니다.';
+        } else if (score >= 50) {
+            return '현재 입찰가격이 낮은 수준입니다. 낙찰을 위해서는 가격 상향 조정이 필요합니다.';
+        } else {
+            return '현재 입찰가격이 매우 낮습니다. 대폭적인 가격 상향 조정을 권장합니다.';
+        }
     }
 
     // 입찰 전략 조언 생성
@@ -3747,6 +3901,13 @@ class AuctionSimulator {
                 marketPrice, appraisalPrice, minimumBid, failedCount, renovationCost
             );
             console.log('최적 입찰가격 계산 완료:', result);
+            
+            // 연구 논문 기반 낙찰가 분석 실행
+            const salePriceRate = this.getCurrentSalePriceRate();
+            const bidAnalysis = this.analyzeBidPriceFactors(
+                bidPrice, marketPrice, appraisalPrice, minimumBid, 
+                salePriceRate, competitorCount, failedCount
+            );
             
             console.log('총 비용 계산 시작');
             // 총 비용 계산 (사용자가 입력한 입찰가격 기준으로 계산)
