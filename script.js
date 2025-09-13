@@ -2717,7 +2717,7 @@ class AuctionSimulator {
         
         // C. 등기 관련 비용
         const ownershipTransferTax = bidPrice * 0.002; // 소유권이전등기: 낙찰가 × 0.2%
-        const mortgageTax = bidPrice * 0.001; // 근저당권설정등기: 채권최고액 × 0.1% (추정)
+        const mortgageTax = 0; // 근저당권설정등기: 기본 0원
         const registrationEducationTax = ownershipTransferTax * 0.20; // 지방교육세 (등기분): 등록면허세 × 20%
         
         // 국민주택채권 매입 (수도권 기준)
@@ -2739,18 +2739,17 @@ class AuctionSimulator {
             legalFee = 1750000; // 5억 초과: 175만원
         }
         
-        // F. 경매 수수료 (일반적으로 낙찰가의 1-3%)
-        const auctionFee = bidPrice * 0.02; // 2% 경매 수수료
+        // F. 경매 수수료 삭제 (더 이상 계산하지 않음)
         
-        // G. 기타 발생 가능 비용 (추정)
-        const evictionCost = bidPrice * 0.02; // 명도비: 낙찰가의 2% (추정)
+        // G. 기타 발생 가능 비용 (기본값 0원)
+        const evictionCost = 0; // 명도비: 기본 0원
         const unpaidUtilities = bidPrice * 0.005; // 미납 공과금: 낙찰가의 0.5% (추정)
         
         // 총 세금 및 수수료 계산
         const totalTaxes = acquisitionTax + localEducationTax + ruralSpecialTax;
         const totalRegistrationFees = ownershipTransferTax + mortgageTax + registrationEducationTax + housingBond + stampTax + mortgageStampTax;
         const totalProfessionalFees = legalFee;
-        const totalAuctionFees = auctionFee;
+        const totalAuctionFees = 0; // 경매수수료 삭제
         const totalOtherCosts = evictionCost + unpaidUtilities;
         
         const totalAdditionalCosts = totalTaxes + totalRegistrationFees + totalProfessionalFees + totalAuctionFees + totalOtherCosts;
@@ -2786,10 +2785,10 @@ class AuctionSimulator {
                 total: totalProfessionalFees
             },
             
-            // 경매 수수료
+            // 경매 수수료 삭제
             auctionFees: {
-            auctionFee: auctionFee,
-                total: totalAuctionFees
+                auctionFee: 0,
+                total: 0
             },
             
             // 기타 비용
@@ -2861,9 +2860,7 @@ class AuctionSimulator {
             document.getElementById('legalFee').textContent = this.formatNumber(dc.professionalFees.legalFee) + '원';
             document.getElementById('totalProfessionalFees').textContent = this.formatNumber(dc.professionalFees.total) + '원';
             
-            // 경매 수수료
-            document.getElementById('auctionFeeDetail').textContent = this.formatNumber(dc.auctionFees.auctionFee) + '원';
-            document.getElementById('totalAuctionFees').textContent = this.formatNumber(dc.auctionFees.total) + '원';
+            // 경매 수수료 삭제 (표시하지 않음)
             
             // 기타 비용
             document.getElementById('evictionCost').textContent = this.formatNumber(dc.otherCosts.evictionCost) + '원';
