@@ -905,50 +905,7 @@ class AuctionSimulator {
             propertyName.value = '';
             console.log('매물명 초기화 완료');
         }
-        
-        // 상세위치 초기화
-        const modalPropertyLocation = document.getElementById('modalPropertyLocation');
-        if (modalPropertyLocation) {
-            modalPropertyLocation.value = '';
-            console.log('상세위치 초기화 완료');
-        }
-        
-        // 매물유형 초기화
-        const modalPropertyType = document.getElementById('modalPropertyType');
-        if (modalPropertyType) {
-            modalPropertyType.value = '';
-            console.log('매물유형 초기화 완료');
-        }
-        
-        // 메모 초기화
-        const notes = document.getElementById('notes');
-        if (notes) {
-            notes.value = '';
-            console.log('메모 초기화 완료');
-        }
-        
-        // 지역 선택 초기화
-        const regionSelect = document.getElementById('regionSelect');
-        if (regionSelect) {
-            regionSelect.value = '';
-            console.log('지역선택 초기화 완료');
-        }
-        
-        // 구/군 선택 초기화
-        const districtSelect = document.getElementById('districtSelect');
-        if (districtSelect) {
-            districtSelect.innerHTML = '<option value="">먼저 지역을 선택하세요</option>';
-            console.log('구/군선택 초기화 완료');
-        }
-        
-        // 매각통계 정보 초기화
-        const statisticsInfo = document.getElementById('saleStatisticsInfo');
-        if (statisticsInfo) {
-            statisticsInfo.innerHTML = '<p>지역을 선택하면 매각통계 정보가 표시됩니다.</p>';
-            console.log('매각통계정보 초기화 완료');
-        }
-        
-        console.log('모든 모달 폼 초기화 완료');
+        console.log('모달 폼 초기화 완료');
     }
 
     // 메인 폼 초기화 (매물 추가 시에만 사용)
@@ -1854,20 +1811,20 @@ class AuctionSimulator {
             id: isEdit ? this.properties[editIndex].id : Date.now(),
             caseNumber: document.getElementById('caseNumber').value || '',
             name: document.getElementById('propertyName').value || '',
-            type: document.getElementById('modalPropertyType').value || '',
-            location: document.getElementById('modalPropertyLocation').value || '',
-            region: document.getElementById('regionSelect').value || '',
-            district: document.getElementById('districtSelect').value || '',
-            notes: document.getElementById('notes').value || '',
+            type: '', // 삭제된 필드 - 빈 문자열로 설정
+            location: '', // 삭제된 필드 - 빈 문자열로 설정
+            region: '', // 삭제된 필드 - 빈 문자열로 설정
+            district: '', // 삭제된 필드 - 빈 문자열로 설정
+            notes: '', // 삭제된 필드 - 빈 문자열로 설정
             createdAt: isEdit ? this.properties[editIndex].createdAt : new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             // 경매 데이터가 있다면 함께 저장
             auctionData: this.currentAuctionData || null
         };
 
-        // 최소한의 유효성 검사 (매물명이 있으면 저장 허용)
-        if (!property.name && !property.caseNumber && !property.location) {
-            alert('최소한 매물명, 사건번호, 또는 위치 중 하나는 입력해주세요.');
+        // 최소한의 유효성 검사 (매물명 또는 사건번호가 있으면 저장 허용)
+        if (!property.name && !property.caseNumber) {
+            alert('매물명 또는 사건번호를 입력해주세요.');
             return;
         }
 
@@ -1943,10 +1900,9 @@ class AuctionSimulator {
 
         // 모달이 완전히 로드된 후 기존 데이터 로드
         setTimeout(() => {
-            // 1. 기본 매물 정보 로드
+            // 1. 기본 매물 정보 로드 (현재 남아있는 필드만)
+            document.getElementById('caseNumber').value = property.caseNumber || '';
             document.getElementById('propertyName').value = property.name || '';
-            document.getElementById('modalPropertyType').value = property.type || '';
-            document.getElementById('modalPropertyLocation').value = property.location || '';
 
             // 2. 저장된 모든 데이터가 있으면 불러오기
             const saveKey = `property_${index}_data`;
