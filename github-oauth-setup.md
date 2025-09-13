@@ -9,10 +9,12 @@
 ### 2단계: OAuth App 정보 입력
 ```
 Application name: 경매 입찰가격 시뮬레이션
-Homepage URL: https://giroklabs.github.io/bidsimulator/
+Homepage URL: https://giroklabs.github.io/bidsimulator
 Application description: 경매 입찰가격 시뮬레이션 서비스
-Authorization callback URL: https://giroklabs.github.io/bidsimulator/
+Authorization callback URL: https://giroklabs.github.io/bidsimulator
 ```
+
+⚠️ **중요**: URL 끝에 슬래시(/)를 넣지 마세요! 404 에러의 주요 원인입니다.
 
 ### 3단계: OAuth App 생성
 - "Register application" 버튼 클릭
@@ -61,7 +63,29 @@ REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator/', // GitHub Pages URL
 2. Personal Access Token 입력
 3. 수동으로 토큰 생성 필요
 
-## 6. 보안 고려사항
+## 6. 404 에러 해결 방법
+
+### 일반적인 원인들
+1. **URL 끝의 슬래시**: `https://giroklabs.github.io/bidsimulator/` ❌ → `https://giroklabs.github.io/bidsimulator` ✅
+2. **잘못된 Client ID**: OAuth App에서 정확한 Client ID 확인
+3. **Callback URL 불일치**: OAuth App 설정과 코드의 REDIRECT_URI가 정확히 일치해야 함
+
+### 해결 단계
+1. **GitHub OAuth App 설정 확인**:
+   - https://github.com/settings/applications/0v231iLVfDCFuPGVfmpu 접속
+   - Authorization callback URL이 `https://giroklabs.github.io/bidsimulator`인지 확인
+   - 끝에 슬래시가 없어야 함
+
+2. **코드 확인**:
+   ```javascript
+   REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator' // 슬래시 없음
+   ```
+
+3. **브라우저 개발자 도구 확인**:
+   - F12 → Console 탭에서 OAuth URL 확인
+   - Network 탭에서 404 에러 상세 정보 확인
+
+## 7. 보안 고려사항
 
 - **Client Secret**은 절대 클라이언트에 노출하지 않음
 - **Personal Access Token**은 사용자 개인 정보

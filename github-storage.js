@@ -10,7 +10,7 @@ window.githubStorage = {
     
     // OAuth 설정 (GitHub OAuth App에서 생성)
     CLIENT_ID: '0v231iLVfDCFuPGVfmpu', // GitHub OAuth App Client ID
-    REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator/', // GitHub Pages URL
+    REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator', // GitHub Pages URL (마지막 슬래시 제거)
     OAUTH_URL: 'https://github.com/login/oauth/authorize',
     
     // 인증 토큰 (OAuth로 획득)
@@ -121,7 +121,31 @@ window.githubStorage = {
         const authUrl = `${this.OAUTH_URL}?client_id=${this.CLIENT_ID}&redirect_uri=${encodeURIComponent(this.REDIRECT_URI)}&scope=${scope}&state=${state}`;
         
         console.log('GitHub OAuth 로그인 시작');
-        window.location.href = authUrl;
+        console.log('OAuth URL:', authUrl);
+        console.log('Client ID:', this.CLIENT_ID);
+        console.log('Redirect URI:', this.REDIRECT_URI);
+        
+        // URL 유효성 검사
+        if (!this.CLIENT_ID || this.CLIENT_ID === '') {
+            alert('OAuth Client ID가 설정되지 않았습니다.');
+            return;
+        }
+        
+        // OAuth URL 테스트
+        try {
+            new URL(authUrl);
+        } catch (error) {
+            console.error('잘못된 OAuth URL:', error);
+            alert('OAuth URL이 올바르지 않습니다. 설정을 확인해주세요.');
+            return;
+        }
+        
+        // 사용자에게 OAuth 로그인 안내
+        const proceed = confirm('GitHub OAuth 로그인을 시작합니다.\n\n새 탭에서 GitHub 로그인 페이지가 열립니다.\n\n계속하시겠습니까?');
+        
+        if (proceed) {
+            window.location.href = authUrl;
+        }
     },
     
     // 인증 코드를 액세스 토큰으로 교환
