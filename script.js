@@ -2881,6 +2881,57 @@ class AuctionSimulator {
         console.log('상세 비용 정보 표시 완료');
     }
 
+    // 목표 낙찰확률을 달성하기 위한 가격비율 계산
+    calculatePriceRatioForTargetProbability(targetProbability, competitorCount, marketCondition, urgency, failedCount) {
+        console.log('목표 낙찰확률을 위한 가격비율 계산:', {
+            targetProbability: Math.round(targetProbability * 100) + '%',
+            competitorCount,
+            marketCondition,
+            urgency,
+            failedCount
+        });
+        
+        // 기본 가격비율 범위 (시세 대비 30%~80%)
+        let minRatio = 0.30;
+        let maxRatio = 0.80;
+        
+        // 이분 탐색을 사용하여 목표 확률에 맞는 가격비율 찾기
+        let bestRatio = 0.55; // 기본값
+        let minError = Infinity;
+        
+        // 0.30~0.80 범위에서 0.01 단위로 탐색
+        for (let ratio = minRatio; ratio <= maxRatio; ratio += 0.01) {
+            const probability = this.calculateAdvancedWinProbability(
+                ratio, 
+                competitorCount, 
+                marketCondition, 
+                urgency, 
+                failedCount
+            );
+            
+            const error = Math.abs(probability - targetProbability);
+            
+            if (error < minError) {
+                minError = error;
+                bestRatio = ratio;
+            }
+            
+            // 오차가 0.01 이하면 충분히 정확하다고 판단
+            if (error <= 0.01) {
+                break;
+            }
+        }
+        
+        console.log('가격비율 계산 결과:', {
+            목표확률: Math.round(targetProbability * 100) + '%',
+            계산된가격비율: Math.round(bestRatio * 100) + '%',
+            예상낙찰확률: Math.round(this.calculateAdvancedWinProbability(bestRatio, competitorCount, marketCondition, urgency, failedCount) * 100) + '%',
+            오차: Math.round(minError * 100) + '%'
+        });
+        
+        return bestRatio;
+    }
+
     // 리스크 조정 수익률 계산 (샤프 비율 기반)
     calculateRiskAdjustedProfit(propertyValue, totalCost, winProbability, marketCondition, failedCount) {
         const basicProfit = this.calculateExpectedProfit(propertyValue, totalCost);
@@ -3008,15 +3059,56 @@ class AuctionSimulator {
             minimumBid
         );
         
-        // 5. 낙찰 확률 계산 (개선된 버전)
-        const priceRatio = (appraisalPrice > 0) ? recommendedBid / appraisalPrice : 1.0;
-        const winProbability = this.calculateAdvancedWinProbability(
+        // 5. 낙찰 확률 계산 및 목표 범위(50~60%) 조정
+        let priceRatio = (appraisalPrice > 0) ? recommendedBid / appraisalPrice : 1.0;
+        let winProbability = this.calculateAdvancedWinProbability(
             priceRatio, 
             competitorCount, 
             marketCondition, 
             urgency, 
             failedCount
         );
+        
+        // 목표 낙찰확률 50~60% 범위로 조정
+        if (winProbability < 0.50 || winProbability > 0.60) {
+            console.log('낙찰확률 조정 필요:', {
+                현재확률: Math.round(winProbability * 100) + '%',
+                목표범위: '50~60%'
+            });
+            
+            // 목표 확률 55%를 기준으로 역산
+            const targetProbability = 0.55;
+            const adjustedPriceRatio = this.calculatePriceRatioForTargetProbability(
+                targetProbability, 
+                competitorCount, 
+                marketCondition, 
+                urgency, 
+                failedCount
+            );
+            
+            // 조정된 가격비율로 권장입찰가 재계산
+            const adjustedBid = appraisalPrice * adjustedPriceRatio;
+            
+            // 최소입찰가보다 낮지 않도록 보정
+            const finalBid = Math.max(adjustedBid, minimumBid * 1.05);
+            
+            console.log('권장입찰가 조정:', {
+                기존가격: Math.round(recommendedBid).toLocaleString() + '원',
+                조정가격: Math.round(finalBid).toLocaleString() + '원',
+                가격비율변화: Math.round((finalBid / appraisalPrice) * 100) + '%',
+                예상낙찰확률: Math.round(targetProbability * 100) + '%'
+            });
+            
+            recommendedBid = finalBid;
+            priceRatio = (appraisalPrice > 0) ? recommendedBid / appraisalPrice : 1.0;
+            winProbability = this.calculateAdvancedWinProbability(
+                priceRatio, 
+                competitorCount, 
+                marketCondition, 
+                urgency, 
+                failedCount
+            );
+        }
         
         // 6. 총 비용 및 수익률 계산
         const costInfo = this.calculateTotalCost(recommendedBid, auctionType, renovationCost);
