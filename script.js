@@ -739,6 +739,10 @@ class AuctionSimulator {
                 const regionalData = this.getRegionalSaleRateData();
                 const fullDistrictName = `${region} ${district}`;
                 
+                console.log('=== 디버깅 정보 ===');
+                console.log('region:', region);
+                console.log('district:', district);
+                console.log('fullDistrictName:', fullDistrictName);
                 console.log('검색할 지역명:', fullDistrictName);
                 
                 if (regionalData[fullDistrictName]) {
@@ -1459,6 +1463,10 @@ class AuctionSimulator {
             const regionalData = this.getRegionalSaleRateData();
             const fullDistrictName = `${region} ${district}`;
             
+            console.log('=== loadSaleRateInfo 디버깅 ===');
+            console.log('region:', region);
+            console.log('district:', district);
+            console.log('fullDistrictName:', fullDistrictName);
             console.log('검색할 지역명:', fullDistrictName);
             
             if (regionalData[fullDistrictName]) {
@@ -2781,7 +2789,7 @@ class AuctionSimulator {
             
             // 경매 수수료
             auctionFees: {
-                auctionFee: auctionFee,
+            auctionFee: auctionFee,
                 total: totalAuctionFees
             },
             
