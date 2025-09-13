@@ -76,19 +76,14 @@ header p {
     position: relative;
 }
 
-/* GitHub 연동 레이어 */
-.github-integration-layer {
-    position: absolute;
-    top: -80px;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+/* GitHub 연동 섹션 (사이드바 내부) */
+.github-integration-section {
+    background: #f8f9fa;
     border-radius: 12px;
     padding: 15px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 15px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .github-storage-section h4 {
@@ -378,16 +373,13 @@ header p {
         flex-direction: column;
     }
     
-    .github-integration-layer {
-        position: static;
-        top: auto;
-        margin-bottom: 20px;
-        border-radius: 12px;
-    }
-    
     .sidebar {
         width: 100%;
         position: static;
+    }
+    
+    .github-integration-section {
+        margin-bottom: 20px;
     }
     
     .main-container {
