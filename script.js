@@ -2877,8 +2877,8 @@ class AuctionSimulator {
         console.log('상세 비용 정보 표시 완료');
     }
 
-    // 목표 낙찰확률을 달성하기 위한 가격비율 계산
-    calculatePriceRatioForTargetProbability(targetProbability, competitorCount, marketCondition, urgency, failedCount) {
+    // 목표 낙찰확률을 달성하기 위한 가격비율 계산 (매각가율 반영)
+    calculatePriceRatioForTargetProbability(targetProbability, competitorCount, marketCondition, urgency, failedCount, salePriceRate = null) {
         console.log('목표 낙찰확률을 위한 가격비율 계산:', {
             targetProbability: Math.round(targetProbability * 100) + '%',
             competitorCount,
@@ -2902,7 +2902,8 @@ class AuctionSimulator {
                 competitorCount, 
                 marketCondition, 
                 urgency, 
-                failedCount
+                failedCount,
+                salePriceRate
             );
             
             const error = Math.abs(probability - targetProbability);
@@ -2921,7 +2922,7 @@ class AuctionSimulator {
         console.log('가격비율 계산 결과:', {
             목표확률: Math.round(targetProbability * 100) + '%',
             계산된가격비율: Math.round(bestRatio * 100) + '%',
-            예상낙찰확률: Math.round(this.calculateAdvancedWinProbability(bestRatio, competitorCount, marketCondition, urgency, failedCount) * 100) + '%',
+            예상낙찰확률: Math.round(this.calculateAdvancedWinProbability(bestRatio, competitorCount, marketCondition, urgency, failedCount, salePriceRate) * 100) + '%',
             오차: Math.round(minError * 100) + '%'
         });
         
@@ -3062,7 +3063,8 @@ class AuctionSimulator {
             competitorCount, 
             marketCondition, 
             urgency, 
-            failedCount
+            failedCount,
+            salePriceRate
         );
         
         // 목표 낙찰확률 50~60% 범위로 조정
@@ -3084,7 +3086,8 @@ class AuctionSimulator {
                 competitorCount, 
                 marketCondition, 
                 urgency, 
-                failedCount
+                failedCount,
+                salePriceRate
             );
             
             // 조정된 가격비율로 권장입찰가 재계산
@@ -3107,7 +3110,8 @@ class AuctionSimulator {
                 competitorCount, 
                 marketCondition, 
                 urgency, 
-                failedCount
+                failedCount,
+                salePriceRate
             );
         }
         
@@ -3162,7 +3166,8 @@ class AuctionSimulator {
                 competitorCount, 
                 marketCondition, 
                 urgency, 
-                failedCount
+                failedCount,
+                salePriceRate
             );
             probabilities.push(winProbability);
             
@@ -3446,8 +3451,8 @@ class AuctionSimulator {
         console.log('\n=== 낙찰확률 50~60% 조정 기능 테스트 완료 ===');
     }
 
-    // 개선된 낙찰 확률 계산
-    calculateAdvancedWinProbability(priceRatio, competitorCount, marketCondition, urgency, failedCount) {
+    // 개선된 낙찰 확률 계산 (매각가율 반영)
+    calculateAdvancedWinProbability(priceRatio, competitorCount, marketCondition, urgency, failedCount, salePriceRate = null) {
         // 입력값 검증
         if (isNaN(priceRatio) || priceRatio === null || priceRatio === undefined) {
             console.error('유효하지 않은 priceRatio:', priceRatio);
@@ -3460,6 +3465,11 @@ class AuctionSimulator {
         
         if (isNaN(failedCount) || failedCount === null || failedCount === undefined) {
             failedCount = 0; // 기본값
+        }
+        
+        // 매각가율이 없으면 현재 매각가율 가져오기
+        if (salePriceRate === null || salePriceRate === undefined) {
+            salePriceRate = this.getCurrentSalePriceRate();
         }
         
         // 기본 확률 (가격 비율 기반) - 50~60% 목표에 맞게 조정
@@ -3492,6 +3502,20 @@ class AuctionSimulator {
         const failureBonus = Math.min(1 + (failedCount * 0.1), 1.5);
         baseProbability *= failureBonus;
         
+        // 매각가율 조정 (지역별 경매 성공률 반영)
+        let saleRateAdjustment = 1.0;
+        if (salePriceRate < 70) {
+            saleRateAdjustment = 0.8; // 매각가율 70% 미만: 낙찰 확률 20% 감소
+        } else if (salePriceRate < 75) {
+            saleRateAdjustment = 0.9; // 매각가율 70-75%: 낙찰 확률 10% 감소
+        } else if (salePriceRate > 85) {
+            saleRateAdjustment = 1.15; // 매각가율 85% 초과: 낙찰 확률 15% 증가
+        } else if (salePriceRate > 80) {
+            saleRateAdjustment = 1.1; // 매각가율 80-85%: 낙찰 확률 10% 증가
+        }
+        
+        baseProbability *= saleRateAdjustment;
+        
         // 최종 확률 제한 (0.1 ~ 0.95)
         const finalProbability = Math.max(0.1, Math.min(0.95, baseProbability));
         
@@ -3502,6 +3526,8 @@ class AuctionSimulator {
                 baseProbability: Math.round(baseProbability * 100) + '%',
                 competitionPenalty: Math.round(competitionPenalty * 100) + '%',
                 failureBonus: Math.round(failureBonus * 100) + '%',
+                saleRateAdjustment: Math.round(saleRateAdjustment * 100) + '%',
+                salePriceRate: salePriceRate + '%',
                 finalProbability: Math.round(finalProbability * 100) + '%',
                 competitorCount,
                 failedCount
