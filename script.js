@@ -2527,29 +2527,199 @@ class AuctionSimulator {
         return Math.max(0.5, Math.min(1.5, urgencyFactor));
     }
 
-    // 총 비용 계산 (수수료, 세금 포함)
-    calculateTotalCost(bidPrice, auctionType, renovationCost = 0) {
-        const fees = this.getAuctionFees(auctionType);
+    // 상세 경매비용 계산 (세금, 수수료, 등기비용 등 디테일하게)
+    calculateDetailedAuctionCosts(bidPrice, propertyType = '아파트', isFirstHome = true, homeCount = 1, area = 85) {
+        console.log('상세 경매비용 계산 시작:', { bidPrice, propertyType, isFirstHome, homeCount, area });
         
-        const auctionFee = bidPrice * fees.auctionFee;
-        const registrationFee = bidPrice * fees.registrationFee;
-        const tax = bidPrice * fees.tax;
-        const additionalCosts = bidPrice * fees.additionalCosts;
+        // A. 낙찰대금 잔금 (입찰보증금은 일반적으로 낙찰가의 10%)
+        const deposit = bidPrice * 0.1; // 입찰보증금
+        const remainingPayment = bidPrice - deposit; // 잔금
+        
+        // B. 취득세 및 관련세
+        let acquisitionTaxRate = 0;
+        if (propertyType === '아파트' || propertyType === '오피스텔' || propertyType === '빌라' || propertyType === '단독주택') {
+            // 주택 취득세
+            if (homeCount === 1) {
+                // 1주택자: 면적별 차등 (85㎡ 기준 3%)
+                acquisitionTaxRate = area <= 85 ? 0.03 : (area <= 102 ? 0.02 : 0.01);
+            } else if (homeCount === 2) {
+                acquisitionTaxRate = 0.08; // 2주택자: 8%
+            } else {
+                acquisitionTaxRate = 0.12; // 3주택 이상: 12%
+            }
+        } else if (propertyType === '토지') {
+            acquisitionTaxRate = 0.03; // 토지: 2-4% (평균 3%)
+        } else {
+            acquisitionTaxRate = 0.04; // 상업용 부동산: 4%
+        }
+        
+        const acquisitionTax = bidPrice * acquisitionTaxRate;
+        const localEducationTax = acquisitionTax * 0.20; // 지방교육세: 취득세 × 20%
+        const ruralSpecialTax = acquisitionTax * 0.15; // 농어촌특별세: 취득세 × 15% (평균)
+        
+        // C. 등기 관련 비용
+        const ownershipTransferTax = bidPrice * 0.002; // 소유권이전등기: 낙찰가 × 0.2%
+        const mortgageTax = bidPrice * 0.001; // 근저당권설정등기: 채권최고액 × 0.1% (추정)
+        const registrationEducationTax = ownershipTransferTax * 0.20; // 지방교육세 (등기분): 등록면허세 × 20%
+        
+        // 국민주택채권 매입 (수도권 기준)
+        const housingBond = acquisitionTax * 0.20; // 수도권: 취득세액 × 20%
+        
+        // D. 인지세
+        const stampTax = bidPrice > 100000000 ? 50000 : 0; // 등기신청서: 5만원 (부동산가액 1억 초과시)
+        const mortgageStampTax = bidPrice > 1000000000 ? 150000 : 0; // 근저당권설정계약서: 15만원 (채권액 10억 초과시)
+        
+        // E. 전문가 수수료
+        let legalFee = 0; // 법무사 수수료
+        if (bidPrice <= 100000000) {
+            legalFee = 500000; // 1억 이하: 50만원
+        } else if (bidPrice <= 300000000) {
+            legalFee = 800000; // 1-3억: 80만원
+        } else if (bidPrice <= 500000000) {
+            legalFee = 1250000; // 3-5억: 125만원
+        } else {
+            legalFee = 1750000; // 5억 초과: 175만원
+        }
+        
+        // F. 경매 수수료 (일반적으로 낙찰가의 1-3%)
+        const auctionFee = bidPrice * 0.02; // 2% 경매 수수료
+        
+        // G. 기타 발생 가능 비용 (추정)
+        const evictionCost = bidPrice * 0.02; // 명도비: 낙찰가의 2% (추정)
+        const unpaidUtilities = bidPrice * 0.005; // 미납 공과금: 낙찰가의 0.5% (추정)
+        
+        // 총 세금 및 수수료 계산
+        const totalTaxes = acquisitionTax + localEducationTax + ruralSpecialTax;
+        const totalRegistrationFees = ownershipTransferTax + mortgageTax + registrationEducationTax + housingBond + stampTax + mortgageStampTax;
+        const totalProfessionalFees = legalFee;
+        const totalAuctionFees = auctionFee;
+        const totalOtherCosts = evictionCost + unpaidUtilities;
+        
+        const totalAdditionalCosts = totalTaxes + totalRegistrationFees + totalProfessionalFees + totalAuctionFees + totalOtherCosts;
+        
+        const result = {
+            // 기본 정보
+            bidPrice: bidPrice,
+            deposit: deposit,
+            remainingPayment: remainingPayment,
+            
+            // 세금
+            taxes: {
+                acquisitionTax: acquisitionTax,
+                localEducationTax: localEducationTax,
+                ruralSpecialTax: ruralSpecialTax,
+                total: totalTaxes
+            },
+            
+            // 등기비용
+            registration: {
+                ownershipTransferTax: ownershipTransferTax,
+                mortgageTax: mortgageTax,
+                registrationEducationTax: registrationEducationTax,
+                housingBond: housingBond,
+                stampTax: stampTax,
+                mortgageStampTax: mortgageStampTax,
+                total: totalRegistrationFees
+            },
+            
+            // 전문가 수수료
+            professionalFees: {
+                legalFee: legalFee,
+                total: totalProfessionalFees
+            },
+            
+            // 경매 수수료
+            auctionFees: {
+                auctionFee: auctionFee,
+                total: totalAuctionFees
+            },
+            
+            // 기타 비용
+            otherCosts: {
+                evictionCost: evictionCost,
+                unpaidUtilities: unpaidUtilities,
+                total: totalOtherCosts
+            },
+            
+            // 합계
+            totalAdditionalCosts: totalAdditionalCosts,
+            totalInvestment: bidPrice + totalAdditionalCosts,
+            costPercentage: (totalAdditionalCosts / bidPrice) * 100
+        };
+        
+        console.log('상세 경매비용 계산 완료:', result);
+        return result;
+    }
+
+    // 총 비용 계산 (수수료, 세금 포함) - 기존 함수 호환성 유지
+    calculateTotalCost(bidPrice, auctionType, renovationCost = 0) {
+        const detailedCosts = this.calculateDetailedAuctionCosts(bidPrice);
         
         return {
             bidPrice: bidPrice,
-            auctionFee: auctionFee,
-            registrationFee: registrationFee,
-            tax: tax,
-            additionalCosts: additionalCosts,
+            auctionFee: detailedCosts.auctionFees.auctionFee,
+            registrationFee: detailedCosts.registration.total,
+            tax: detailedCosts.taxes.total,
+            additionalCosts: detailedCosts.otherCosts.total,
             renovationCost: renovationCost,
-            totalCost: bidPrice + auctionFee + registrationFee + tax + additionalCosts + renovationCost
+            totalCost: bidPrice + detailedCosts.totalAdditionalCosts + renovationCost,
+            detailedCosts: detailedCosts // 상세 비용 정보 포함
         };
     }
 
     // 예상 수익률 계산 (기본)
     calculateExpectedProfit(propertyValue, totalCost) {
         return ((propertyValue - totalCost) / totalCost) * 100;
+    }
+
+    // 상세 비용 정보 표시
+    displayDetailedCosts(costInfo, bidPrice, renovationCost) {
+        console.log('상세 비용 정보 표시 시작:', { costInfo, bidPrice, renovationCost });
+        
+        // detailedCosts가 있으면 상세 정보 표시
+        if (costInfo.detailedCosts) {
+            const dc = costInfo.detailedCosts;
+            
+            // 기본 정보
+            document.getElementById('bidPriceDetail').textContent = this.formatNumber(dc.bidPrice) + '원';
+            document.getElementById('depositAmount').textContent = this.formatNumber(dc.deposit) + '원';
+            document.getElementById('remainingPayment').textContent = this.formatNumber(dc.remainingPayment) + '원';
+            
+            // 세금
+            document.getElementById('acquisitionTax').textContent = this.formatNumber(dc.taxes.acquisitionTax) + '원';
+            document.getElementById('localEducationTax').textContent = this.formatNumber(dc.taxes.localEducationTax) + '원';
+            document.getElementById('ruralSpecialTax').textContent = this.formatNumber(dc.taxes.ruralSpecialTax) + '원';
+            document.getElementById('totalTaxes').textContent = this.formatNumber(dc.taxes.total) + '원';
+            
+            // 등기비용
+            document.getElementById('ownershipTransferTax').textContent = this.formatNumber(dc.registration.ownershipTransferTax) + '원';
+            document.getElementById('mortgageTax').textContent = this.formatNumber(dc.registration.mortgageTax) + '원';
+            document.getElementById('registrationEducationTax').textContent = this.formatNumber(dc.registration.registrationEducationTax) + '원';
+            document.getElementById('housingBond').textContent = this.formatNumber(dc.registration.housingBond) + '원';
+            document.getElementById('stampTax').textContent = this.formatNumber(dc.registration.stampTax + dc.registration.mortgageStampTax) + '원';
+            document.getElementById('totalRegistrationFees').textContent = this.formatNumber(dc.registration.total) + '원';
+            
+            // 전문가 수수료
+            document.getElementById('legalFee').textContent = this.formatNumber(dc.professionalFees.legalFee) + '원';
+            document.getElementById('totalProfessionalFees').textContent = this.formatNumber(dc.professionalFees.total) + '원';
+            
+            // 경매 수수료
+            document.getElementById('auctionFeeDetail').textContent = this.formatNumber(dc.auctionFees.auctionFee) + '원';
+            document.getElementById('totalAuctionFees').textContent = this.formatNumber(dc.auctionFees.total) + '원';
+            
+            // 기타 비용
+            document.getElementById('evictionCost').textContent = this.formatNumber(dc.otherCosts.evictionCost) + '원';
+            document.getElementById('unpaidUtilities').textContent = this.formatNumber(dc.otherCosts.unpaidUtilities) + '원';
+            document.getElementById('totalOtherCosts').textContent = this.formatNumber(dc.otherCosts.total + renovationCost) + '원';
+            
+            // 총계
+            document.getElementById('totalBidPrice').textContent = this.formatNumber(dc.bidPrice) + '원';
+            document.getElementById('totalAdditionalCosts').textContent = this.formatNumber(dc.totalAdditionalCosts + renovationCost) + '원';
+            document.getElementById('totalInvestmentDetail').textContent = this.formatNumber(dc.totalInvestment + renovationCost) + '원';
+            document.getElementById('costPercentage').textContent = dc.costPercentage.toFixed(1) + '%';
+        }
+        
+        console.log('상세 비용 정보 표시 완료');
     }
 
     // 리스크 조정 수익률 계산 (샤프 비율 기반)
@@ -3371,6 +3541,9 @@ class AuctionSimulator {
         if (registrationFeeEl) registrationFeeEl.textContent = this.formatNumber(Math.round(costInfo.registrationFee)) + '원';
         if (taxEl) taxEl.textContent = this.formatNumber(Math.round(costInfo.tax)) + '원';
         if (renovationCostDisplayEl) renovationCostDisplayEl.textContent = this.formatNumber(renovationCost) + '원';
+        
+        // 상세 비용 정보 표시
+        this.displayDetailedCosts(costInfo, bidPrice, renovationCost);
         
         // 총 투자 비용 계산 (입찰가 + 수수료 + 리모델링 비용)
         const totalInvestment = totalCostInWon + renovationCost;

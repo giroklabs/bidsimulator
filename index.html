@@ -468,31 +468,154 @@
                 </div>
 
                 <div class="detailed-results" style="display: none;">
-                    <h3>상세 분석</h3>
-                    <div class="analysis-grid">
-                        <div class="analysis-item">
-                            <span class="label">총 비용 (수수료 포함)</span>
-                            <span class="value" id="totalCost">0원</span>
+                    <h3>상세 비용 분석</h3>
+                    
+                    <!-- 기본 정보 -->
+                    <div class="cost-section">
+                        <h4>📋 기본 정보</h4>
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <span class="label">입찰가격</span>
+                                <span class="value" id="bidPriceDetail">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">입찰보증금</span>
+                                <span class="value" id="depositAmount">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">잔금</span>
+                                <span class="value" id="remainingPayment">0원</span>
+                            </div>
                         </div>
-                        <div class="analysis-item">
-                            <span class="label">경매 수수료</span>
-                            <span class="value" id="auctionFee">0원</span>
+                    </div>
+
+                    <!-- 세금 -->
+                    <div class="cost-section">
+                        <h4>💰 세금 (취득세 및 관련세)</h4>
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <span class="label">취득세</span>
+                                <span class="value" id="acquisitionTax">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">지방교육세</span>
+                                <span class="value" id="localEducationTax">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">농어촌특별세</span>
+                                <span class="value" id="ruralSpecialTax">0원</span>
+                            </div>
+                            <div class="analysis-item total-row">
+                                <span class="label"><strong>세금 합계</strong></span>
+                                <span class="value" id="totalTaxes"><strong>0원</strong></span>
+                            </div>
                         </div>
-                        <div class="analysis-item">
-                            <span class="label">등기비용</span>
-                            <span class="value" id="registrationFee">0원</span>
+                    </div>
+
+                    <!-- 등기비용 -->
+                    <div class="cost-section">
+                        <h4>📄 등기 관련 비용</h4>
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <span class="label">소유권이전등기</span>
+                                <span class="value" id="ownershipTransferTax">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">근저당권설정등기</span>
+                                <span class="value" id="mortgageTax">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">지방교육세 (등기분)</span>
+                                <span class="value" id="registrationEducationTax">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">국민주택채권</span>
+                                <span class="value" id="housingBond">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">인지세</span>
+                                <span class="value" id="stampTax">0원</span>
+                            </div>
+                            <div class="analysis-item total-row">
+                                <span class="label"><strong>등기비용 합계</strong></span>
+                                <span class="value" id="totalRegistrationFees"><strong>0원</strong></span>
+                            </div>
                         </div>
-                        <div class="analysis-item">
-                            <span class="label">세금</span>
-                            <span class="value" id="tax">0원</span>
+                    </div>
+
+                    <!-- 전문가 수수료 -->
+                    <div class="cost-section">
+                        <h4>⚖️ 전문가 수수료</h4>
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <span class="label">법무사 수수료</span>
+                                <span class="value" id="legalFee">0원</span>
+                            </div>
+                            <div class="analysis-item total-row">
+                                <span class="label"><strong>전문가 수수료 합계</strong></span>
+                                <span class="value" id="totalProfessionalFees"><strong>0원</strong></span>
+                            </div>
                         </div>
-                        <div class="analysis-item">
-                            <span class="label">리모델링 비용</span>
-                            <span class="value" id="renovationCostDisplay">0원</span>
+                    </div>
+
+                    <!-- 경매 수수료 -->
+                    <div class="cost-section">
+                        <h4>🏛️ 경매 수수료</h4>
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <span class="label">경매 수수료</span>
+                                <span class="value" id="auctionFeeDetail">0원</span>
+                            </div>
+                            <div class="analysis-item total-row">
+                                <span class="label"><strong>경매 수수료 합계</strong></span>
+                                <span class="value" id="totalAuctionFees"><strong>0원</strong></span>
+                            </div>
                         </div>
-                        <div class="analysis-item">
-                            <span class="label">총 투자 비용</span>
-                            <span class="value" id="totalInvestment">0원</span>
+                    </div>
+
+                    <!-- 기타 비용 -->
+                    <div class="cost-section">
+                        <h4>🔧 기타 발생 가능 비용</h4>
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <span class="label">명도비</span>
+                                <span class="value" id="evictionCost">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">미납 공과금</span>
+                                <span class="value" id="unpaidUtilities">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">리모델링 비용</span>
+                                <span class="value" id="renovationCostDisplay">0원</span>
+                            </div>
+                            <div class="analysis-item total-row">
+                                <span class="label"><strong>기타 비용 합계</strong></span>
+                                <span class="value" id="totalOtherCosts"><strong>0원</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 총계 -->
+                    <div class="cost-section total-section">
+                        <h4>💯 총 비용 요약</h4>
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <span class="label">입찰가격</span>
+                                <span class="value" id="totalBidPrice">0원</span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">부대비용 합계</span>
+                                <span class="value" id="totalAdditionalCosts">0원</span>
+                            </div>
+                            <div class="analysis-item grand-total">
+                                <span class="label"><strong>총 투자 비용</strong></span>
+                                <span class="value" id="totalInvestmentDetail"><strong>0원</strong></span>
+                            </div>
+                            <div class="analysis-item">
+                                <span class="label">부대비용 비율</span>
+                                <span class="value" id="costPercentage">0%</span>
+                            </div>
                         </div>
                     </div>
                 </div>

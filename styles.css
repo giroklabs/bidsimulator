@@ -1441,6 +1441,59 @@ header p {
 
 /* 물건조사 카드 헤더는 공통 스타일 사용 */
 
+/* 상세 비용 분석 스타일 */
+.cost-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+}
+
+.cost-section h4 {
+    color: #2c3e50;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.cost-section.total-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-left: 4px solid #764ba2;
+}
+
+.cost-section.total-section h4 {
+    color: white;
+}
+
+.total-row {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-top: 8px;
+}
+
+.total-section .total-row {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.grand-total {
+    background: rgba(102, 126, 234, 0.15);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 12px;
+    border: 2px solid #667eea;
+}
+
+.total-section .grand-total {
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
 .inspection-sections {
     display: flex;
     flex-direction: column;
