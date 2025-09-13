@@ -737,7 +737,7 @@ class AuctionSimulator {
             if (region && district) {
                 // 지역별 데이터에서 직접 찾기
                 const regionalData = this.getRegionalSaleRateData();
-                const fullDistrictName = region === '경기' ? district : `${region} ${district}`;
+                const fullDistrictName = `${region} ${district}`;
                 
                 console.log('검색할 지역명:', fullDistrictName);
                 
@@ -1457,7 +1457,7 @@ class AuctionSimulator {
         try {
             // 지역별 데이터에서 직접 찾기
             const regionalData = this.getRegionalSaleRateData();
-            const fullDistrictName = region === '경기' ? district : `${region} ${district}`;
+            const fullDistrictName = `${region} ${district}`;
             
             console.log('검색할 지역명:', fullDistrictName);
             
