@@ -267,17 +267,30 @@ class AuctionSimulator {
         
         // 매물 추가 버튼 이벤트
         const addPropertyBtn = document.getElementById('addPropertyBtn');
+        console.log('매물 추가 버튼 요소 찾기 시도:', addPropertyBtn);
+        
         if (addPropertyBtn) {
+            console.log('매물 추가 버튼 찾음, 이벤트 리스너 등록 시작');
             addPropertyBtn.addEventListener('click', (e) => {
                 console.log('=== 매물 추가 버튼 클릭됨 ===');
                 console.log('이벤트 객체:', e);
                 console.log('버튼 요소:', addPropertyBtn);
                 console.log('this 객체:', this);
-                this.showPropertyModal();
+                
+                try {
+                    this.showPropertyModal();
+                    console.log('showPropertyModal 호출 완료');
+                } catch (error) {
+                    console.error('showPropertyModal 호출 오류:', error);
+                }
             });
             console.log('매물 추가 버튼 이벤트 리스너 등록 완료');
         } else {
             console.error('addPropertyBtn 요소를 찾을 수 없습니다');
+            // 모든 버튼 요소 확인
+            const allButtons = document.querySelectorAll('button');
+            console.log('페이지의 모든 버튼 요소들:', allButtons);
+            console.log('버튼들의 ID:', Array.from(allButtons).map(btn => btn.id));
         }
 
         // 클라우드 서비스 선택 및 연동 버튼 이벤트
@@ -801,17 +814,28 @@ class AuctionSimulator {
 
     // 매물 추가 모달 표시
     showPropertyModal() {
-        console.log('매물 추가 모달 표시 시작');
+        console.log('=== showPropertyModal 함수 시작 ===');
         const modal = document.getElementById('propertyModal');
+        console.log('모달 요소 찾기:', modal);
+        
         if (modal) {
+            console.log('모달 요소 찾음, 표시 시작');
             const isEditMode = modal.dataset.editIndex !== undefined;
+            console.log('편집 모드 여부:', isEditMode);
             
             if (!isEditMode) {
                 // 새 매물 추가 모드일 때만 초기화
+                console.log('새 매물 추가 모드로 초기화 시작');
+                
                 // 편집 모드 초기화
                 delete modal.dataset.editIndex;
-                modal.querySelector('h3').textContent = '매물 추가';
-                console.log('편집 모드 초기화 완료');
+                const titleElement = modal.querySelector('h3');
+                if (titleElement) {
+                    titleElement.textContent = '매물 추가';
+                    console.log('제목 변경 완료');
+                } else {
+                    console.error('모달 제목 요소를 찾을 수 없습니다');
+                }
                 
                 // 현재 경매 데이터 초기화
                 this.currentAuctionData = null;
