@@ -312,7 +312,14 @@ window.githubStorage = {
         
         try {
             // 현재 데이터 가져오기
+            console.log('=== GitHub 업로드 시작 ===');
+            console.log('StorageManager 상태:', {
+                hasStorageManager: !!window.storageManager,
+                currentData: window.storageManager ? window.storageManager.currentData : null
+            });
+            
             const currentData = window.storageManager.exportData();
+            console.log('내보낼 데이터:', currentData);
             
             // Gist 업데이트
             const gistData = {
@@ -322,6 +329,8 @@ window.githubStorage = {
                     }
                 }
             };
+            
+            console.log('업로드할 Gist 데이터:', gistData);
             
             const response = await fetch(`${this.GIST_API_URL}/${this.gistId}`, {
                 method: 'PATCH',

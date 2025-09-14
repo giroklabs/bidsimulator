@@ -2034,10 +2034,18 @@ class AuctionSimulator {
                 alert('매물이 성공적으로 추가되었습니다.');
                 console.log('새 매물 추가 완료:', newProperty);
                 
+                // 강제로 데이터 저장 확인
+                const saveResult = window.storageManager.saveData();
+                console.log('강제 저장 결과:', saveResult);
+                
                 // 저장 후 현재 매물 목록 확인
                 const currentProperties = window.storageManager.getProperties();
                 console.log('현재 저장된 매물 목록:', currentProperties);
                 console.log('저장된 매물 수:', currentProperties.length);
+                
+                // localStorage 직접 확인
+                const localData = localStorage.getItem('auctionSimulatorData');
+                console.log('localStorage 직접 확인:', localData);
             } else {
                 alert('매물 추가에 실패했습니다.');
                 console.error('매물 추가 실패 - newProperty가 null입니다.');
