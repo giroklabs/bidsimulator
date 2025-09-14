@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카카오 로그인 처리 중...</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #FEE500 0%, #FFD700 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .callback-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .kakao-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3c1e1e;
+            margin-bottom: 20px;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #FEE500;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .message {
+            color: #333;
+            font-size: 1.1rem;
+            margin: 20px 0;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            background: #ffeaea;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .success-message {
+            color: #27ae60;
+            background: #eafaf1;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .back-button {
+            background: #FEE500;
+            color: #3c1e1e;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #FDD835;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <div class="kakao-logo">💬 kakao</div>
+        
+        <div class="spinner"></div>
+        
+        <div class="message">카카오 로그인을 처리하고 있습니다...</div>
+        
+        <div class="error-message" id="errorMessage">
+            <strong>오류가 발생했습니다!</strong><br>
+            <span id="errorText"></span>
+        </div>
+        
+        <div class="success-message" id="successMessage">
+            <strong>로그인 성공!</strong><br>
+            곧 메인 페이지로 이동합니다.
+        </div>
+        
+        <button class="back-button" id="backButton" onclick="goBack()" style="display: none;">
+            메인 페이지로 돌아가기
+        </button>
+    </div>
+
+    <script>
+        // 카카오 로그인 콜백 처리
+        function handleKakaoCallback() {
+            console.log('=== 카카오 콜백 페이지 로드됨 ===');
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const error = urlParams.get('error');
+            const errorDescription = urlParams.get('error_description');
+            
+            console.log('URL 파라미터:', { code, error, errorDescription });
+            
+            if (error) {
+                console.error('카카오 로그인 오류:', error, errorDescription);
+                showError(`카카오 로그인 중 오류가 발생했습니다: ${errorDescription || error}`);
+                return;
+            }
+            
+            if (code) {
+                console.log('카카오 인증 코드 수신:', code.substring(0, 10) + '...');
+                processKakaoCode(code);
+            } else {
+                console.warn('인증 코드가 없습니다.');
+                showError('인증 코드를 받지 못했습니다.');
+            }
+        }
+        
+        async function processKakaoCode(code) {
+            try {
+                // 카카오 토큰 요청
+                const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        grant_type: 'authorization_code',
+                        client_id: 'ea409d22c2a8c639237054f161928d75',
+                        redirect_uri: window.location.origin + '/kakao-callback',
+                        code: code
+                    }).toString()
+                });
+                
+                if (!tokenResponse.ok) {
+                    throw new Error(`토큰 요청 실패: ${tokenResponse.status}`);
+                }
+                
+                const tokenData = await tokenResponse.json();
+                console.log('카카오 토큰 응답:', tokenData);
+                
+                if (tokenData.access_token) {
+                    // 사용자 정보 요청
+                    const userResponse = await fetch('https://kapi.kakao.com/v2/user/me', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${tokenData.access_token}`,
+                            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+                        }
+                    });
+                    
+                    if (!userResponse.ok) {
+                        throw new Error(`사용자 정보 요청 실패: ${userResponse.status}`);
+                    }
+                    
+                    const userData = await userResponse.json();
+                    console.log('카카오 사용자 정보:', userData);
+                    
+                    // 사용자 정보 정리
+                    const userInfo = {
+                        id: userData.id,
+                        nickname: userData.kakao_account?.profile?.nickname || '카카오 사용자',
+                        profileImage: userData.kakao_account?.profile?.profile_image_url || '',
+                        connectedAt: userData.connected_at
+                    };
+                    
+                    // 로컬 스토리지에 저장
+                    localStorage.setItem('kakao_access_token', tokenData.access_token);
+                    localStorage.setItem('kakao_user_info', JSON.stringify(userInfo));
+                    
+                    showSuccess();
+                    
+                    // 2초 후 메인 페이지로 리디렉션
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                    
+                } else {
+                    throw new Error('액세스 토큰을 받지 못했습니다.');
+                }
+                
+            } catch (error) {
+                console.error('카카오 로그인 처리 오류:', error);
+                showError('로그인 처리 중 오류가 발생했습니다: ' + error.message);
+            }
+        }
+        
+        function showError(message) {
+            document.getElementById('errorText').textContent = message;
+            document.getElementById('errorMessage').style.display = 'block';
+            document.querySelector('.spinner').style.display = 'none';
+            document.querySelector('.message').style.display = 'none';
+            document.getElementById('backButton').style.display = 'inline-block';
+        }
+        
+        function showSuccess() {
+            document.getElementById('successMessage').style.display = 'block';
+            document.querySelector('.spinner').style.display = 'none';
+            document.querySelector('.message').style.display = 'none';
+            document.getElementById('backButton').style.display = 'inline-block';
+        }
+        
+        function goBack() {
+            window.location.href = '/';
+        }
+        
+        // 페이지 로드 시 콜백 처리 시작
+        document.addEventListener('DOMContentLoaded', handleKakaoCallback);
+    </script>
+</body>
+</html>
