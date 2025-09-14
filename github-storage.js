@@ -10,6 +10,7 @@ window.githubStorage = {
 
     // OAuth 설정 (GitHub OAuth App에서 생성)
     CLIENT_ID: 'Ov23li1iPKmWdw0h568z', // 새로운 GitHub OAuth App Client ID
+    CLIENT_SECRET: '627a31df6db2f26c368c570737e3f7fa2baec09a', // GitHub OAuth App Client Secret
     REDIRECT_URI: 'https://giroklabs.github.io/bidsimulator', // GitHub Pages URL
     OAUTH_URL: 'https://github.com/login/oauth/authorize',
 
@@ -45,7 +46,43 @@ window.githubStorage = {
         // 에러 처리 설정
         this.setupErrorHandling();
 
+        // 이벤트 리스너 설정
+        this.setupEventListeners();
+
         console.log('GitHub Storage 초기화 완료');
+    },
+
+    // 이벤트 리스너 설정
+    setupEventListeners() {
+        // GitHub 연동 버튼
+        const connectBtn = document.getElementById('github-connect-btn');
+        if (connectBtn) {
+            connectBtn.addEventListener('click', () => this.connectToGitHub());
+        }
+
+        // 토큰 로그인 버튼
+        const tokenBtn = document.getElementById('github-token-btn');
+        if (tokenBtn) {
+            tokenBtn.addEventListener('click', () => this.connectToGitHubWithToken());
+        }
+
+        // 연결 해제 버튼
+        const disconnectBtn = document.getElementById('github-disconnect-btn');
+        if (disconnectBtn) {
+            disconnectBtn.addEventListener('click', () => this.disconnectFromGitHub());
+        }
+
+        // 업로드 버튼
+        const syncToBtn = document.getElementById('github-sync-to-btn');
+        if (syncToBtn) {
+            syncToBtn.addEventListener('click', () => this.syncToGitHub());
+        }
+
+        // 다운로드 버튼
+        const syncFromBtn = document.getElementById('github-sync-from-btn');
+        if (syncFromBtn) {
+            syncFromBtn.addEventListener('click', () => this.syncFromGitHub());
+        }
     },
     
     // 에러 처리 설정
@@ -333,24 +370,54 @@ window.githubStorage = {
         }
     },
     
-    // GitHub 인증 시작 (Personal Access Token 방식 기본)
+    // GitHub 인증 시작 (OAuth 및 Personal Access Token 방식 지원)
     async connectToGitHub() {
         try {
-            console.log('GitHub 연결 시작 - Personal Access Token 방식');
+            console.log('GitHub 연결 시작');
 
             // 네트워크 연결 상태 확인
             if (!navigator.onLine) {
                 throw new Error('네트워크 연결이 필요합니다. 인터넷 연결을 확인해주세요.');
             }
 
-            // Personal Access Token 방식이 기본
-            console.log('Personal Access Token 방식으로 인증 시작');
-            return await this.connectToGitHubWithToken();
+            // 모바일 브라우저 감지
+            const isMobile = this.isMobileDevice();
+
+            // 사용자에게 인증 방식 선택
+            const authMethod = await this.selectAuthMethod(isMobile);
+
+            switch (authMethod) {
+                case 'oauth':
+                    console.log('OAuth 방식 선택');
+                    return await this.startOAuthFlow(isMobile);
+
+                case 'token':
+                default:
+                    console.log('Personal Access Token 방식 선택');
+                    return await this.connectToGitHubWithToken();
+            }
 
         } catch (error) {
             console.error('GitHub 연결 오류:', error);
             alert('GitHub 연결 중 오류가 발생했습니다: ' + error.message);
-            return false;
+
+            // 오류 시 토큰 방식으로 폴백
+            setTimeout(() => {
+                if (confirm('OAuth 방식에 문제가 있습니다.\n\nPersonal Access Token 방식으로 시도하시겠습니까?\n\n(더 안정적인 방법입니다)')) {
+                    this.connectToGitHubWithToken();
+                }
+            }, 1000);
+        }
+    },
+
+    // OAuth 플로우 시작
+    async startOAuthFlow(isMobile) {
+        if (isMobile) {
+            console.log('모바일 브라우저 감지됨 - 리디렉션 방식 사용');
+            return await this.startOAuthFlowRedirect();
+        } else {
+            console.log('데스크톱 브라우저 - 팝업 방식 사용');
+            return await this.startOAuthFlowPopup();
         }
     },
 
@@ -360,15 +427,12 @@ window.githubStorage = {
 
         if (isMobile) {
             methods.push(
-                '웹 브라우저로 이동하여 인증 (권장)',
-                '디바이스 코드 방식',
+                'OAuth 인증 (GitHub 로그인)',
                 'Personal Access Token 방식'
             );
         } else {
             methods.push(
-                '팝업 창으로 인증 (권장)',
-                '웹 브라우저로 이동하여 인증',
-                '디바이스 코드 방식',
+                'OAuth 인증 (GitHub 로그인)',
                 'Personal Access Token 방식'
             );
         }
@@ -378,26 +442,15 @@ window.githubStorage = {
         const choice = prompt(`GitHub 인증 방식을 선택해주세요:\n\n${methodNames}\n\n번호를 입력하세요 (기본: 1):`, '1');
 
         if (!choice || choice.trim() === '') {
-            return isMobile ? 'redirect' : 'popup';
+            return 'oauth';
         }
 
         const choiceNum = parseInt(choice.trim());
 
-        if (isMobile) {
-            switch (choiceNum) {
-                case 1: return 'redirect';
-                case 2: return 'device';
-                case 3: return 'token';
-                default: return 'redirect';
-            }
-        } else {
-            switch (choiceNum) {
-                case 1: return 'popup';
-                case 2: return 'redirect';
-                case 3: return 'device';
-                case 4: return 'token';
-                default: return 'popup';
-            }
+        switch (choiceNum) {
+            case 1: return 'oauth';
+            case 2: return 'token';
+            default: return 'oauth';
         }
     },
 
@@ -697,36 +750,70 @@ GitHub 인증이 필요합니다.
         try {
             console.log('토큰 교환 시작 - 코드:', code.substring(0, 10) + '...');
 
-            // GitHub OAuth는 보안상 클라이언트에서 직접 토큰 교환이 불가능
-            // Client Secret이 필요하므로 서버 측에서 처리해야 함
-            console.log('클라이언트 측 토큰 교환 제한 - Personal Access Token 방식으로 전환');
+            // GitHub OAuth 토큰 교환 엔드포인트 호출 (Client Secret 포함)
+            const response = await fetch('https://github.com/login/oauth/access_token', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    client_id: this.CLIENT_ID,
+                    client_secret: this.CLIENT_SECRET,
+                    code: code,
+                    redirect_uri: this.REDIRECT_URI
+                }).toString()
+            });
 
-            // 사용자에게 토큰 방식으로 전환 안내
-            const useToken = confirm(
-                'GitHub OAuth 인증이 완료되었습니다!\n\n' +
-                '보안상의 이유로 클라이언트에서 직접 토큰 교환이 제한됩니다.\n\n' +
-                'Personal Access Token 방식으로 계속하시겠습니까?\n\n' +
-                '(더 안전하고 안정적인 방법입니다)'
-            );
-
-            if (useToken) {
-                // 토큰 방식으로 전환
-                setTimeout(() => {
-                    this.connectToGitHubWithToken();
-                }, 500);
-                return false;
-            } else {
-                alert('인증이 취소되었습니다.');
-                return false;
+            if (!response.ok) {
+                throw new Error(`토큰 교환 실패: ${response.status} ${response.statusText}`);
             }
+
+            const data = await response.json();
+            console.log('토큰 교환 응답:', { hasAccessToken: !!data.access_token, hasError: !!data.error });
+
+            if (data.error) {
+                throw new Error(`GitHub OAuth 오류: ${data.error_description || data.error}`);
+            }
+
+            if (!data.access_token) {
+                throw new Error('액세스 토큰을 받지 못했습니다.');
+            }
+
+            // 액세스 토큰 저장
+            this.accessToken = data.access_token;
+
+            // 사용자 정보 가져오기
+            await this.fetchUserInfo();
+
+            // Gist 생성 또는 가져오기
+            await this.createOrGetGist();
+
+            // 인증 정보 저장
+            this.saveCredentials();
+
+            console.log('OAuth 토큰 교환 및 인증 완료');
+            return true;
 
         } catch (error) {
             console.error('토큰 교환 오류:', error);
 
-            // 모든 오류에 대해 토큰 방식으로 폴백
-            console.log('OAuth 오류 발생 - 토큰 방식으로 폴백');
+            // CORS 오류나 네트워크 오류인 경우 토큰 방식으로 폴백
+            if (error.message.includes('CORS') || error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
+                console.log('네트워크 오류 감지 - 토큰 방식으로 폴백');
 
-            if (confirm('OAuth 인증 중 문제가 발생했습니다.\n\nPersonal Access Token 방식으로 시도하시겠습니까?\n\n(더 안정적인 방법입니다)')) {
+                if (confirm('OAuth 토큰 교환 중 네트워크 오류가 발생했습니다.\n\nPersonal Access Token 방식으로 시도하시겠습니까?\n\n(더 안정적인 방법입니다)')) {
+                    setTimeout(() => {
+                        this.connectToGitHubWithToken();
+                    }, 500);
+                }
+                return false;
+            }
+
+            // 다른 오류는 사용자에게 표시하고 토큰 방식으로 폴백
+            console.log('OAuth 오류 발생 - 토큰 방식으로 폴백');
+            
+            if (confirm(`OAuth 인증 중 오류가 발생했습니다:\n${error.message}\n\nPersonal Access Token 방식으로 시도하시겠습니까?`)) {
                 setTimeout(() => {
                     this.connectToGitHubWithToken();
                 }, 500);
