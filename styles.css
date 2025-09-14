@@ -165,8 +165,7 @@ header p {
     background: white;
     color: #1a7f37;
     border-color: #238636;
-    width: 48%;
-    margin-right: 2%;
+    flex: 1;
 }
 
 .github-btn.success:hover {
@@ -179,7 +178,7 @@ header p {
     background: white;
     color: #0969da;
     border-color: #0969da;
-    width: 48%;
+    flex: 1;
 }
 
 .github-btn.info:hover {
@@ -190,7 +189,7 @@ header p {
 
 .github-storage-section #github-sync-buttons {
     display: flex;
-    gap: 0;
+    gap: 8px;
     margin-top: 8px;
 }
 
