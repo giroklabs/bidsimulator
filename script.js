@@ -2011,16 +2011,36 @@ class AuctionSimulator {
                 return;
             }
         } else {
-            // 매물 추가 - 간단한 저장 시스템 사용
-            const newProperty = window.simpleStorage ? 
-                window.simpleStorage.addProperty(property) :
-                window.storageManager.addProperty(property);
+            // 매물 추가 - 디버깅 코드 추가
+            console.log('=== 매물 추가 모드 ===');
+            console.log('저장 시스템 상태:', {
+                hasSimpleStorage: !!window.simpleStorage,
+                hasStorageManager: !!window.storageManager
+            });
+            
+            let newProperty = null;
+            
+            if (window.storageManager) {
+                console.log('StorageManager를 사용하여 매물 추가');
+                newProperty = window.storageManager.addProperty(property);
+                console.log('StorageManager addProperty 결과:', newProperty);
+            } else {
+                console.error('StorageManager가 없습니다!');
+                alert('저장 시스템이 초기화되지 않았습니다.');
+                return;
+            }
                 
             if (newProperty) {
                 alert('매물이 성공적으로 추가되었습니다.');
-                console.log('새 매물 추가 완료 - 사용자가 직접 선택하세요');
+                console.log('새 매물 추가 완료:', newProperty);
+                
+                // 저장 후 현재 매물 목록 확인
+                const currentProperties = window.storageManager.getProperties();
+                console.log('현재 저장된 매물 목록:', currentProperties);
+                console.log('저장된 매물 수:', currentProperties.length);
             } else {
                 alert('매물 추가에 실패했습니다.');
+                console.error('매물 추가 실패 - newProperty가 null입니다.');
                 return;
             }
         }
