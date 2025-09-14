@@ -1700,17 +1700,17 @@ select {
     flex-shrink: 0;
 }
 
-/* 모바일 공지 스타일 */
-.mobile-notice {
+/* GitHub 연동 안내 스타일 */
+.github-notice {
     margin-top: 12px;
     padding: 8px 12px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 6px;
-    border-left: 3px solid #ffc107;
+    border-left: 3px solid #28a745;
 }
 
-.mobile-notice small {
-    color: #fff3cd;
+.github-notice small {
+    color: #d4edda;
     font-size: 12px;
     line-height: 1.4;
 }
