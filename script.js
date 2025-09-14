@@ -3130,7 +3130,7 @@ class AuctionSimulator {
         });
         
         // 입찰가격별 낙찰 확률 그래프를 위한 데이터 생성
-        const chartData = this.generateChartData(marketPrice, appraisalPrice, minimumBid, competitorCount, marketCondition, urgency, failedCount, renovationCost, auctionType);
+        const chartData = this.generateChartData(marketPrice, appraisalPrice, minimumBid, competitorCount, marketCondition, urgency, failedCount, renovationCost, auctionType, salePriceRate);
         
         return {
             recommendedBid: recommendedBid,
@@ -3145,7 +3145,7 @@ class AuctionSimulator {
     }
 
     // 입찰가격별 낙찰 확률 그래프 데이터 생성
-    generateChartData(marketPrice, appraisalPrice, minimumBid, competitorCount, marketCondition, urgency, failedCount, renovationCost, auctionType) {
+    generateChartData(marketPrice, appraisalPrice, minimumBid, competitorCount, marketCondition, urgency, failedCount, renovationCost, auctionType, salePriceRate) {
         const bidPrices = [];
         const probabilities = [];
         const profits = [];
