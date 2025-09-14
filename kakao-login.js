@@ -5,7 +5,7 @@
 
 window.kakaoLogin = {
     // 카카오 API 설정
-    KAKAO_CLIENT_ID: 'YOUR_KAKAO_REST_API_KEY', // 카카오 개발자 콘솔에서 발급받은 REST API 키
+    KAKAO_CLIENT_ID: 'ea409d22c2a8c639237054f161928d75', // 카카오 개발자 콘솔에서 발급받은 REST API 키
     KAKAO_REDIRECT_URI: window.location.origin + '/kakao-callback',
     KAKAO_AUTH_URL: 'https://kauth.kakao.com/oauth/authorize',
     KAKAO_TOKEN_URL: 'https://kauth.kakao.com/oauth/token',
