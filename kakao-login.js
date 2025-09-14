@@ -268,6 +268,7 @@ window.kakaoLogin = {
         const kakaoStatusElement = document.getElementById('kakao-status');
         const kakaoLoginButton = document.getElementById('kakao-login-btn');
         const kakaoLogoutButton = document.getElementById('kakao-logout-btn');
+        const kakaoDriveButtons = document.getElementById('kakao-drive-buttons');
         
         if (this.kakaoUserInfo) {
             // 로그인된 상태
@@ -276,6 +277,12 @@ window.kakaoLogin = {
             }
             if (kakaoLoginButton) kakaoLoginButton.style.display = 'none';
             if (kakaoLogoutButton) kakaoLogoutButton.style.display = 'inline-block';
+            if (kakaoDriveButtons) kakaoDriveButtons.style.display = 'block';
+            
+            // 카카오 드라이브 스토리지 초기화
+            if (window.kakaoDriveStorage) {
+                window.kakaoDriveStorage.init();
+            }
         } else {
             // 로그인되지 않은 상태
             if (kakaoStatusElement) {
@@ -283,6 +290,7 @@ window.kakaoLogin = {
             }
             if (kakaoLoginButton) kakaoLoginButton.style.display = 'inline-block';
             if (kakaoLogoutButton) kakaoLogoutButton.style.display = 'none';
+            if (kakaoDriveButtons) kakaoDriveButtons.style.display = 'none';
         }
     },
     
@@ -345,5 +353,51 @@ document.addEventListener('DOMContentLoaded', () => {
             window.kakaoLogin.logoutFromKakao();
         });
         console.log('카카오 로그아웃 버튼 이벤트 리스너 등록 완료');
+    }
+    
+    // 카카오 드라이브 저장 버튼
+    const kakaoDriveSaveButton = document.getElementById('kakao-drive-save-btn');
+    if (kakaoDriveSaveButton) {
+        kakaoDriveSaveButton.addEventListener('click', async () => {
+            console.log('카카오 드라이브 저장 버튼 클릭됨');
+            try {
+                // 현재 데이터 가져오기
+                const currentData = window.storageManager.exportData();
+                const dataObj = JSON.parse(currentData);
+                
+                // 카카오 드라이브에 저장
+                await window.kakaoDriveStorage.saveToKakaoDrive(dataObj);
+                alert('카카오 드라이브에 저장되었습니다!');
+            } catch (error) {
+                console.error('카카오 드라이브 저장 오류:', error);
+                alert('카카오 드라이브 저장 중 오류가 발생했습니다: ' + error.message);
+            }
+        });
+        console.log('카카오 드라이브 저장 버튼 이벤트 리스너 등록 완료');
+    }
+    
+    // 카카오 드라이브 불러오기 버튼
+    const kakaoDriveLoadButton = document.getElementById('kakao-drive-load-btn');
+    if (kakaoDriveLoadButton) {
+        kakaoDriveLoadButton.addEventListener('click', async () => {
+            console.log('카카오 드라이브 불러오기 버튼 클릭됨');
+            try {
+                // 카카오 드라이브에서 불러오기
+                const data = await window.kakaoDriveStorage.loadFromKakaoDrive();
+                if (data) {
+                    // 데이터 가져오기
+                    window.storageManager.importData(JSON.stringify(data));
+                    alert('카카오 드라이브에서 데이터를 불러왔습니다!');
+                    // 페이지 새로고침
+                    window.location.reload();
+                } else {
+                    alert('저장된 데이터가 없습니다.');
+                }
+            } catch (error) {
+                console.error('카카오 드라이브 불러오기 오류:', error);
+                alert('카카오 드라이브 불러오기 중 오류가 발생했습니다: ' + error.message);
+            }
+        });
+        console.log('카카오 드라이브 불러오기 버튼 이벤트 리스너 등록 완료');
     }
 });

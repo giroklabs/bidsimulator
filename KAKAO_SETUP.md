@@ -27,10 +27,21 @@ KAKAO_CLIENT_ID: 'YOUR_KAKAO_REST_API_KEY', // 여기에 REST API 키 입력
 
 ### 1-4. Redirect URI 등록
 1. **제품 설정** → **카카오 로그인** → **활성화 설정**
-2. **카카오 로그인** 활성화
-3. **Redirect URI** 추가:
-   - `https://giroklabs.github.io/bidsimulator/kakao-callback` (GitHub Pages)
-   - `http://localhost:8000/kakao-callback` (로컬 테스트용)
+2. **카카오 로그인** 활성화 (토글 스위치 ON)
+3. **플랫폼 설정** → **Web** 선택
+4. **사이트 도메인**에 다음 URI들을 **하나씩** 추가:
+   - `http://localhost:8000/kakao-callback` (로컬 개발용)
+   - `https://giroklabs.github.io/bidsimulator/kakao-callback` (GitHub Pages 배포용)
+   - `http://127.0.0.1:8000/kakao-callback` (추가 로컬 테스트용)
+5. **+ 추가** 버튼으로 각각 등록 후 **저장**
+
+#### 📋 Redirect URI 등록 상세 단계:
+1. 카카오 개발자 콘솔 → 내 애플리케이션 → [애플리케이션 선택]
+2. 제품 설정 → 카카오 로그인 클릭
+3. 카카오 로그인 활성화 (토글 ON)
+4. 플랫폼 설정에서 "Web" 선택
+5. 사이트 도메인 입력란에 URI 입력 후 "추가" 버튼 클릭
+6. 모든 URI 추가 완료 후 "저장" 버튼 클릭
 
 ## 2. 로컬 테스트 설정
 
