@@ -40,7 +40,7 @@ window.kakaoLogin = {
             response_type: 'code',
             client_id: this.KAKAO_CLIENT_ID,
             redirect_uri: this.KAKAO_REDIRECT_URI,
-            scope: 'profile_nickname,profile_image,account_email' // 필요한 권한
+            scope: 'profile_nickname,profile_image' // 필요한 권한 (이메일 제외)
         });
         
         const kakaoAuthUrl = `${this.KAKAO_AUTH_URL}?${params.toString()}`;
