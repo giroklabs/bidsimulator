@@ -1669,6 +1669,101 @@ select {
     font-weight: 400;
 }
 
+/* 카카오 로그인 섹션 스타일 */
+.kakao-login-section {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.kakao-storage-section h4 {
+    margin: 0 0 12px 0;
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* 카카오 버튼 스타일 */
+.kakao-btn {
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    margin-bottom: 8px;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: white;
+    color: #24292f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+}
+
+.kakao-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-color: #d0d7de;
+}
+
+.kakao-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* 카카오 버튼 타입별 스타일 */
+.kakao-btn.primary {
+    background: #FEE500;
+    color: #3c1e1e;
+    border-color: #FEE500;
+}
+
+.kakao-btn.primary:hover {
+    background: #FDD835;
+    border-color: #FDD835;
+    box-shadow: 0 4px 12px rgba(254, 229, 0, 0.3);
+}
+
+.kakao-btn.danger {
+    background: white;
+    color: #cf222e;
+    border-color: #d1242f;
+}
+
+.kakao-btn.danger:hover {
+    background: #fff5f5;
+    border-color: #cf222e;
+    box-shadow: 0 4px 12px rgba(207, 34, 46, 0.1);
+}
+
+/* 카카오 버튼 아이콘 스타일 */
+.kakao-btn .btn-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+/* 카카오 로그인 안내 스타일 */
+.kakao-notice {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #fffbf0;
+    border-radius: 8px;
+    border: 1px solid #fdd835;
+}
+
+.kakao-notice small {
+    color: #8b6914;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 400;
+}
+
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {

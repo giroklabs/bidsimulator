@@ -70,6 +70,29 @@
                     </div>
                 </div>
 
+                <!-- 카카오 로그인 섹션 -->
+                <div class="kakao-login-section">
+                    <div class="kakao-storage-section">
+                        <h4>💬 카카오 로그인</h4>
+                        <div id="kakao-status">카카오 미로그인</div>
+
+                        <button id="kakao-login-btn" class="kakao-btn primary">
+                            <span class="btn-icon">💬</span>
+                            카카오 로그인
+                        </button>
+
+                        <button id="kakao-logout-btn" class="kakao-btn danger" style="display: none;">
+                            <span class="btn-icon">🚪</span>
+                            카카오 로그아웃
+                        </button>
+
+                        <!-- 카카오 로그인 안내 -->
+                        <div id="kakao-notice" class="kakao-notice">
+                            <small>💬 카카오 계정으로 간편하게 로그인하세요</small>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="sidebar-header">
                     <h3>📋 매물 선택</h3>
                     <button class="add-property-btn" id="addPropertyBtn">+ 매물 추가</button>
@@ -686,6 +709,7 @@
     <script src="simple-storage.js"></script>
     <script src="form-data-manager.js"></script>
     <script src="github-storage.js"></script>
+    <script src="kakao-login.js"></script>
     <script src="storage-manager.js"></script>
     <script src="script.js"></script>
 </body>
