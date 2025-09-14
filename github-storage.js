@@ -19,18 +19,24 @@ window.githubStorage = {
     
     // 초기화
     init() {
-        console.log('GitHub Storage 초기화 시작');
+        console.log('=== GitHub Storage 초기화 시작 ===');
 
         // 저장된 토큰과 Gist ID 불러오기
         this.loadStoredCredentials();
+        console.log('저장된 인증 정보 로드 완료:', {
+            hasAccessToken: !!this.accessToken,
+            hasGistId: !!this.gistId,
+            hasUserInfo: !!this.userInfo
+        });
 
         // UI 업데이트
         this.updateUI();
+        console.log('UI 업데이트 완료');
 
         // 에러 처리 설정
         this.setupErrorHandling();
 
-        console.log('GitHub Storage 초기화 완료');
+        console.log('=== GitHub Storage 초기화 완료 ===');
     },
     
     // 에러 처리 설정
@@ -401,6 +407,29 @@ if (typeof window !== 'undefined') {
     window.githubStorage.init();
 }
 
+// GitHub 연동 상태 테스트 함수
+window.testGitHubConnection = function() {
+    console.log('=== GitHub 연동 상태 테스트 ===');
+    console.log('GitHub Storage 객체:', window.githubStorage);
+    console.log('연동 상태:', {
+        hasAccessToken: !!window.githubStorage.accessToken,
+        hasGistId: !!window.githubStorage.gistId,
+        hasUserInfo: !!window.githubStorage.userInfo
+    });
+    
+    // 버튼 상태 확인
+    const syncButtons = document.getElementById('github-sync-buttons');
+    const uploadBtn = document.getElementById('github-sync-to-btn');
+    console.log('업로드 버튼 요소:', uploadBtn);
+    console.log('업로드 버튼 표시 상태:', syncButtons ? syncButtons.style.display : 'N/A');
+    
+    // StorageManager 상태 확인
+    console.log('StorageManager 상태:', {
+        hasStorageManager: !!window.storageManager,
+        currentData: window.storageManager ? window.storageManager.currentData : null
+    });
+};
+
 // UI 이벤트 리스너 등록
 document.addEventListener('DOMContentLoaded', () => {
     // GitHub 연동 버튼
@@ -417,8 +446,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 업로드 버튼
     const syncToButton = document.getElementById('github-sync-to-btn');
+    console.log('GitHub 업로드 버튼 찾기:', syncToButton);
     if (syncToButton) {
-        syncToButton.addEventListener('click', () => window.githubStorage.syncToGitHub());
+        syncToButton.addEventListener('click', () => {
+            console.log('=== GitHub 업로드 버튼 클릭됨 ===');
+            console.log('GitHub 연동 상태:', {
+                hasAccessToken: !!window.githubStorage.accessToken,
+                hasGistId: !!window.githubStorage.gistId,
+                hasUserInfo: !!window.githubStorage.userInfo
+            });
+            window.githubStorage.syncToGitHub();
+        });
+        console.log('GitHub 업로드 버튼 이벤트 리스너 등록 완료');
+    } else {
+        console.error('github-sync-to-btn 요소를 찾을 수 없습니다');
     }
 
     // 다운로드 버튼
