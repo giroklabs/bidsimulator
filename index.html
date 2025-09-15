@@ -29,8 +29,17 @@
 <body>
     <div class="container">
         <header>
-            <h1>🏛️ 경매 입찰가격 시뮬레이션</h1>
-            <p>최적의 입찰가격을 찾아보세요</p>
+            <div class="header-content">
+                <div class="header-text">
+                    <h1>🏛️ 경매 입찰가격 시뮬레이션</h1>
+                    <p>최적의 입찰가격을 찾아보세요</p>
+                </div>
+                <div class="header-controls">
+                    <button id="themeToggle" class="theme-toggle" title="다크 모드 토글">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </div>
+            </div>
         </header>
 
         <div class="layout">
@@ -753,5 +762,41 @@
     <!-- <script src="kakao-drive-storage.js"></script> -->
     <script src="storage-manager.js"></script>
     <script src="script.js"></script>
+    
+    <!-- Mac 스타일 다크 모드 토글 기능 -->
+    <script>
+        // 다크 모드 토글 기능
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('.theme-icon');
+        
+        // 로컬 스토리지에서 테마 설정 불러오기
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+        
+        // 테마 토글 이벤트 리스너
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        });
+        
+        // 테마 아이콘 업데이트
+        function updateThemeIcon(theme) {
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+        }
+        
+        // 시스템 다크 모드 감지
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        mediaQuery.addListener((e) => {
+            if (!localStorage.getItem('theme')) {
+                document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+                updateThemeIcon(e.matches ? 'dark' : 'light');
+            }
+        });
+    </script>
 </body>
 </html>

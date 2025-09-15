@@ -1,31 +1,85 @@
+/* Mac 스타일 기본 설정 */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* 크롬 브라우저 호환성을 위한 추가 설정 */
+:root {
+    /* Mac Light Mode Colors */
+    --mac-bg-primary: #f5f5f7;
+    --mac-bg-secondary: #ffffff;
+    --mac-bg-tertiary: #f2f2f7;
+    --mac-text-primary: #1d1d1f;
+    --mac-text-secondary: #86868b;
+    --mac-text-tertiary: #6e6e73;
+    --mac-accent-blue: #007aff;
+    --mac-accent-green: #34c759;
+    --mac-accent-orange: #ff9500;
+    --mac-accent-red: #ff3b30;
+    --mac-accent-purple: #af52de;
+    --mac-border: #d2d2d7;
+    --mac-border-light: #e5e5ea;
+    --mac-shadow: rgba(0, 0, 0, 0.1);
+    --mac-shadow-hover: rgba(0, 0, 0, 0.15);
+    --mac-glass: rgba(255, 255, 255, 0.8);
+    --mac-glass-border: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] {
+    /* Mac Dark Mode Colors */
+    --mac-bg-primary: #000000;
+    --mac-bg-secondary: #1c1c1e;
+    --mac-bg-tertiary: #2c2c2e;
+    --mac-text-primary: #ffffff;
+    --mac-text-secondary: #8e8e93;
+    --mac-text-tertiary: #636366;
+    --mac-accent-blue: #0a84ff;
+    --mac-accent-green: #30d158;
+    --mac-accent-orange: #ff9f0a;
+    --mac-accent-red: #ff453a;
+    --mac-accent-purple: #bf5af2;
+    --mac-border: #38383a;
+    --mac-border-light: #48484a;
+    --mac-shadow: rgba(0, 0, 0, 0.3);
+    --mac-shadow-hover: rgba(0, 0, 0, 0.4);
+    --mac-glass: rgba(28, 28, 30, 0.8);
+    --mac-glass-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Mac 스타일 기본 설정 */
 html, body {
     width: 100%;
     height: 100%;
-    overflow-x: auto; /* 가로 스크롤 허용 */
-    overflow-y: auto; /* 세로 스크롤 허용 */
+    overflow-x: auto;
+    overflow-y: auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: var(--mac-bg-primary);
+    color: var(--mac-text-primary);
+    line-height: 1.47059;
+    font-weight: 400;
+    letter-spacing: -0.022em;
+    transition: all 0.3s ease;
 }
 
-/* 크롬에서 스크롤바 계산 문제 해결 */
+/* Mac 스타일 스크롤바 */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--mac-bg-tertiary);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888;
+    background: var(--mac-text-tertiary);
     border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--mac-text-secondary);
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -51,22 +105,86 @@ body {
 }
 
 header {
-    text-align: center;
+    background: var(--mac-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 24px 0;
+    box-shadow: 0 1px 0 var(--mac-border-light), 0 8px 32px var(--mac-shadow);
+    border-bottom: 1px solid var(--mac-border-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     margin-bottom: 40px;
-    color: white;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.header-text {
+    flex: 1;
+    text-align: center;
+}
+
+.header-controls {
+    position: absolute;
+    right: 24px;
 }
 
 header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    color: var(--mac-text-primary);
+    font-size: 2.75rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: -0.022em;
+    line-height: 1.09091;
 }
 
 header p {
-    font-size: 1.2rem;
-    font-weight: 300;
-    opacity: 0.9;
+    color: var(--mac-text-secondary);
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: -0.022em;
+}
+
+/* Mac 스타일 다크 모드 토글 */
+.theme-toggle {
+    background: var(--mac-bg-secondary);
+    border: 1px solid var(--mac-border);
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 1px 3px var(--mac-shadow);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--mac-shadow-hover);
+}
+
+.theme-toggle:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px var(--mac-shadow);
+}
+
+.theme-icon {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .theme-icon {
+    transform: rotate(15deg);
 }
 
 .layout {
@@ -194,21 +312,23 @@ header p {
 }
 
 .sidebar {
-    width: 495px; /* 10% 감소: 550px → 495px */
-    background: white;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    border: 1px solid rgba(102, 126, 234, 0.1);
+    width: 350px;
+    background: var(--mac-bg-secondary);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 16px var(--mac-shadow), 0 1px 0 var(--mac-border-light);
+    border: 1px solid var(--mac-border);
     height: fit-content;
     position: sticky;
     top: 20px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .sidebar:hover {
     transform: translateY(-2px);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 24px var(--mac-shadow-hover), 0 1px 0 var(--mac-border-light);
 }
 
 /* 사이드바 레이어 스타일 - 다양한 카드 디자인 */
@@ -286,166 +406,138 @@ header p {
     position: relative;
 }
 
-/* 클라우드 연동 카드 - 구름 모양 */
+/* Mac 스타일 클라우드 연동 카드 */
 .cloud-layer {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 25px 25px 15px 15px;
-    box-shadow: 
-        0 8px 32px rgba(102, 126, 234, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--mac-bg-secondary);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--mac-shadow), 0 1px 0 var(--mac-border-light);
+    border: 1px solid var(--mac-border);
+    overflow: hidden;
 }
 
 .cloud-layer::after {
     content: '☁️';
     position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 2rem;
-    opacity: 0.3;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+    top: 12px;
+    right: 12px;
+    font-size: 1.25rem;
+    opacity: 0.6;
 }
 
 .cloud-layer .layer-header {
-    background: linear-gradient(135deg, #5a6fd8 0%, #6b4190 100%);
-    border-radius: 23px 23px 0 0;
+    background: var(--mac-accent-blue);
+    border-radius: 0;
+    padding: 16px 20px;
+}
+
+.cloud-layer .layer-header h4 {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: -0.022em;
 }
 
 .cloud-layer .layer-content {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 0 0 13px 13px;
-    margin: 0 2px 2px 2px;
+    background: var(--mac-bg-secondary);
+    border-radius: 0;
+    margin: 0;
+    padding: 20px;
 }
 
-/* 매물 관리 카드 - 건물 모양 */
+/* Mac 스타일 매물 관리 카드 */
 .property-layer {
-    background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
-    border-radius: 15px;
-    box-shadow: 
-        0 8px 32px rgba(46, 204, 113, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-}
-
-.property-layer::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: 20px;
-    right: 20px;
-    height: 10px;
-    background: linear-gradient(90deg, #34495e, #2c3e50, #34495e);
-    border-radius: 5px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    background: var(--mac-bg-secondary);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--mac-shadow), 0 1px 0 var(--mac-border-light);
+    border: 1px solid var(--mac-border);
+    overflow: hidden;
 }
 
 .property-layer::after {
     content: '🏢';
     position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.5rem;
-    background: white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    top: 12px;
+    right: 12px;
+    font-size: 1.25rem;
+    opacity: 0.6;
 }
 
 .property-layer .layer-header {
-    background: linear-gradient(135deg, #27ae60 0%, #2980b9 100%);
-    border-radius: 10px 10px 0 0;
-    margin: 10px 10px 0 10px;
+    background: var(--mac-accent-green);
+    border-radius: 0;
+    padding: 16px 20px;
+}
+
+.property-layer .layer-header h4 {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: -0.022em;
 }
 
 .property-layer .layer-content {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 0 0 10px 10px;
-    margin: 0 10px 10px 10px;
+    background: var(--mac-bg-secondary);
+    border-radius: 0;
+    margin: 0;
+    padding: 20px;
 }
 
-/* 엑셀 데이터 관리 카드 - 스프레드시트 모양 */
+/* Mac 스타일 엑셀 데이터 관리 카드 */
 .excel-layer {
-    background: linear-gradient(135deg, #f1c40f 0%, #e67e22 100%);
-    border-radius: 20px;
-    box-shadow: 
-        0 8px 32px rgba(241, 196, 15, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
-}
-
-.excel-layer::before {
-    content: '';
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    right: 15px;
-    height: 20px;
-    background: repeating-linear-gradient(
-        90deg,
-        #34495e 0px,
-        #34495e 2px,
-        transparent 2px,
-        transparent 20px
-    );
-    border-radius: 3px;
+    background: var(--mac-bg-secondary);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px var(--mac-shadow), 0 1px 0 var(--mac-border-light);
+    border: 1px solid var(--mac-border);
+    overflow: hidden;
 }
 
 .excel-layer::after {
     content: '📊';
     position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 1.2rem;
-    animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+    top: 12px;
+    right: 12px;
+    font-size: 1.25rem;
+    opacity: 0.6;
 }
 
 .excel-layer .layer-header {
-    background: linear-gradient(135deg, #f39c12 0%, #d35400 100%);
-    border-radius: 15px 15px 0 0;
-    margin: 25px 15px 0 15px;
-    padding-top: 25px;
+    background: var(--mac-accent-orange);
+    border-radius: 0;
+    padding: 16px 20px;
+}
+
+.excel-layer .layer-header h4 {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: -0.022em;
 }
 
 .excel-layer .layer-content {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 0 0 15px 15px;
-    margin: 0 15px 15px 15px;
-    padding-top: 20px;
+    background: var(--mac-bg-secondary);
+    border-radius: 0;
+    margin: 0;
+    padding: 20px;
 }
 
-/* 상태 표시기 */
+/* Mac 스타일 상태 표시기 */
 .status-indicator {
     text-align: center;
-    padding: 8px 12px;
+    padding: 8px 16px;
     border-radius: 8px;
     font-weight: 500;
-    margin-bottom: 15px;
-    background: rgba(231, 76, 60, 0.1);
-    color: #e74c3c;
-    border: 1px solid rgba(231, 76, 60, 0.2);
+    font-size: 0.875rem;
+    margin-bottom: 16px;
+    background: rgba(255, 59, 48, 0.1);
+    color: var(--mac-accent-red);
+    border: 1px solid rgba(255, 59, 48, 0.2);
+    letter-spacing: -0.022em;
 }
 
 .status-indicator.connected {
-    background: rgba(46, 204, 113, 0.1);
-    color: #27ae60;
-    border: 1px solid rgba(46, 204, 113, 0.2);
+    background: rgba(52, 199, 89, 0.1);
+    color: var(--mac-accent-green);
+    border: 1px solid rgba(52, 199, 89, 0.2);
 }
 
 /* 동기화 버튼들 */
@@ -461,162 +553,128 @@ header p {
     padding: 10px 15px;
 }
 
-/* 클라우드 연동 버튼들 */
+/* Mac 스타일 버튼들 */
 .github-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 20px;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border: none;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     width: 100%;
-}
-
-.github-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.github-btn:hover::before {
-    left: 100%;
+    letter-spacing: -0.022em;
 }
 
 .github-btn.primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--mac-accent-blue);
     color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 1px 3px rgba(0, 122, 255, 0.3);
 }
 
 .github-btn.success {
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    background: var(--mac-accent-green);
     color: white;
-    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    box-shadow: 0 1px 3px rgba(52, 199, 89, 0.3);
 }
 
 .github-btn.info {
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    background: var(--mac-accent-blue);
     color: white;
-    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    box-shadow: 0 1px 3px rgba(0, 122, 255, 0.3);
 }
 
 .github-btn.danger {
-    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    background: var(--mac-accent-red);
     color: white;
-    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    box-shadow: 0 1px 3px rgba(255, 59, 48, 0.3);
 }
 
 .github-btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 매물 추가 버튼 */
+.github-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Mac 스타일 매물 추가 버튼 */
 .add-property-btn {
-    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    background: var(--mac-accent-green);
     color: white;
     border: none;
-    padding: 15px 25px;
-    border-radius: 15px;
-    font-weight: 600;
-    font-size: 1rem;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
-    position: relative;
-    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 1px 3px rgba(52, 199, 89, 0.3);
     width: 100%;
-    margin-bottom: 20px;
-}
-
-.add-property-btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: all 0.6s ease;
-}
-
-.add-property-btn:hover::before {
-    width: 300px;
-    height: 300px;
+    margin-bottom: 16px;
+    letter-spacing: -0.022em;
 }
 
 .add-property-btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
 }
 
-/* 엑셀 버튼들 */
+.add-property-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(52, 199, 89, 0.3);
+}
+
+/* Mac 스타일 엑셀 버튼들 */
 .excel-buttons {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-bottom: 20px;
+    gap: 8px;
+    margin-bottom: 16px;
 }
 
 .excel-buttons .btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 15px 20px;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border: none;
     cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.excel-buttons .btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    transition: left 0.6s ease;
-}
-
-.excel-buttons .btn:hover::before {
-    left: 100%;
+    letter-spacing: -0.022em;
 }
 
 .excel-buttons .btn-success {
-    background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+    background: var(--mac-accent-orange);
     color: white;
-    box-shadow: 0 6px 20px rgba(241, 196, 15, 0.3);
+    box-shadow: 0 1px 3px rgba(255, 149, 0, 0.3);
 }
 
 .excel-buttons .btn-info {
-    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+    background: var(--mac-accent-blue);
     color: white;
-    box-shadow: 0 6px 20px rgba(230, 126, 34, 0.3);
+    box-shadow: 0 1px 3px rgba(0, 122, 255, 0.3);
 }
 
 .excel-buttons .btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.excel-buttons .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .excel-notice {
@@ -869,7 +927,11 @@ header p {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
+    background: var(--mac-bg-primary);
+    padding: 24px;
+    border-radius: 12px;
+    margin-left: 20px;
 }
 
 .main-container {
@@ -982,38 +1044,37 @@ header p {
     border-radius: 2px;
 }
 
+/* Mac 스타일 폼 요소들 */
 .form-group {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
-/* 중복 제거 - 위의 통합 라벨 스타일 사용 */
-
-/* 통합된 라벨 스타일 */
 .form-group label,
 .inspection-item label {
     display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #2c3e50;
-    font-size: 1rem;
-    font-family: 'Noto Sans KR', sans-serif;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: var(--mac-text-primary);
+    font-size: 0.875rem;
+    letter-spacing: -0.022em;
 }
 
-/* 통합된 입력박스 스타일 */
 .form-group input,
 .form-group select,
 .inspection-item input,
 .inspection-item select,
 .inspection-item textarea {
     width: 100%;
-    padding: 15px;
-    border: 2px solid #e1e8ed;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-family: 'Noto Sans KR', sans-serif;
-    transition: all 0.3s ease;
-    background: #f8f9fa;
+    padding: 12px 16px;
+    border: 1px solid var(--mac-border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    background: var(--mac-bg-secondary);
+    color: var(--mac-text-primary);
     box-sizing: border-box;
+    letter-spacing: -0.022em;
 }
 
 .form-group input:focus,
@@ -1022,10 +1083,17 @@ header p {
 .inspection-item select:focus,
 .inspection-item textarea:focus {
     outline: none;
-    border-color: #667eea;
-    background: white;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    transform: translateY(-1px);
+    border-color: var(--mac-accent-blue);
+    background: var(--mac-bg-secondary);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group select::placeholder,
+.inspection-item input::placeholder,
+.inspection-item select::placeholder,
+.inspection-item textarea::placeholder {
+    color: var(--mac-text-tertiary);
 }
 
 .help-text {
