@@ -259,6 +259,68 @@ class StorageManager {
             return false;
         }
     }
+
+    /**
+     * 모든 매물 데이터 초기화
+     */
+    clearAllProperties() {
+        console.log('=== 모든 매물 데이터 초기화 시작 ===');
+        
+        try {
+            // 기본 매물 데이터 초기화
+            this.currentData = {
+                properties: [],
+                currentPropertyIndex: -1,
+                lastSaved: new Date().toISOString()
+            };
+            
+            // localStorage에 저장
+            const saveResult = this.saveData();
+            console.log('기본 매물 데이터 초기화 결과:', saveResult);
+            
+            // 매물별 상세 데이터도 초기화
+            this.clearAllPropertyDetails();
+            
+            console.log('✅ 모든 매물 데이터 초기화 완료');
+            return true;
+            
+        } catch (error) {
+            console.error('❌ 매물 데이터 초기화 오류:', error);
+            return false;
+        }
+    }
+
+    /**
+     * 모든 매물별 상세 데이터 초기화
+     */
+    clearAllPropertyDetails() {
+        console.log('=== 매물별 상세 데이터 초기화 시작 ===');
+        
+        try {
+            // localStorage에서 property_all_ 키들을 찾아서 삭제
+            const keysToRemove = [];
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('property_all_')) {
+                    keysToRemove.push(key);
+                }
+            }
+            
+            console.log('삭제할 상세 데이터 키들:', keysToRemove);
+            
+            // 키들 삭제
+            keysToRemove.forEach(key => {
+                localStorage.removeItem(key);
+                console.log(`삭제됨: ${key}`);
+            });
+            
+            console.log(`✅ ${keysToRemove.length}개의 매물별 상세 데이터 초기화 완료`);
+            
+        } catch (error) {
+            console.error('❌ 매물별 상세 데이터 초기화 오류:', error);
+        }
+    }
 }
 
 // 전역 인스턴스 생성
