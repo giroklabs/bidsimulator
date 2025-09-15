@@ -4438,14 +4438,64 @@ class AuctionSimulator {
         console.log('개별 저장/불러오기 버튼들이 삭제됨 - 이벤트 리스너 초기화 완료');
     }
 
-    // 매물별 모든 정보 저장 (새로운 간단한 시스템)
-    // 새로운 간단한 저장 시스템
+    // 매물별 모든 정보 저장 (StorageManager 우선 사용)
     saveAllDataForProperty(propertyIndex) {
         console.log('매물별 저장 시작:', propertyIndex);
         
-        // 간단한 저장 시스템 사용
-        if (window.simpleStorage && window.simpleFormManager) {
-            try {
+        try {
+            // StorageManager 우선 사용
+            if (window.storageManager && window.simpleFormManager) {
+                console.log('StorageManager를 사용하여 매물별 데이터 저장');
+                
+                // 폼 데이터 수집
+                const formData = window.simpleFormManager.collectAllFormData();
+                console.log('폼 데이터 수집 완료:', formData);
+                
+                // 현재 매물 정보 가져오기
+                const properties = window.storageManager.getProperties();
+                const property = properties[propertyIndex];
+                
+                if (!property) {
+                    console.error('매물을 찾을 수 없습니다:', propertyIndex);
+                    alert('매물을 찾을 수 없습니다.');
+                    return;
+                }
+                
+                console.log('저장할 매물:', property);
+                
+                // property_all_{index} 키에 상세 데이터 저장
+                const propertyData = {
+                    property: property,
+                    auctionInfo: formData.auctionInfo || {},
+                    inspectionData: formData.inspectionData || {},
+                    simulationResult: formData.simulationResult || {},
+                    saleRateInfo: formData.saleRateInfo || {},
+                    timestamp: new Date().toISOString()
+                };
+                
+                const propertyKey = `property_all_${propertyIndex}`;
+                console.log('저장할 키:', propertyKey);
+                console.log('저장할 데이터:', propertyData);
+                
+                localStorage.setItem(propertyKey, JSON.stringify(propertyData));
+                console.log('property_all_ 키에 데이터 저장 완료');
+                
+                // StorageManager에도 저장 (기본 매물 정보)
+                const success = window.storageManager.updateProperty(propertyIndex, property);
+                
+                if (success) {
+                    const propertyName = property?.name || property?.caseNumber || '이름없음';
+                    alert(`${propertyName}의 모든 정보가 저장되었습니다!`);
+                    console.log('매물별 저장 완료:', propertyName);
+                } else {
+                    console.warn('StorageManager 업데이트 실패, 하지만 property_all_ 데이터는 저장됨');
+                    const propertyName = property?.name || property?.caseNumber || '이름없음';
+                    alert(`${propertyName}의 모든 정보가 저장되었습니다!`);
+                }
+                
+            } else if (window.simpleStorage && window.simpleFormManager) {
+                console.log('SimpleStorage를 사용하여 매물별 데이터 저장 (폴백)');
+                
                 // 폼 데이터 수집
                 const formData = window.simpleFormManager.collectAllFormData();
                 
@@ -4462,13 +4512,13 @@ class AuctionSimulator {
                     alert('저장에 실패했습니다.');
                     console.error('매물별 저장 실패');
                 }
-            } catch (error) {
-                console.error('매물별 저장 오류:', error);
-                alert('저장 중 오류가 발생했습니다: ' + error.message);
+            } else {
+                alert('저장 시스템이 초기화되지 않았습니다.');
+                console.error('StorageManager 또는 SimpleStorage가 없습니다.');
             }
-        } else {
-            alert('저장 시스템이 초기화되지 않았습니다.');
-            console.error('SimpleStorage 또는 SimpleFormManager가 없습니다.');
+        } catch (error) {
+            console.error('매물별 저장 오류:', error);
+            alert('저장 중 오류가 발생했습니다: ' + error.message);
         }
     }
 
@@ -4476,9 +4526,46 @@ class AuctionSimulator {
     loadAllDataForProperty(propertyIndex) {
         console.log('매물별 불러오기 시작:', propertyIndex);
         
-        // 간단한 불러오기 시스템 사용
-        if (window.simpleStorage && window.simpleFormManager) {
+        // StorageManager 우선 사용
+        if (window.storageManager && window.simpleFormManager) {
             try {
+                console.log('StorageManager를 사용하여 매물별 데이터 불러오기');
+                
+                // property_all_{index} 키에서 상세 데이터 불러오기
+                const propertyKey = `property_all_${propertyIndex}`;
+                console.log('불러올 키:', propertyKey);
+                
+                const propertyData = localStorage.getItem(propertyKey);
+                if (!propertyData) {
+                    console.warn('저장된 상세 데이터가 없습니다:', propertyKey);
+                    alert('저장된 상세 데이터가 없습니다.');
+                    return;
+                }
+                
+                const parsedData = JSON.parse(propertyData);
+                console.log('불러온 상세 데이터:', parsedData);
+                
+                // 폼에 데이터 로드
+                const success = window.simpleFormManager.loadFormData(parsedData);
+                
+                if (success) {
+                    const properties = window.storageManager.getProperties();
+                    const property = properties[propertyIndex];
+                    const propertyName = property?.name || property?.caseNumber || '이름없음';
+                    alert(`${propertyName}의 모든 정보가 불러와졌습니다!`);
+                    console.log('매물별 불러오기 완료:', propertyName);
+                } else {
+                    alert('데이터 로드에 실패했습니다.');
+                    console.error('폼 데이터 로드 실패');
+                }
+            } catch (error) {
+                console.error('매물별 불러오기 오류:', error);
+                alert('불러오기 중 오류가 발생했습니다: ' + error.message);
+            }
+        } else if (window.simpleStorage && window.simpleFormManager) {
+            try {
+                console.log('SimpleStorage를 사용하여 매물별 데이터 불러오기 (폴백)');
+                
                 // 저장된 데이터 로드
                 const savedData = window.simpleStorage.loadPropertyData(propertyIndex);
                 
@@ -4508,7 +4595,7 @@ class AuctionSimulator {
             }
         } else {
             alert('불러오기 시스템이 초기화되지 않았습니다.');
-            console.error('SimpleStorage 또는 SimpleFormManager가 없습니다.');
+            console.error('StorageManager 또는 SimpleStorage가 없습니다.');
         }
     }
 
@@ -5036,3 +5123,48 @@ function showLoadModal(title, items, callback) {
         document.body.removeChild(modal);
     });
 }
+
+// 디버깅 함수들
+window.debugSaveSystem = function() {
+    console.log('=== 저장 시스템 디버깅 ===');
+    console.log('StorageManager 존재:', !!window.storageManager);
+    console.log('SimpleStorage 존재:', !!window.simpleStorage);
+    console.log('SimpleFormManager 존재:', !!window.simpleFormManager);
+    
+    if (window.storageManager) {
+        const properties = window.storageManager.getProperties();
+        console.log('StorageManager 매물 목록:', properties);
+        
+        properties.forEach((property, index) => {
+            const key = `property_all_${index}`;
+            const data = localStorage.getItem(key);
+            console.log(`${key}:`, data ? '데이터 있음' : '데이터 없음');
+            if (data) {
+                console.log('  내용:', JSON.parse(data));
+            }
+        });
+    }
+};
+
+window.testSaveProperty = function(propertyIndex = 0) {
+    console.log('=== 매물 저장 테스트 ===');
+    if (window.auctionSimulator) {
+        window.auctionSimulator.saveAllDataForProperty(propertyIndex);
+    } else {
+        console.error('AuctionSimulator가 없습니다');
+    }
+};
+
+window.testLoadProperty = function(propertyIndex = 0) {
+    console.log('=== 매물 불러오기 테스트 ===');
+    if (window.auctionSimulator) {
+        window.auctionSimulator.loadAllDataForProperty(propertyIndex);
+    } else {
+        console.error('AuctionSimulator가 없습니다');
+    }
+};
+
+console.log('디버깅 함수들:');
+console.log('- debugSaveSystem(): 저장 시스템 상태 확인');
+console.log('- testSaveProperty(index): 매물 저장 테스트');
+console.log('- testLoadProperty(index): 매물 불러오기 테스트');
