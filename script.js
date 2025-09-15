@@ -5389,6 +5389,65 @@ window.testGitHubReconnect = function() {
     }, 1000);
 };
 
+// GitHub 업로드 테스트 (모든 데이터 포함)
+window.testGitHubUploadComplete = function() {
+    console.log('=== GitHub 완전 업로드 테스트 시작 ===');
+    
+    if (!window.githubStorage) {
+        console.error('❌ GitHub Storage가 없습니다');
+        return;
+    }
+    
+    if (!window.githubStorage.accessToken || !window.githubStorage.gistId) {
+        console.warn('⚠️ GitHub에 연결되지 않음. 먼저 GitHub 연동을 해주세요.');
+        return;
+    }
+    
+    // 1. 현재 데이터 상태 확인
+    console.log('1. 현재 데이터 상태 확인');
+    
+    // 기본 매물 데이터 확인
+    const basicData = window.storageManager ? window.storageManager.exportData() : 'StorageManager 없음';
+    console.log('기본 매물 데이터:', basicData);
+    
+    // 매물별 상세 데이터 확인
+    if (window.storageManager) {
+        const properties = window.storageManager.getProperties();
+        console.log('매물 개수:', properties.length);
+        
+        properties.forEach((property, index) => {
+            const propertyKey = `property_all_${index}`;
+            const propertyData = localStorage.getItem(propertyKey);
+            if (propertyData) {
+                console.log(`매물 ${index} 상세 데이터 있음:`, property.name || property.caseNumber);
+                try {
+                    const parsed = JSON.parse(propertyData);
+                    console.log('  경매 정보:', !!parsed.auctionInfo);
+                    console.log('  물건조사:', !!parsed.inspectionData);
+                    console.log('  시뮬레이션:', !!parsed.simulationResult);
+                } catch (e) {
+                    console.log('  데이터 파싱 오류:', e);
+                }
+            } else {
+                console.log(`매물 ${index} 상세 데이터 없음:`, property.name || property.caseNumber);
+            }
+        });
+    }
+    
+    // 2. 업로드 실행
+    console.log('2. GitHub 업로드 실행');
+    window.githubStorage.syncToGitHub().then(success => {
+        if (success) {
+            console.log('✅ GitHub 업로드 성공');
+            console.log('=== GitHub 완전 업로드 테스트 완료 ===');
+        } else {
+            console.error('❌ GitHub 업로드 실패');
+        }
+    }).catch(error => {
+        console.error('❌ GitHub 업로드 오류:', error);
+    });
+};
+
 // Excel 내보내기 테스트
 window.testExcelExport = function() {
     console.log('=== Excel 내보내기 테스트 시작 ===');
@@ -5410,4 +5469,5 @@ console.log('- testDataStorage(): 종합 데이터 저장 테스트');
 console.log('- testGitHubStorage(): GitHub 저장 테스트');
 console.log('- testGitHubDownload(): GitHub 다운로드 전용 테스트');
 console.log('- testGitHubReconnect(): GitHub 재연동 테스트');
+console.log('- testGitHubUploadComplete(): GitHub 완전 업로드 테스트 (모든 데이터 포함)');
 console.log('- testExcelExport(): Excel 내보내기 테스트');

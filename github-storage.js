@@ -400,6 +400,63 @@ window.githubStorage = {
         }
     },
     
+    // 모든 매물의 상세 데이터 수집
+    collectAllPropertyData() {
+        console.log('=== 모든 매물 상세 데이터 수집 시작 ===');
+        
+        const allPropertyData = {};
+        
+        try {
+            if (!window.storageManager) {
+                console.warn('StorageManager가 없습니다');
+                return allPropertyData;
+            }
+            
+            const properties = window.storageManager.getProperties();
+            console.log('수집할 매물 개수:', properties.length);
+            
+            properties.forEach((property, index) => {
+                console.log(`--- 매물 ${index} 상세 데이터 수집 ---`);
+                console.log('매물 정보:', property);
+                
+                // 매물별 상세 데이터 키
+                const propertyKey = `property_all_${index}`;
+                console.log('조회할 키:', propertyKey);
+                
+                // localStorage에서 상세 데이터 조회
+                const propertyDataString = localStorage.getItem(propertyKey);
+                if (propertyDataString) {
+                    try {
+                        const propertyData = JSON.parse(propertyDataString);
+                        console.log('매물 상세 데이터:', propertyData);
+                        
+                        // 매물 식별자로 저장
+                        const propertyId = property.caseNumber || property.name || `property_${index}`;
+                        allPropertyData[propertyId] = {
+                            index: index,
+                            basicInfo: property,
+                            detailedData: propertyData
+                        };
+                        
+                        console.log(`✅ 매물 ${propertyId} 상세 데이터 수집 완료`);
+                    } catch (error) {
+                        console.error(`❌ 매물 ${index} 데이터 파싱 오류:`, error);
+                    }
+                } else {
+                    console.warn(`❌ 매물 ${index} 상세 데이터 없음 (키: ${propertyKey})`);
+                }
+            });
+            
+            console.log('✅ 모든 매물 상세 데이터 수집 완료:', allPropertyData);
+            console.log('수집된 매물 개수:', Object.keys(allPropertyData).length);
+            
+        } catch (error) {
+            console.error('❌ 매물 상세 데이터 수집 오류:', error);
+        }
+        
+        return allPropertyData;
+    },
+    
     // GitHub에 데이터 업로드
     async syncToGitHub() {
         if (!this.accessToken || !this.gistId) {
@@ -408,21 +465,37 @@ window.githubStorage = {
         }
         
         try {
-            // 현재 데이터 가져오기
-            console.log('=== GitHub 업로드 시작 ===');
+            // 현재 데이터 가져오기 (모든 데이터 포함)
+            console.log('=== GitHub 업로드 시작 (모든 데이터 포함) ===');
             console.log('StorageManager 상태:', {
                 hasStorageManager: !!window.storageManager,
                 currentData: window.storageManager ? window.storageManager.currentData : null
             });
             
-            const currentData = window.storageManager.exportData();
-            console.log('내보낼 데이터:', currentData);
+            // 기본 매물 데이터
+            const basicData = window.storageManager.exportData();
+            console.log('기본 매물 데이터:', basicData);
+            
+            // 모든 매물의 상세 데이터 수집
+            const allPropertyData = this.collectAllPropertyData();
+            console.log('수집된 모든 매물 상세 데이터:', allPropertyData);
+            
+            // 통합 데이터 생성
+            const completeData = {
+                basicData: JSON.parse(basicData),
+                propertyDetails: allPropertyData,
+                exportDate: new Date().toISOString(),
+                version: '2.0'
+            };
+            
+            const completeDataString = JSON.stringify(completeData, null, 2);
+            console.log('최종 업로드 데이터:', completeDataString);
             
             // Gist 업데이트
             const gistData = {
                 files: {
                     'auction-data.json': {
-                        content: currentData
+                        content: completeDataString
                     }
                 }
             };
@@ -448,6 +521,75 @@ window.githubStorage = {
         } catch (error) {
             console.error('GitHub 업로드 오류:', error);
             alert('GitHub 업로드 중 오류가 발생했습니다: ' + error.message);
+            return false;
+        }
+    },
+    
+    // 완전한 데이터 복원 (기본 데이터 + 상세 데이터)
+    restoreCompleteData(fileContent) {
+        console.log('=== 완전한 데이터 복원 시작 ===');
+        console.log('파일 내용:', fileContent);
+        
+        try {
+            const downloadedData = JSON.parse(fileContent);
+            console.log('파싱된 다운로드 데이터:', downloadedData);
+            
+            // 새로운 구조 (v2.0) 확인
+            if (downloadedData.version === '2.0' && downloadedData.basicData && downloadedData.propertyDetails) {
+                console.log('✅ 새로운 데이터 구조 (v2.0) 감지');
+                
+                // 1. 기본 매물 데이터 복원
+                console.log('1. 기본 매물 데이터 복원...');
+                const basicDataString = JSON.stringify(downloadedData.basicData);
+                const basicRestoreSuccess = window.storageManager.importData(basicDataString);
+                console.log('기본 데이터 복원 결과:', basicRestoreSuccess);
+                
+                if (!basicRestoreSuccess) {
+                    console.error('❌ 기본 데이터 복원 실패');
+                    return false;
+                }
+                
+                // 2. 각 매물의 상세 데이터 복원
+                console.log('2. 매물별 상세 데이터 복원...');
+                const propertyDetails = downloadedData.propertyDetails;
+                console.log('복원할 상세 데이터:', propertyDetails);
+                
+                Object.keys(propertyDetails).forEach(propertyId => {
+                    const propertyData = propertyDetails[propertyId];
+                    console.log(`--- 매물 ${propertyId} 상세 데이터 복원 ---`);
+                    console.log('매물 데이터:', propertyData);
+                    
+                    const index = propertyData.index;
+                    const detailedData = propertyData.detailedData;
+                    
+                    if (index !== undefined && detailedData) {
+                        const propertyKey = `property_all_${index}`;
+                        console.log('저장할 키:', propertyKey);
+                        
+                        try {
+                            localStorage.setItem(propertyKey, JSON.stringify(detailedData));
+                            console.log(`✅ 매물 ${propertyId} 상세 데이터 복원 완료`);
+                        } catch (error) {
+                            console.error(`❌ 매물 ${propertyId} 상세 데이터 복원 실패:`, error);
+                        }
+                    } else {
+                        console.warn(`❌ 매물 ${propertyId} 데이터 형식 오류`);
+                    }
+                });
+                
+                console.log('✅ 완전한 데이터 복원 성공');
+                return true;
+                
+            } else {
+                // 기존 구조 (v1.0) 지원
+                console.log('✅ 기존 데이터 구조 (v1.0) 감지, 기본 복원');
+                const success = window.storageManager.importData(fileContent);
+                console.log('기존 구조 복원 결과:', success);
+                return success;
+            }
+            
+        } catch (error) {
+            console.error('❌ 데이터 복원 오류:', error);
             return false;
         }
     },
@@ -478,25 +620,25 @@ window.githubStorage = {
                 const gist = await response.json();
                 console.log('GitHub Gist 응답:', gist);
                 
-                if (gist.files && gist.files['auction-data.json']) {
-                    const fileContent = gist.files['auction-data.json'].content;
-                    console.log('다운로드된 파일 내용:', fileContent);
-                    
-                    // StorageManager 존재 확인
-                    if (!window.storageManager) {
-                        console.error('❌ StorageManager가 없습니다');
-                        throw new Error('StorageManager가 초기화되지 않았습니다.');
-                    }
-                    
-                    console.log('StorageManager 상태:', {
-                        hasStorageManager: !!window.storageManager,
-                        hasImportData: typeof window.storageManager.importData === 'function'
-                    });
-                    
-                    // 데이터 복원
-                    console.log('데이터 복원 시도...');
-                    const success = window.storageManager.importData(fileContent);
-                    console.log('데이터 복원 결과:', success);
+                   if (gist.files && gist.files['auction-data.json']) {
+                       const fileContent = gist.files['auction-data.json'].content;
+                       console.log('다운로드된 파일 내용:', fileContent);
+                       
+                       // StorageManager 존재 확인
+                       if (!window.storageManager) {
+                           console.error('❌ StorageManager가 없습니다');
+                           throw new Error('StorageManager가 초기화되지 않았습니다.');
+                       }
+                       
+                       console.log('StorageManager 상태:', {
+                           hasStorageManager: !!window.storageManager,
+                           hasImportData: typeof window.storageManager.importData === 'function'
+                       });
+                       
+                       // 데이터 복원 (새로운 구조 지원)
+                       console.log('데이터 복원 시도...');
+                       const success = this.restoreCompleteData(fileContent);
+                       console.log('데이터 복원 결과:', success);
                     
                     if (success) {
                         console.log('✅ 데이터 복원 성공');
