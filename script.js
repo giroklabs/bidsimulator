@@ -602,12 +602,41 @@ class AuctionSimulator {
         console.log('선택된 매물:', this.selectedProperty);
     }
 
-    // 저장된 데이터 확인 및 자동 불러오기 옵션 제공
+    // 저장된 데이터 확인 및 자동 불러오기
     checkAndOfferDataLoad(propertyIndex) {
+        console.log('=== 매물 선택 시 자동 데이터 불러오기 시작 ===');
+        
         try {
-            // 간단한 저장 시스템에서 저장된 데이터 확인
+            // StorageManager에서 저장된 데이터 확인
             let hasData = false;
-            if (window.simpleStorage) {
+            let dataSource = '';
+            
+            // 1. StorageManager 방식 확인 (property_all_{index} 키)
+            if (window.storageManager) {
+                const propertyKey = `property_all_${propertyIndex}`;
+                const propertyData = localStorage.getItem(propertyKey);
+                
+                if (propertyData) {
+                    try {
+                        const parsedData = JSON.parse(propertyData);
+                        hasData = parsedData && (
+                            Object.keys(parsedData.auctionInfo || {}).length > 0 ||
+                            Object.keys(parsedData.inspectionData || {}).length > 0 ||
+                            Object.keys(parsedData.simulationResult || {}).length > 0 ||
+                            Object.keys(parsedData.auctionResult || {}).length > 0
+                        );
+                        if (hasData) {
+                            dataSource = 'StorageManager';
+                            console.log('StorageManager에서 상세 데이터 발견');
+                        }
+                    } catch (error) {
+                        console.error('StorageManager 데이터 파싱 오류:', error);
+                    }
+                }
+            }
+            
+            // 2. SimpleStorage 방식 확인 (폴백)
+            if (!hasData && window.simpleStorage) {
                 const savedData = window.simpleStorage.loadPropertyData(propertyIndex);
                 hasData = savedData && (
                     Object.keys(savedData.auctionInfo || {}).length > 0 ||
@@ -615,21 +644,26 @@ class AuctionSimulator {
                     Object.keys(savedData.simulationResult || {}).length > 0 ||
                     Object.keys(savedData.saleRateInfo || {}).length > 0
                 );
+                if (hasData) {
+                    dataSource = 'SimpleStorage';
+                    console.log('SimpleStorage에서 상세 데이터 발견');
+                }
             }
             
             if (hasData) {
-                // 저장된 데이터가 있으면 자동 불러오기 여부 확인
+                // 저장된 데이터가 있으면 자동으로 불러오기
                 const property = this.selectedProperty;
                 const propertyName = property?.name || property?.caseNumber || '이 매물';
                 
+                console.log(`${propertyName}의 저장된 데이터를 자동으로 불러오는 중... (데이터 소스: ${dataSource})`);
+                
+                // 약간의 지연 후 자동 불러오기 (UI 업데이트 완료 후)
                 setTimeout(() => {
-                    const shouldLoad = confirm(`${propertyName}에 저장된 정보가 있습니다.\n자동으로 불러오시겠습니까?`);
-                    if (shouldLoad) {
-                        this.loadAllDataForProperty(propertyIndex);
-                    }
-                }, 500); // 약간의 지연 후 확인 다이얼로그 표시
+                    this.loadAllDataForProperty(propertyIndex);
+                }, 300);
             } else {
                 console.log('저장된 상세 데이터가 없습니다.');
+                console.log('매물 선택 완료 - 새로 입력할 수 있습니다.');
             }
         } catch (error) {
             console.error('데이터 확인 중 오류:', error);
@@ -669,6 +703,62 @@ class AuctionSimulator {
         }
         
         console.log('기본 매각가율 정보 설정 완료 (전국 평균: 78.5%)');
+    }
+
+    // 토스트 알림 표시
+    showToastNotification(message, type = 'info') {
+        console.log(`토스트 알림: ${message} (${type})`);
+        
+        // 기존 토스트 제거
+        const existingToast = document.querySelector('.toast-notification');
+        if (existingToast) {
+            existingToast.remove();
+        }
+        
+        // 토스트 요소 생성
+        const toast = document.createElement('div');
+        toast.className = `toast-notification toast-${type}`;
+        toast.textContent = message;
+        
+        // 스타일 적용
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 10000;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+        
+        // DOM에 추가
+        document.body.appendChild(toast);
+        
+        // 애니메이션으로 표시
+        setTimeout(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateX(0)';
+        }, 100);
+        
+        // 3초 후 자동 제거
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
     }
 
     // 매각가율 정보 완전 초기화
@@ -4554,11 +4644,24 @@ class AuctionSimulator {
                     const properties = window.storageManager.getProperties();
                     const property = properties[propertyIndex];
                     const propertyName = property?.name || property?.caseNumber || '이름없음';
-                    alert(`${propertyName}의 모든 정보가 불러와졌습니다!`);
-                    console.log('매물별 불러오기 완료:', propertyName);
+                    
+                    // 데이터 불러오기 성공 알림 (간단하게)
+                    console.log(`✅ ${propertyName}의 모든 정보가 자동으로 불러와졌습니다!`);
+                    
+                    // 사용자에게 간단한 알림 (선택적)
+                    const hasSignificantData = (
+                        Object.keys(parsedData.auctionInfo || {}).length > 0 ||
+                        Object.keys(parsedData.inspectionData || {}).length > 0 ||
+                        Object.keys(parsedData.simulationResult || {}).length > 0
+                    );
+                    
+                    if (hasSignificantData) {
+                        // 토스트 알림 스타일로 간단히 표시
+                        this.showToastNotification(`${propertyName} 데이터 불러오기 완료!`, 'success');
+                    }
                 } else {
-                    alert('데이터 로드에 실패했습니다.');
-                    console.error('폼 데이터 로드 실패');
+                    console.error('❌ 폼 데이터 로드 실패');
+                    this.showToastNotification('데이터 로드에 실패했습니다.', 'error');
                 }
             } catch (error) {
                 console.error('매물별 불러오기 오류:', error);
@@ -4585,15 +4688,18 @@ class AuctionSimulator {
                     const properties = window.simpleStorage.getProperties();
                     const property = properties[propertyIndex];
                     const propertyName = property?.name || property?.caseNumber || '이름없음';
-                    alert(`${propertyName}의 모든 정보가 불러와졌습니다!`);
-                    console.log('매물별 불러오기 완료:', propertyName);
+                    
+                    console.log(`✅ ${propertyName}의 모든 정보가 자동으로 불러와졌습니다! (SimpleStorage)`);
+                    
+                    // 토스트 알림으로 간단히 표시
+                    this.showToastNotification(`${propertyName} 데이터 불러오기 완료!`, 'success');
                 } else {
-                    alert('데이터 로드에 실패했습니다.');
-                    console.error('폼 데이터 로드 실패');
+                    console.error('❌ 폼 데이터 로드 실패 (SimpleStorage)');
+                    this.showToastNotification('데이터 로드에 실패했습니다.', 'error');
                 }
             } catch (error) {
                 console.error('매물별 불러오기 오류:', error);
-                alert('불러오기 중 오류가 발생했습니다: ' + error.message);
+                this.showToastNotification('불러오기 중 오류가 발생했습니다.', 'error');
             }
         } else {
             alert('불러오기 시스템이 초기화되지 않았습니다.');
@@ -5448,6 +5554,54 @@ window.testGitHubUploadComplete = function() {
     });
 };
 
+// 매물 자동 불러오기 테스트
+window.testPropertyAutoLoad = function(propertyIndex = 0) {
+    console.log('=== 매물 자동 불러오기 테스트 시작 ===');
+    
+    if (!window.auctionSimulator) {
+        console.error('❌ AuctionSimulator가 없습니다');
+        return;
+    }
+    
+    // 1. 매물 선택 (자동 불러오기 포함)
+    console.log(`1. 매물 ${propertyIndex} 선택 (자동 불러오기 포함)`);
+    window.auctionSimulator.selectProperty(propertyIndex);
+    
+    // 2. 데이터 상태 확인
+    setTimeout(() => {
+        console.log('2. 데이터 불러오기 상태 확인');
+        
+        if (window.storageManager) {
+            const properties = window.storageManager.getProperties();
+            if (properties[propertyIndex]) {
+                const property = properties[propertyIndex];
+                console.log('선택된 매물:', property.name || property.caseNumber);
+                
+                // 상세 데이터 확인
+                const propertyKey = `property_all_${propertyIndex}`;
+                const propertyData = localStorage.getItem(propertyKey);
+                if (propertyData) {
+                    console.log('✅ 상세 데이터 존재');
+                    try {
+                        const parsed = JSON.parse(propertyData);
+                        console.log('  경매 정보:', !!parsed.auctionInfo);
+                        console.log('  물건조사:', !!parsed.inspectionData);
+                        console.log('  시뮬레이션:', !!parsed.simulationResult);
+                    } catch (e) {
+                        console.log('  데이터 파싱 오류:', e);
+                    }
+                } else {
+                    console.log('❌ 상세 데이터 없음');
+                }
+            } else {
+                console.log('❌ 매물이 존재하지 않음');
+            }
+        }
+        
+        console.log('=== 매물 자동 불러오기 테스트 완료 ===');
+    }, 1000);
+};
+
 // Excel 내보내기 테스트
 window.testExcelExport = function() {
     console.log('=== Excel 내보내기 테스트 시작 ===');
@@ -5470,4 +5624,5 @@ console.log('- testGitHubStorage(): GitHub 저장 테스트');
 console.log('- testGitHubDownload(): GitHub 다운로드 전용 테스트');
 console.log('- testGitHubReconnect(): GitHub 재연동 테스트');
 console.log('- testGitHubUploadComplete(): GitHub 완전 업로드 테스트 (모든 데이터 포함)');
+console.log('- testPropertyAutoLoad(index): 매물 자동 불러오기 테스트');
 console.log('- testExcelExport(): Excel 내보내기 테스트');
