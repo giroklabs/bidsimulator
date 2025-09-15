@@ -369,12 +369,17 @@ window.githubStorage = {
     
     // GitHub에서 데이터 다운로드
     async syncFromGitHub() {
+        console.log('=== GitHub 다운로드 시작 ===');
+        
         if (!this.accessToken || !this.gistId) {
+            console.error('❌ GitHub 인증 정보 없음');
             alert('GitHub에 연결되지 않았습니다. 먼저 GitHub 연동을 해주세요.');
             return false;
         }
         
         try {
+            console.log('GitHub Gist API 요청:', `${this.GIST_API_URL}/${this.gistId}`);
+            
             const response = await fetch(`${this.GIST_API_URL}/${this.gistId}`, {
                 headers: {
                     'Authorization': `token ${this.accessToken}`,
@@ -382,27 +387,65 @@ window.githubStorage = {
                 }
             });
             
+            console.log('GitHub API 응답 상태:', response.status, response.statusText);
+            
             if (response.ok) {
                 const gist = await response.json();
-                const fileContent = gist.files['auction-data.json'].content;
+                console.log('GitHub Gist 응답:', gist);
                 
-                // 데이터 복원
-                const success = window.storageManager.importData(fileContent);
-                
-                if (success) {
-                    alert('GitHub에서 데이터를 성공적으로 다운로드했습니다!');
-                    // 페이지 새로고침하여 UI 업데이트
-                    window.location.reload();
-                    return true;
+                if (gist.files && gist.files['auction-data.json']) {
+                    const fileContent = gist.files['auction-data.json'].content;
+                    console.log('다운로드된 파일 내용:', fileContent);
+                    
+                    // StorageManager 존재 확인
+                    if (!window.storageManager) {
+                        console.error('❌ StorageManager가 없습니다');
+                        throw new Error('StorageManager가 초기화되지 않았습니다.');
+                    }
+                    
+                    console.log('StorageManager 상태:', {
+                        hasStorageManager: !!window.storageManager,
+                        hasImportData: typeof window.storageManager.importData === 'function'
+                    });
+                    
+                    // 데이터 복원
+                    console.log('데이터 복원 시도...');
+                    const success = window.storageManager.importData(fileContent);
+                    console.log('데이터 복원 결과:', success);
+                    
+                    if (success) {
+                        console.log('✅ 데이터 복원 성공');
+                        
+                        // 복원된 데이터 확인
+                        const restoredData = window.storageManager.exportData();
+                        console.log('복원된 데이터:', restoredData);
+                        
+                        alert('GitHub에서 데이터를 성공적으로 다운로드했습니다!');
+                        
+                        // 매물 목록 새로고침
+                        if (window.auctionSimulator && window.auctionSimulator.renderPropertyTree) {
+                            console.log('매물 목록 새로고침...');
+                            window.auctionSimulator.renderPropertyTree();
+                        }
+                        
+                        return true;
+                    } else {
+                        console.error('❌ 데이터 복원 실패');
+                        throw new Error('데이터 복원에 실패했습니다.');
+                    }
                 } else {
-                    throw new Error('데이터 복원에 실패했습니다.');
+                    console.error('❌ auction-data.json 파일이 없음');
+                    console.log('사용 가능한 파일들:', Object.keys(gist.files || {}));
+                    throw new Error('auction-data.json 파일을 찾을 수 없습니다.');
                 }
             } else {
-                throw new Error('다운로드에 실패했습니다.');
+                const errorText = await response.text();
+                console.error('GitHub API 오류 응답:', errorText);
+                throw new Error(`GitHub API 오류: ${response.status} ${response.statusText}`);
             }
         } catch (error) {
-            console.error('GitHub 다운로드 오류:', error);
-            alert('GitHub 다운로드 중 오류가 발생했습니다: ' + error.message);
+            console.error('❌ GitHub 다운로드 오류:', error);
+            alert('GitHub에서 데이터 다운로드 중 오류가 발생했습니다: ' + error.message);
             return false;
         }
     }

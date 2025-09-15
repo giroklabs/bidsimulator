@@ -5295,6 +5295,60 @@ window.testGitHubStorage = function() {
     }
 };
 
+// GitHub 다운로드 전용 테스트
+window.testGitHubDownload = function() {
+    console.log('=== GitHub 다운로드 전용 테스트 시작 ===');
+    
+    if (!window.githubStorage) {
+        console.error('❌ GitHub Storage가 없습니다');
+        return;
+    }
+    
+    console.log('GitHub Storage 상태:', {
+        hasAccessToken: !!window.githubStorage.accessToken,
+        hasGistId: !!window.githubStorage.gistId,
+        hasUserInfo: !!window.githubStorage.userInfo
+    });
+    
+    if (!window.githubStorage.accessToken || !window.githubStorage.gistId) {
+        console.warn('⚠️ GitHub에 연결되지 않음. 먼저 GitHub 연동을 해주세요.');
+        return;
+    }
+    
+    // 현재 localStorage 상태 확인
+    console.log('다운로드 전 localStorage 상태:');
+    const beforeData = window.storageManager ? window.storageManager.exportData() : 'StorageManager 없음';
+    console.log('기존 데이터:', beforeData);
+    
+    // 다운로드 실행
+    console.log('GitHub에서 데이터 다운로드 실행...');
+    window.githubStorage.syncFromGitHub().then(success => {
+        if (success) {
+            console.log('✅ GitHub 다운로드 성공');
+            
+            // 다운로드 후 상태 확인
+            setTimeout(() => {
+                console.log('다운로드 후 localStorage 상태:');
+                const afterData = window.storageManager ? window.storageManager.exportData() : 'StorageManager 없음';
+                console.log('복원된 데이터:', afterData);
+                
+                // 매물 목록 확인
+                if (window.storageManager) {
+                    const properties = window.storageManager.getProperties();
+                    console.log('복원된 매물 개수:', properties.length);
+                    console.log('복원된 매물 목록:', properties);
+                }
+                
+                console.log('=== GitHub 다운로드 전용 테스트 완료 ===');
+            }, 1000);
+        } else {
+            console.error('❌ GitHub 다운로드 실패');
+        }
+    }).catch(error => {
+        console.error('❌ GitHub 다운로드 오류:', error);
+    });
+};
+
 // Excel 내보내기 테스트
 window.testExcelExport = function() {
     console.log('=== Excel 내보내기 테스트 시작 ===');
@@ -5314,4 +5368,5 @@ console.log('- testSaveProperty(index): 매물 저장 테스트');
 console.log('- testLoadProperty(index): 매물 불러오기 테스트');
 console.log('- testDataStorage(): 종합 데이터 저장 테스트');
 console.log('- testGitHubStorage(): GitHub 저장 테스트');
+console.log('- testGitHubDownload(): GitHub 다운로드 전용 테스트');
 console.log('- testExcelExport(): Excel 내보내기 테스트');

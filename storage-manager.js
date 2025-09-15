@@ -192,16 +192,70 @@ class StorageManager {
      * 데이터 복원 (JSON 문자열에서 복원)
      */
     importData(jsonString) {
+        console.log('=== StorageManager 데이터 복원 시작 ===');
+        console.log('입력된 JSON 문자열:', jsonString);
+        
         try {
+            if (!jsonString || jsonString.trim() === '') {
+                console.error('❌ 빈 JSON 문자열');
+                return false;
+            }
+            
             const data = JSON.parse(jsonString);
+            console.log('파싱된 데이터:', data);
+            
+            // 데이터 유효성 검사
+            if (!data || typeof data !== 'object') {
+                console.error('❌ 유효하지 않은 데이터 형식');
+                return false;
+            }
+            
+            // 기존 데이터 백업
+            const oldData = { ...this.currentData };
+            console.log('기존 데이터 백업:', oldData);
+            
+            // 새 데이터 설정
             this.currentData = {
                 properties: data.properties || [],
-                currentPropertyIndex: data.currentPropertyIndex || -1,
+                currentPropertyIndex: data.currentPropertyIndex !== undefined ? data.currentPropertyIndex : -1,
                 lastSaved: new Date().toISOString()
             };
-            return this.saveData();
+            
+            console.log('새로 설정된 데이터:', this.currentData);
+            console.log('복원된 매물 개수:', this.currentData.properties.length);
+            
+            // localStorage에 저장
+            const saveResult = this.saveData();
+            console.log('localStorage 저장 결과:', saveResult);
+            
+            if (saveResult) {
+                console.log('✅ 데이터 복원 성공');
+                
+                // 복원된 매물 목록 로그
+                this.currentData.properties.forEach((property, index) => {
+                    console.log(`매물 ${index}:`, {
+                        caseNumber: property.caseNumber,
+                        name: property.name,
+                        type: property.type,
+                        location: property.location
+                    });
+                });
+                
+                return true;
+            } else {
+                console.error('❌ localStorage 저장 실패');
+                // 원래 데이터로 복원
+                this.currentData = oldData;
+                return false;
+            }
+            
         } catch (error) {
-            console.error('데이터 복원 실패:', error);
+            console.error('❌ 데이터 복원 실패:', error);
+            console.error('오류 상세:', {
+                message: error.message,
+                stack: error.stack,
+                inputLength: jsonString ? jsonString.length : 0
+            });
             return false;
         }
     }
