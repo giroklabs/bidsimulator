@@ -11,6 +11,9 @@ class FormDataManager {
                 'renovationCost', 'competitorCount', 'marketCondition', 'urgency',
                 'auctionType', 'failedCount', 'regionSelect', 'districtSelect'
             ],
+            auctionResult: [
+                'auctionDate', 'winningBid', 'secondBidDifference', 'marketRatio', 'auctionResultMemo'
+            ],
             inspection: [
                 'preservationRegistry', 'buildingAge', 'meters', 'mailCheck', 'slope',
                 'lightingDirection', 'structureFloor', 'parking', 'waterLeakage',
@@ -31,6 +34,7 @@ class FormDataManager {
     collectAllFormData() {
         const data = {
             auctionInfo: this.collectSectionData('auction'),
+            auctionResult: this.collectSectionData('auctionResult'),
             inspectionData: this.collectSectionData('inspection'),
             simulationResult: this.collectSimulationData(),
             saleRateInfo: this.collectSaleRateInfo(),
@@ -130,6 +134,11 @@ class FormDataManager {
             // 경매 정보 로드
             if (data.auctionInfo) {
                 this.loadSectionData('auction', data.auctionInfo);
+            }
+
+            // 경매 결과 데이터 로드
+            if (data.auctionResult) {
+                this.loadSectionData('auctionResult', data.auctionResult);
             }
 
             // 물건조사 데이터 로드

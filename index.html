@@ -262,6 +262,43 @@
                         </div>
                     </div>
 
+                    <!-- 경매 결과 정보 입력 섹션 -->
+                    <div class="form-section">
+                        <h3>🏆 경매 결과</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="auctionDate">낙찰일</label>
+                                <input type="date" id="auctionDate">
+                                <small class="help-text">경매가 진행된 날짜</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="winningBid">낙찰가 (원)</label>
+                                <input type="number" id="winningBid" placeholder="예: 220000000">
+                                <small class="help-text">최종 낙찰된 가격</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="secondBidDifference">2순위와의 차이 (원)</label>
+                                <input type="number" id="secondBidDifference" placeholder="예: 5000000">
+                                <small class="help-text">1순위와 2순위 입찰가의 차액</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="marketRatio">시세대비 낙찰액비율 (%)</label>
+                                <input type="number" id="marketRatio" placeholder="예: 88.0" step="0.1" min="0" max="200">
+                                <small class="help-text">낙찰가 ÷ 시세 × 100</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="auctionResultMemo">메모</label>
+                            <textarea id="auctionResultMemo" rows="3" placeholder="경매 결과에 대한 추가 메모나 특이사항을 입력하세요..."></textarea>
+                            <small class="help-text">경매 과정이나 결과에 대한 기타 정보</small>
+                        </div>
+                    </div>
+
                     <!-- 입찰 전략 정보 입력 섹션 -->
                     <div class="form-section">
                         <h3>🎯 입찰 전략 정보</h3>

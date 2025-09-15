@@ -147,6 +147,13 @@ class ExcelDataManager {
             '경매유형',
             '유찰횟수',
 
+            // 경매 결과 정보
+            '낙찰일',
+            '낙찰가',
+            '2순위와의차이',
+            '시세대비낙찰액비율',
+            '경매결과메모',
+
             // 물건조사 정보
             '건물연도',
             '층수',
@@ -211,6 +218,13 @@ class ExcelDataManager {
                 this.escapeCSV(allData.auctionInfo?.deposit || ''),
                 this.escapeCSV(allData.auctionInfo?.auctionType || ''),
                 this.escapeCSV(allData.auctionInfo?.failedCount || ''),
+
+                // 경매 결과 정보
+                this.escapeCSV(allData.auctionResult?.auctionDate || ''),
+                this.escapeCSV(allData.auctionResult?.winningBid || ''),
+                this.escapeCSV(allData.auctionResult?.secondBidDifference || ''),
+                this.escapeCSV(allData.auctionResult?.marketRatio || ''),
+                this.escapeCSV(allData.auctionResult?.auctionResultMemo || ''),
 
                 // 물건조사 정보
                 this.escapeCSV(allData.inspectionData?.buildingYear || ''),
