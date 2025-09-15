@@ -6,44 +6,38 @@
 }
 
 :root {
-    /* Mac Light Mode Colors */
-    --mac-bg-primary: #f5f5f7;
+    /* Modern Minimal Light Mode Colors */
+    --mac-bg-primary: #fafafa;
     --mac-bg-secondary: #ffffff;
-    --mac-bg-tertiary: #f2f2f7;
-    --mac-text-primary: #1d1d1f;
-    --mac-text-secondary: #86868b;
-    --mac-text-tertiary: #6e6e73;
-    --mac-accent-blue: #007aff;
-    --mac-accent-green: #34c759;
-    --mac-accent-orange: #ff9500;
-    --mac-accent-red: #ff3b30;
-    --mac-accent-purple: #af52de;
-    --mac-border: #d2d2d7;
-    --mac-border-light: #e5e5ea;
-    --mac-shadow: rgba(0, 0, 0, 0.1);
-    --mac-shadow-hover: rgba(0, 0, 0, 0.15);
-    --mac-glass: rgba(255, 255, 255, 0.8);
-    --mac-glass-border: rgba(255, 255, 255, 0.2);
+    --mac-bg-tertiary: #f8f8f8;
+    --mac-text-primary: #1a1a1a;
+    --mac-text-secondary: #666666;
+    --mac-text-tertiary: #999999;
+    --mac-accent: #000000;
+    --mac-accent-muted: #333333;
+    --mac-border: #e0e0e0;
+    --mac-border-light: #f0f0f0;
+    --mac-shadow: rgba(0, 0, 0, 0.05);
+    --mac-shadow-hover: rgba(0, 0, 0, 0.1);
+    --mac-glass: rgba(255, 255, 255, 0.9);
+    --mac-glass-border: rgba(255, 255, 255, 0.3);
 }
 
 [data-theme="dark"] {
-    /* Mac Dark Mode Colors */
-    --mac-bg-primary: #000000;
-    --mac-bg-secondary: #1c1c1e;
-    --mac-bg-tertiary: #2c2c2e;
+    /* Modern Minimal Dark Mode Colors */
+    --mac-bg-primary: #0a0a0a;
+    --mac-bg-secondary: #1a1a1a;
+    --mac-bg-tertiary: #2a2a2a;
     --mac-text-primary: #ffffff;
-    --mac-text-secondary: #8e8e93;
-    --mac-text-tertiary: #636366;
-    --mac-accent-blue: #0a84ff;
-    --mac-accent-green: #30d158;
-    --mac-accent-orange: #ff9f0a;
-    --mac-accent-red: #ff453a;
-    --mac-accent-purple: #bf5af2;
-    --mac-border: #38383a;
-    --mac-border-light: #48484a;
+    --mac-text-secondary: #cccccc;
+    --mac-text-tertiary: #888888;
+    --mac-accent: #ffffff;
+    --mac-accent-muted: #cccccc;
+    --mac-border: #333333;
+    --mac-border-light: #404040;
     --mac-shadow: rgba(0, 0, 0, 0.3);
-    --mac-shadow-hover: rgba(0, 0, 0, 0.4);
-    --mac-glass: rgba(28, 28, 30, 0.8);
+    --mac-shadow-hover: rgba(0, 0, 0, 0.5);
+    --mac-glass: rgba(26, 26, 26, 0.9);
     --mac-glass-border: rgba(255, 255, 255, 0.1);
 }
 
@@ -406,138 +400,108 @@ header p {
     position: relative;
 }
 
-/* Mac 스타일 클라우드 연동 카드 */
+/* Modern Minimal 클라우드 연동 카드 */
 .cloud-layer {
     background: var(--mac-bg-secondary);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px var(--mac-shadow), 0 1px 0 var(--mac-border-light);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px var(--mac-shadow);
     border: 1px solid var(--mac-border);
     overflow: hidden;
 }
 
-.cloud-layer::after {
-    content: '☁️';
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 1.25rem;
-    opacity: 0.6;
-}
-
 .cloud-layer .layer-header {
-    background: var(--mac-accent-blue);
-    border-radius: 0;
+    background: var(--mac-bg-tertiary);
+    border-bottom: 1px solid var(--mac-border);
     padding: 16px 20px;
 }
 
 .cloud-layer .layer-header h4 {
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
+    color: var(--mac-text-primary);
+    font-weight: 500;
+    font-size: 0.875rem;
     letter-spacing: -0.022em;
+    margin: 0;
 }
 
 .cloud-layer .layer-content {
     background: var(--mac-bg-secondary);
-    border-radius: 0;
-    margin: 0;
     padding: 20px;
 }
 
-/* Mac 스타일 매물 관리 카드 */
+/* Modern Minimal 매물 관리 카드 */
 .property-layer {
     background: var(--mac-bg-secondary);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px var(--mac-shadow), 0 1px 0 var(--mac-border-light);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px var(--mac-shadow);
     border: 1px solid var(--mac-border);
     overflow: hidden;
 }
 
-.property-layer::after {
-    content: '🏢';
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 1.25rem;
-    opacity: 0.6;
-}
-
 .property-layer .layer-header {
-    background: var(--mac-accent-green);
-    border-radius: 0;
+    background: var(--mac-bg-tertiary);
+    border-bottom: 1px solid var(--mac-border);
     padding: 16px 20px;
 }
 
 .property-layer .layer-header h4 {
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
+    color: var(--mac-text-primary);
+    font-weight: 500;
+    font-size: 0.875rem;
     letter-spacing: -0.022em;
+    margin: 0;
 }
 
 .property-layer .layer-content {
     background: var(--mac-bg-secondary);
-    border-radius: 0;
-    margin: 0;
     padding: 20px;
 }
 
-/* Mac 스타일 엑셀 데이터 관리 카드 */
+/* Modern Minimal 엑셀 데이터 관리 카드 */
 .excel-layer {
     background: var(--mac-bg-secondary);
-    border-radius: 12px;
-    box-shadow: 0 2px 8px var(--mac-shadow), 0 1px 0 var(--mac-border-light);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px var(--mac-shadow);
     border: 1px solid var(--mac-border);
     overflow: hidden;
 }
 
-.excel-layer::after {
-    content: '📊';
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 1.25rem;
-    opacity: 0.6;
-}
-
 .excel-layer .layer-header {
-    background: var(--mac-accent-orange);
-    border-radius: 0;
+    background: var(--mac-bg-tertiary);
+    border-bottom: 1px solid var(--mac-border);
     padding: 16px 20px;
 }
 
 .excel-layer .layer-header h4 {
-    color: white;
-    font-weight: 600;
-    font-size: 1rem;
+    color: var(--mac-text-primary);
+    font-weight: 500;
+    font-size: 0.875rem;
     letter-spacing: -0.022em;
+    margin: 0;
 }
 
 .excel-layer .layer-content {
     background: var(--mac-bg-secondary);
-    border-radius: 0;
-    margin: 0;
     padding: 20px;
 }
 
-/* Mac 스타일 상태 표시기 */
+/* Modern Minimal 상태 표시기 */
 .status-indicator {
     text-align: center;
     padding: 8px 16px;
-    border-radius: 8px;
-    font-weight: 500;
+    border-radius: 6px;
+    font-weight: 400;
     font-size: 0.875rem;
     margin-bottom: 16px;
-    background: rgba(255, 59, 48, 0.1);
-    color: var(--mac-accent-red);
-    border: 1px solid rgba(255, 59, 48, 0.2);
+    background: var(--mac-bg-tertiary);
+    color: var(--mac-text-secondary);
+    border: 1px solid var(--mac-border);
     letter-spacing: -0.022em;
 }
 
 .status-indicator.connected {
-    background: rgba(52, 199, 89, 0.1);
-    color: var(--mac-accent-green);
-    border: 1px solid rgba(52, 199, 89, 0.2);
+    background: var(--mac-bg-tertiary);
+    color: var(--mac-text-primary);
+    border: 1px solid var(--mac-border);
 }
 
 /* 동기화 버튼들 */
@@ -553,70 +517,71 @@ header p {
     padding: 10px 15px;
 }
 
-/* Mac 스타일 버튼들 */
+/* Modern Minimal 버튼들 */
 .github-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 500;
+    border-radius: 6px;
+    font-weight: 400;
     font-size: 0.875rem;
     transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    border: none;
+    border: 1px solid var(--mac-border);
     cursor: pointer;
     margin-bottom: 8px;
     width: 100%;
     letter-spacing: -0.022em;
+    background: var(--mac-bg-tertiary);
+    color: var(--mac-text-primary);
 }
 
 .github-btn.primary {
-    background: var(--mac-accent-blue);
-    color: white;
-    box-shadow: 0 1px 3px rgba(0, 122, 255, 0.3);
+    background: var(--mac-accent);
+    color: var(--mac-bg-secondary);
+    border-color: var(--mac-accent);
 }
 
 .github-btn.success {
-    background: var(--mac-accent-green);
-    color: white;
-    box-shadow: 0 1px 3px rgba(52, 199, 89, 0.3);
+    background: var(--mac-bg-tertiary);
+    color: var(--mac-text-primary);
+    border: 1px solid var(--mac-border);
 }
 
 .github-btn.info {
-    background: var(--mac-accent-blue);
-    color: white;
-    box-shadow: 0 1px 3px rgba(0, 122, 255, 0.3);
+    background: var(--mac-bg-tertiary);
+    color: var(--mac-text-primary);
+    border: 1px solid var(--mac-border);
 }
 
 .github-btn.danger {
-    background: var(--mac-accent-red);
-    color: white;
-    box-shadow: 0 1px 3px rgba(255, 59, 48, 0.3);
+    background: var(--mac-bg-tertiary);
+    color: var(--mac-text-primary);
+    border: 1px solid var(--mac-border);
 }
 
 .github-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px var(--mac-shadow-hover);
 }
 
 .github-btn:active {
     transform: translateY(0);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 3px var(--mac-shadow);
 }
 
-/* Mac 스타일 매물 추가 버튼 */
+/* Modern Minimal 매물 추가 버튼 */
 .add-property-btn {
-    background: var(--mac-accent-green);
-    color: white;
-    border: none;
+    background: var(--mac-accent);
+    color: var(--mac-bg-secondary);
+    border: 1px solid var(--mac-accent);
     padding: 12px 20px;
-    border-radius: 8px;
-    font-weight: 500;
+    border-radius: 6px;
+    font-weight: 400;
     font-size: 0.875rem;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    box-shadow: 0 1px 3px rgba(52, 199, 89, 0.3);
     width: 100%;
     margin-bottom: 16px;
     letter-spacing: -0.022em;
@@ -624,15 +589,15 @@ header p {
 
 .add-property-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(52, 199, 89, 0.4);
+    box-shadow: 0 2px 8px var(--mac-shadow-hover);
 }
 
 .add-property-btn:active {
     transform: translateY(0);
-    box-shadow: 0 1px 3px rgba(52, 199, 89, 0.3);
+    box-shadow: 0 1px 3px var(--mac-shadow);
 }
 
-/* Mac 스타일 엑셀 버튼들 */
+/* Modern Minimal 엑셀 버튼들 */
 .excel-buttons {
     display: flex;
     flex-direction: column;
@@ -646,45 +611,47 @@ header p {
     justify-content: center;
     gap: 8px;
     padding: 10px 16px;
-    border-radius: 8px;
-    font-weight: 500;
+    border-radius: 6px;
+    font-weight: 400;
     font-size: 0.875rem;
     transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    border: none;
+    border: 1px solid var(--mac-border);
     cursor: pointer;
     letter-spacing: -0.022em;
+    background: var(--mac-bg-tertiary);
+    color: var(--mac-text-primary);
 }
 
 .excel-buttons .btn-success {
-    background: var(--mac-accent-orange);
-    color: white;
-    box-shadow: 0 1px 3px rgba(255, 149, 0, 0.3);
+    background: var(--mac-bg-tertiary);
+    color: var(--mac-text-primary);
+    border: 1px solid var(--mac-border);
 }
 
 .excel-buttons .btn-info {
-    background: var(--mac-accent-blue);
-    color: white;
-    box-shadow: 0 1px 3px rgba(0, 122, 255, 0.3);
+    background: var(--mac-bg-tertiary);
+    color: var(--mac-text-primary);
+    border: 1px solid var(--mac-border);
 }
 
 .excel-buttons .btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px var(--mac-shadow-hover);
 }
 
 .excel-buttons .btn:active {
     transform: translateY(0);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 3px var(--mac-shadow);
 }
 
 .excel-notice {
     text-align: center;
-    color: #7f8c8d;
-    font-size: 0.85rem;
+    color: var(--mac-text-secondary);
+    font-size: 0.75rem;
     padding: 10px;
-    background: rgba(241, 196, 15, 0.1);
+    background: var(--mac-bg-tertiary);
     border-radius: 6px;
-    border: 1px solid rgba(241, 196, 15, 0.2);
+    border: 1px solid var(--mac-border);
 }
 
 /* 기존 스타일 유지 */
@@ -876,44 +843,46 @@ header p {
 }
 
 .property-actions .load-btn {
-    color: var(--mac-accent-blue);
+    color: var(--mac-text-primary);
 }
 
 .property-actions .save-all-btn {
-    color: var(--mac-accent-green);
+    color: var(--mac-text-primary);
 }
 
 .property-actions .edit-btn {
-    color: var(--mac-accent-orange);
+    color: var(--mac-text-primary);
 }
 
 .property-actions .delete-btn {
-    color: var(--mac-accent-red);
+    color: var(--mac-text-primary);
 }
 
 .property-actions button:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px var(--mac-shadow-hover);
+    background: var(--mac-bg-secondary);
+    border-color: var(--mac-accent);
 }
 
 .property-actions .load-btn:hover {
-    background: rgba(0, 122, 255, 0.1);
-    border-color: var(--mac-accent-blue);
+    background: var(--mac-bg-secondary);
+    border-color: var(--mac-accent);
 }
 
 .property-actions .save-all-btn:hover {
-    background: rgba(52, 199, 89, 0.1);
-    border-color: var(--mac-accent-green);
+    background: var(--mac-bg-secondary);
+    border-color: var(--mac-accent);
 }
 
 .property-actions .edit-btn:hover {
-    background: rgba(255, 149, 0, 0.1);
-    border-color: var(--mac-accent-orange);
+    background: var(--mac-bg-secondary);
+    border-color: var(--mac-accent);
 }
 
 .property-actions .delete-btn:hover {
-    background: rgba(255, 59, 48, 0.1);
-    border-color: var(--mac-accent-red);
+    background: var(--mac-bg-secondary);
+    border-color: var(--mac-accent);
 }
 
 .main-content {
