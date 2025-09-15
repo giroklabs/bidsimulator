@@ -5166,7 +5166,152 @@ window.testLoadProperty = function(propertyIndex = 0) {
     }
 };
 
-console.log('디버깅 함수들:');
+// 종합 데이터 저장 테스트
+window.testDataStorage = function() {
+    console.log('=== 종합 데이터 저장 테스트 시작 ===');
+    
+    // 1. 저장 시스템 상태 확인
+    console.log('1. 저장 시스템 상태 확인');
+    window.debugSaveSystem();
+    
+    // 2. 테스트 매물 추가
+    console.log('2. 테스트 매물 추가');
+    const testProperty = {
+        caseNumber: 'TEST-' + Date.now(),
+        name: '테스트 매물',
+        type: '아파트',
+        location: '서울시 강남구',
+        region: '서울',
+        district: '강남구',
+        notes: '데이터 저장 테스트용 매물',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+    };
+    
+    if (window.storageManager) {
+        const success = window.storageManager.addProperty(testProperty);
+        if (success) {
+            console.log('✅ 테스트 매물 추가 성공:', testProperty);
+            
+            // 3. 매물 목록 확인
+            console.log('3. 매물 목록 확인');
+            const properties = window.storageManager.getProperties();
+            console.log('현재 저장된 매물 개수:', properties.length);
+            console.log('저장된 매물 목록:', properties);
+            
+            // 4. 폼 데이터 저장 테스트
+            console.log('4. 폼 데이터 저장 테스트');
+            const propertyIndex = properties.length - 1;
+            
+            // 테스트 폼 데이터 입력
+            document.getElementById('bidPrice').value = '200000000';
+            document.getElementById('marketPrice').value = '250000000';
+            document.getElementById('appraisalPrice').value = '243000000';
+            document.getElementById('minimumBid').value = '170100000';
+            document.getElementById('renovationCost').value = '10000000';
+            
+            // 경매 결과 데이터 입력
+            document.getElementById('auctionDate').value = '2024-01-15';
+            document.getElementById('winningBid').value = '220000000';
+            document.getElementById('secondBidDifference').value = '5000000';
+            document.getElementById('marketRatio').value = '88.0';
+            document.getElementById('auctionResultMemo').value = '테스트 경매 결과입니다.';
+            
+            // 5. 데이터 저장
+            console.log('5. 매물별 데이터 저장');
+            window.auctionSimulator.saveAllDataForProperty(propertyIndex);
+            
+            // 6. 저장 확인
+            setTimeout(() => {
+                console.log('6. 저장된 데이터 확인');
+                const propertyKey = `property_all_${propertyIndex}`;
+                const savedData = localStorage.getItem(propertyKey);
+                if (savedData) {
+                    console.log('✅ 매물별 데이터 저장 확인:', JSON.parse(savedData));
+                } else {
+                    console.error('❌ 매물별 데이터 저장 실패');
+                }
+                
+                // 7. 데이터 불러오기 테스트
+                console.log('7. 데이터 불러오기 테스트');
+                setTimeout(() => {
+                    // 폼 초기화
+                    document.getElementById('bidPrice').value = '';
+                    document.getElementById('auctionDate').value = '';
+                    document.getElementById('winningBid').value = '';
+                    
+                    // 데이터 불러오기
+                    window.auctionSimulator.loadAllDataForProperty(propertyIndex);
+                    
+                    console.log('=== 종합 데이터 저장 테스트 완료 ===');
+                }, 1000);
+            }, 1000);
+            
+        } else {
+            console.error('❌ 테스트 매물 추가 실패');
+        }
+    } else {
+        console.error('❌ StorageManager가 없습니다');
+    }
+};
+
+// GitHub 저장 테스트
+window.testGitHubStorage = function() {
+    console.log('=== GitHub 저장 테스트 시작 ===');
+    
+    if (window.githubStorage) {
+        console.log('GitHub Storage 상태:', {
+            hasAccessToken: !!window.githubStorage.accessToken,
+            hasGistId: !!window.githubStorage.gistId,
+            hasUserInfo: !!window.githubStorage.userInfo
+        });
+        
+        if (window.githubStorage.accessToken && window.githubStorage.gistId) {
+            console.log('GitHub에 데이터 업로드 테스트');
+            window.githubStorage.syncToGitHub().then(success => {
+                if (success) {
+                    console.log('✅ GitHub 업로드 성공');
+                    
+                    setTimeout(() => {
+                        console.log('GitHub에서 데이터 다운로드 테스트');
+                        window.githubStorage.syncFromGitHub().then(downloadSuccess => {
+                            if (downloadSuccess) {
+                                console.log('✅ GitHub 다운로드 성공');
+                                console.log('=== GitHub 저장 테스트 완료 ===');
+                            } else {
+                                console.error('❌ GitHub 다운로드 실패');
+                            }
+                        });
+                    }, 2000);
+                } else {
+                    console.error('❌ GitHub 업로드 실패');
+                }
+            });
+        } else {
+            console.warn('⚠️ GitHub에 연결되지 않음. 먼저 GitHub 연동을 해주세요.');
+        }
+    } else {
+        console.error('❌ GitHub Storage가 없습니다');
+    }
+};
+
+// Excel 내보내기 테스트
+window.testExcelExport = function() {
+    console.log('=== Excel 내보내기 테스트 시작 ===');
+    
+    if (window.excelDataManager) {
+        console.log('Excel Data Manager 존재 확인');
+        window.excelDataManager.exportToCSV();
+        console.log('=== Excel 내보내기 테스트 완료 ===');
+    } else {
+        console.error('❌ Excel Data Manager가 없습니다');
+    }
+};
+
+console.log('=== 디버깅 함수들 ===');
 console.log('- debugSaveSystem(): 저장 시스템 상태 확인');
 console.log('- testSaveProperty(index): 매물 저장 테스트');
 console.log('- testLoadProperty(index): 매물 불러오기 테스트');
+console.log('- testDataStorage(): 종합 데이터 저장 테스트');
+console.log('- testGitHubStorage(): GitHub 저장 테스트');
+console.log('- testExcelExport(): Excel 내보내기 테스트');
