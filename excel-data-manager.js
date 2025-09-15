@@ -254,45 +254,69 @@ class ExcelDataManager {
 
     // 매물별 저장된 모든 데이터 가져오기
     getPropertyAllData(property) {
-        console.log('매물별 모든 데이터 가져오기:', property);
+        console.log('=== 매물별 모든 데이터 가져오기 시작 ===');
+        console.log('입력 매물 정보:', property);
 
         try {
-            const propertyKey = property.caseNumber || property.name || property.location;
-            if (!propertyKey) {
-                console.warn('매물 키가 없습니다');
+            // StorageManager의 데이터 구조 확인
+            const storageKey = 'auctionSimulatorData';
+            const storageData = localStorage.getItem(storageKey);
+
+            if (!storageData) {
+                console.warn('❌ StorageManager 데이터가 없습니다');
                 return { auctionInfo: {}, inspectionData: {}, simulationResult: {} };
             }
 
-            // localStorage에서 매물별 저장된 데이터 찾기
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('property_all_')) {
-                    try {
-                        const savedData = JSON.parse(localStorage.getItem(key));
-                        if (savedData && savedData.property) {
-                            const savedProperty = savedData.property;
+            console.log('StorageManager 원본 데이터:', storageData);
+            const parsedData = JSON.parse(storageData);
+            console.log('StorageManager 파싱된 데이터:', parsedData);
 
-                            // 매물 정보 매칭 확인
-                            if ((savedProperty.caseNumber && savedProperty.caseNumber === property.caseNumber) ||
-                                (savedProperty.name && savedProperty.name === property.name) ||
-                                (savedProperty.location && savedProperty.location === property.location)) {
+            // 현재 선택된 매물의 인덱스 찾기
+            const properties = parsedData.properties || [];
+            console.log('저장된 전체 매물 목록:', properties);
 
-                                console.log('매칭되는 저장된 데이터 발견:', key);
-                                return {
-                                    auctionInfo: savedData.auctionInfo || {},
-                                    inspectionData: savedData.inspectionData || {},
-                                    simulationResult: savedData.simulationResult || {}
-                                };
-                            }
-                        }
-                    } catch (parseError) {
-                        console.warn('데이터 파싱 오류:', key, parseError);
-                    }
-                }
+            // 매물 매칭을 위한 함수
+            const findMatchingProperty = (targetProperty, propertyList) => {
+                return propertyList.findIndex(p =>
+                    (p.caseNumber && p.caseNumber === targetProperty.caseNumber) ||
+                    (p.name && p.name === targetProperty.name) ||
+                    (p.location && p.location === targetProperty.location)
+                );
+            };
+
+            const matchingIndex = findMatchingProperty(property, properties);
+            console.log('매칭되는 매물 인덱스:', matchingIndex);
+
+            if (matchingIndex === -1) {
+                console.warn('❌ 매칭되는 매물을 찾을 수 없습니다');
+                return { auctionInfo: {}, inspectionData: {}, simulationResult: {} };
             }
 
-            console.log('저장된 데이터를 찾을 수 없습니다');
-            return { auctionInfo: {}, inspectionData: {}, simulationResult: {} };
+            const matchedProperty = properties[matchingIndex];
+            console.log('매칭된 매물:', matchedProperty);
+
+            // 매물별 상세 데이터 키 생성 및 조회
+            const propertyKey = `property_all_${matchingIndex}`;
+            console.log('매물별 데이터 키:', propertyKey);
+
+            const propertyData = localStorage.getItem(propertyKey);
+            if (!propertyData) {
+                console.warn(`❌ ${propertyKey} 키에 데이터가 없습니다`);
+                return { auctionInfo: {}, inspectionData: {}, simulationResult: {} };
+            }
+
+            console.log('매물별 원본 데이터:', propertyData);
+            const parsedPropertyData = JSON.parse(propertyData);
+            console.log('매물별 파싱된 데이터:', parsedPropertyData);
+
+            const result = {
+                auctionInfo: parsedPropertyData.auctionInfo || {},
+                inspectionData: parsedPropertyData.inspectionData || {},
+                simulationResult: parsedPropertyData.simulationResult || {}
+            };
+
+            console.log('✅ 최종 반환 데이터:', result);
+            return result;
 
         } catch (error) {
             console.error('매물별 데이터 가져오기 오류:', error);
@@ -664,7 +688,67 @@ class ExcelDataManager {
 // 전역 인스턴스 생성
 window.excelDataManager = new ExcelDataManager();
 
+// 디버깅 함수들
+window.debugLocalStorage = function() {
+    console.log('=== localStorage 디버깅 ===');
+    console.log('총 키 개수:', localStorage.length);
+
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        console.log(`${i}: ${key}`);
+        try {
+            const value = localStorage.getItem(key);
+            const parsed = JSON.parse(value);
+            console.log('  데이터:', parsed);
+        } catch (e) {
+            console.log('  원본 데이터:', localStorage.getItem(key));
+        }
+    }
+};
+
+window.debugPropertyData = function() {
+    console.log('=== 매물 데이터 디버깅 ===');
+    if (window.storageManager) {
+        const properties = window.storageManager.getProperties();
+        console.log('StorageManager 매물 목록:', properties);
+
+        // 각 매물의 상세 데이터 확인
+        properties.forEach((property, index) => {
+            console.log(`--- 매물 ${index}: ${property.name || property.caseNumber} ---`);
+            const key = `property_all_${index}`;
+            const data = localStorage.getItem(key);
+            if (data) {
+                console.log(`  ${key} 데이터:`, JSON.parse(data));
+            } else {
+                console.log(`  ${key} 데이터 없음`);
+            }
+        });
+    }
+    if (window.simpleStorage) {
+        const properties = window.simpleStorage.getProperties();
+        console.log('SimpleStorage 매물 목록:', properties);
+    }
+};
+
+window.testPropertyMatching = function() {
+    console.log('=== 매물 매칭 테스트 ===');
+    if (window.storageManager) {
+        const properties = window.storageManager.getProperties();
+        console.log('테스트할 매물들:', properties);
+
+        properties.forEach(property => {
+            console.log(`--- ${property.name || property.caseNumber} 매칭 테스트 ---`);
+            const result = window.excelDataManager.getPropertyAllData(property);
+            console.log('매칭 결과:', result);
+        });
+    }
+};
+
 console.log('엑셀 데이터 관리 시스템이 로드되었습니다. (확장 버전)');
 console.log('사용법:');
 console.log('- excelDataManager.exportToExcel(): 매물 데이터를 엑셀로 내보내기 (모든 데이터 포함)');
 console.log('- excelDataManager.showImportModal(): 엑셀 파일에서 데이터 가져오기');
+console.log('디버깅 함수들:');
+console.log('- debugLocalStorage(): localStorage의 모든 데이터 확인');
+console.log('- debugPropertyData(): 매물 데이터 확인');
+console.log('- testPropertyMatching(): 매물 매칭 테스트');
