@@ -449,15 +449,23 @@ class AuctionSimulator {
     }
 
     // 매물 데이터 로드 (로컬 스토리지에서)
-    // StorageManager를 사용하여 매물 목록 가져오기
+    // StorageManager를 우선으로 사용하여 매물 목록 가져오기
     getProperties() {
         try {
-            if (window.simpleStorage) {
-                return window.simpleStorage.getProperties();
-            } else if (window.storageManager) {
-                return window.storageManager.getProperties();
+            console.log('=== getProperties() 호출 ===');
+            console.log('StorageManager 존재 여부:', !!window.storageManager);
+            console.log('SimpleStorage 존재 여부:', !!window.simpleStorage);
+            
+            if (window.storageManager) {
+                const properties = window.storageManager.getProperties();
+                console.log('✅ StorageManager에서 매물 목록 가져옴 (우선):', properties.length, '개');
+                return properties;
+            } else if (window.simpleStorage) {
+                const properties = window.simpleStorage.getProperties();
+                console.log('⚠️ SimpleStorage에서 매물 목록 가져옴 (폴백):', properties.length, '개');
+                return properties;
             } else {
-                console.error('저장 시스템이 없습니다.');
+                console.error('❌ 저장 시스템이 없습니다.');
                 return [];
             }
         } catch (error) {
@@ -576,7 +584,9 @@ class AuctionSimulator {
         this.selectedProperty = properties[index];
         
         // StorageManager에 현재 선택된 매물 인덱스 저장
-        window.storageManager.setCurrentPropertyIndex(index);
+        if (window.storageManager) {
+            window.storageManager.setCurrentPropertyIndex(index);
+        }
         
         // 1. 먼저 모든 폼을 완전히 초기화 (매각가율 정보 포함)
         this.resetAllForms();
@@ -1999,10 +2009,17 @@ class AuctionSimulator {
         }
 
         if (isEdit) {
-            // 매물 편집 - 간단한 저장 시스템 사용
-            const success = window.simpleStorage ? 
-                window.simpleStorage.updateProperty(editIndex, property) :
-                window.storageManager.updateProperty(editIndex, property);
+            // 매물 편집 - StorageManager 우선 사용
+            console.log('=== 매물 편집 모드 ===');
+            if (!window.storageManager) {
+                console.error('❌ StorageManager가 없습니다! 로컬 저장을 위해 필수입니다.');
+                alert('저장 시스템이 초기화되지 않았습니다. 페이지를 새로고침해주세요.');
+                return;
+            }
+            
+            console.log('✅ StorageManager를 사용하여 매물 편집');
+            const success = window.storageManager.updateProperty(editIndex, property);
+            console.log('StorageManager 매물 편집 결과:', success);
                 
             if (success) {
                 alert('매물이 성공적으로 수정되었습니다.');
@@ -2020,15 +2037,15 @@ class AuctionSimulator {
             
             let newProperty = null;
             
-            if (window.storageManager) {
-                console.log('StorageManager를 사용하여 매물 추가');
-                newProperty = window.storageManager.addProperty(property);
-                console.log('StorageManager addProperty 결과:', newProperty);
-            } else {
-                console.error('StorageManager가 없습니다!');
-                alert('저장 시스템이 초기화되지 않았습니다.');
+            if (!window.storageManager) {
+                console.error('❌ StorageManager가 없습니다! 로컬 저장을 위해 필수입니다.');
+                alert('저장 시스템이 초기화되지 않았습니다. 페이지를 새로고침해주세요.');
                 return;
             }
+            
+            console.log('✅ StorageManager를 사용하여 매물 추가');
+            newProperty = window.storageManager.addProperty(property);
+            console.log('StorageManager addProperty 결과:', newProperty);
                 
             if (newProperty) {
                 alert('매물이 성공적으로 추가되었습니다.');
@@ -2126,9 +2143,18 @@ class AuctionSimulator {
         if (!property) return;
 
         if (confirm(`"${property.name || property.caseNumber || '이름 없음'}" 매물을 삭제하시겠습니까?`)) {
-            const success = window.simpleStorage ? 
-                window.simpleStorage.deleteProperty(index) :
-                window.storageManager.deleteProperty(index);
+            let success = false;
+            
+            if (window.storageManager) {
+                console.log('✅ StorageManager를 사용하여 매물 삭제');
+                success = window.storageManager.deleteProperty(index);
+            } else if (window.simpleStorage) {
+                console.log('⚠️ SimpleStorage를 사용하여 매물 삭제 (폴백)');
+                success = window.simpleStorage.deleteProperty(index);
+            } else {
+                console.error('❌ 저장 시스템이 없습니다');
+            }
+            
             if (success) {
                 this.renderPropertyTree();
                 
