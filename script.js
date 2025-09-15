@@ -530,13 +530,15 @@ class AuctionSimulator {
         const displayName = property.name || property.caseNumber || property.location || '이름 없음';
         
         item.innerHTML = `
-            <span class="tree-icon property-type-icon ${property.type || 'default'}">${typeIcon}</span>
-            <span class="tree-label">${displayName}</span>
+            <div class="property-header">
+                <span class="tree-icon property-type-icon ${property.type || 'default'}">${typeIcon}</span>
+                <span class="tree-label">${displayName}</span>
+            </div>
             <div class="property-actions">
                 <button class="load-btn" onclick="event.stopPropagation(); auctionSimulator.loadAllDataForProperty(${index})" title="모든 정보 불러오기">📂</button>
                 <button class="save-all-btn" onclick="event.stopPropagation(); auctionSimulator.saveAllDataForProperty(${index})" title="모든 정보 저장">💾</button>
-                <button class="edit-btn" onclick="event.stopPropagation(); auctionSimulator.editProperty(${index})">✏️</button>
-                <button class="delete-btn" onclick="event.stopPropagation(); auctionSimulator.deleteProperty(${index})">🗑️</button>
+                <button class="edit-btn" onclick="event.stopPropagation(); auctionSimulator.editProperty(${index})" title="매물 편집">✏️</button>
+                <button class="delete-btn" onclick="event.stopPropagation(); auctionSimulator.deleteProperty(${index})" title="매물 삭제">🗑️</button>
             </div>
         `;
 

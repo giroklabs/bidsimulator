@@ -781,13 +781,16 @@ header p {
     margin: 8px 0;
     padding: 12px 15px;
     font-size: 0.95rem;
-    background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,249,250,0.9) 100%);
-    border: 1px solid rgba(46, 204, 113, 0.2);
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background: var(--mac-bg-secondary);
+    border: 1px solid var(--mac-border);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px var(--mac-shadow);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .tree-item.property-item::before {
@@ -816,14 +819,23 @@ header p {
     font-size: 1.1rem;
 }
 
+/* 매물명과 아이콘을 위한 상단 행 */
+.tree-item.property-item .property-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
 .tree-label {
     flex: 1;
     font-weight: 500;
-    writing-mode: horizontal-tb; /* 가로 텍스트 강제 */
-    text-orientation: mixed; /* 텍스트 방향 정상화 */
-    white-space: nowrap; /* 한 줄로 표시 */
-    overflow: hidden; /* 넘치는 텍스트 숨김 */
-    text-overflow: ellipsis; /* 넘치는 텍스트에 ... 표시 */
+    color: var(--mac-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.875rem;
+    letter-spacing: -0.022em;
 }
 
 .tree-count {
@@ -841,86 +853,67 @@ header p {
 
 .property-actions {
     display: flex;
-    gap: 8px;
-    margin-left: auto;
-    margin-top: 8px;
+    gap: 6px;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 4px;
 }
 
 .property-actions button {
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: var(--mac-bg-tertiary);
+    border: 1px solid var(--mac-border);
     cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
-    overflow: hidden;
-}
-
-.property-actions button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    transition: left 0.5s ease;
-}
-
-.property-actions button:hover::before {
-    left: 100%;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 1px 2px var(--mac-shadow);
+    min-width: 32px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .property-actions .load-btn {
-    color: #3498db;
-    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
-    border-color: rgba(52, 152, 219, 0.3);
+    color: var(--mac-accent-blue);
 }
 
 .property-actions .save-all-btn {
-    color: #2ecc71;
-    background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(46, 204, 113, 0.05) 100%);
-    border-color: rgba(46, 204, 113, 0.3);
+    color: var(--mac-accent-green);
 }
 
 .property-actions .edit-btn {
-    color: #f39c12;
-    background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, rgba(243, 156, 18, 0.05) 100%);
-    border-color: rgba(243, 156, 18, 0.3);
+    color: var(--mac-accent-orange);
 }
 
 .property-actions .delete-btn {
-    color: #e74c3c;
-    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
-    border-color: rgba(231, 76, 60, 0.3);
+    color: var(--mac-accent-red);
 }
 
 .property-actions button:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px var(--mac-shadow-hover);
 }
 
 .property-actions .load-btn:hover {
-    background: linear-gradient(135deg, rgba(52, 152, 219, 0.2) 0%, rgba(52, 152, 219, 0.1) 100%);
-    border-color: rgba(52, 152, 219, 0.5);
+    background: rgba(0, 122, 255, 0.1);
+    border-color: var(--mac-accent-blue);
 }
 
 .property-actions .save-all-btn:hover {
-    background: linear-gradient(135deg, rgba(46, 204, 113, 0.2) 0%, rgba(46, 204, 113, 0.1) 100%);
-    border-color: rgba(46, 204, 113, 0.5);
+    background: rgba(52, 199, 89, 0.1);
+    border-color: var(--mac-accent-green);
 }
 
 .property-actions .edit-btn:hover {
-    background: linear-gradient(135deg, rgba(243, 156, 18, 0.2) 0%, rgba(243, 156, 18, 0.1) 100%);
-    border-color: rgba(243, 156, 18, 0.5);
+    background: rgba(255, 149, 0, 0.1);
+    border-color: var(--mac-accent-orange);
 }
 
 .property-actions .delete-btn:hover {
-    background: linear-gradient(135deg, rgba(231, 76, 60, 0.2) 0%, rgba(231, 76, 60, 0.1) 100%);
-    border-color: rgba(231, 76, 60, 0.5);
+    background: rgba(255, 59, 48, 0.1);
+    border-color: var(--mac-accent-red);
 }
 
 .main-content {
