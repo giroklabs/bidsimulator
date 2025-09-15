@@ -1,11 +1,12 @@
 /**
- * 엑셀 데이터 관리 시스템
+ * 엑셀 데이터 관리 시스템 (확장 버전)
  * 매물 데이터를 엑셀로 내보내고 엑셀에서 데이터를 가져오는 기능
+ * 경매정보, 물건조사, 시뮬레이션 결과 등 모든 데이터 포함
  */
 
 class ExcelDataManager {
     constructor() {
-        console.log('=== 엑셀 데이터 관리자 초기화 ===');
+        console.log('=== 엑셀 데이터 관리자 초기화 (확장 버전) ===');
         this.init();
     }
 
@@ -65,10 +66,10 @@ class ExcelDataManager {
         }
     }
 
-    // 엑셀로 데이터 내보내기
+    // 엑셀로 데이터 내보내기 (모든 데이터 포함)
     exportToExcel() {
-        console.log('=== 엑셀 내보내기 시작 ===');
-        
+        console.log('=== 엑셀 내보내기 시작 (모든 데이터 포함) ===');
+
         try {
             // 현재 매물 데이터 가져오기
             const properties = this.getCurrentProperties();
@@ -79,15 +80,15 @@ class ExcelDataManager {
                 return;
             }
 
-            // CSV 형식으로 데이터 변환
+            // CSV 형식으로 데이터 변환 (모든 데이터 포함)
             const csvData = this.convertToCSV(properties);
             console.log('CSV 데이터 생성 완료');
 
             // 파일 다운로드
-            this.downloadCSV(csvData, '매물데이터.csv');
-            
+            this.downloadCSV(csvData, '매물데이터_전체.csv');
+
             console.log('엑셀 내보내기 완료');
-            alert(`${properties.length}개의 매물 데이터가 엑셀 파일로 내보내졌습니다.`);
+            alert(`${properties.length}개의 매물 데이터가 엑셀 파일로 내보내졌습니다.\n(경매정보, 물건조사, 시뮬레이션 결과 포함)`);
 
         } catch (error) {
             console.error('엑셀 내보내기 오류:', error);
@@ -118,12 +119,13 @@ class ExcelDataManager {
         }
     }
 
-    // 데이터를 CSV 형식으로 변환
+    // 데이터를 CSV 형식으로 변환 (모든 데이터 포함)
     convertToCSV(properties) {
-        console.log('CSV 형식으로 데이터 변환');
-        
-        // 헤더 정의
+        console.log('CSV 형식으로 데이터 변환 (모든 데이터 포함)');
+
+        // 확장된 헤더 정의
         const headers = [
+            // 기본 매물 정보
             '사건번호',
             '매물명',
             '매물유형',
@@ -132,7 +134,51 @@ class ExcelDataManager {
             '구/군',
             '메모',
             '생성일시',
-            '수정일시'
+            '수정일시',
+
+            // 경매 기본 정보
+            '법원',
+            '경매일',
+            '경매상태',
+            '입찰가',
+            '감정가',
+            '최저가',
+            '보증금',
+            '경매유형',
+            '유찰횟수',
+
+            // 물건조사 정보
+            '건물연도',
+            '층수',
+            '전용면적',
+            '공급면적',
+            '방수',
+            '욕실수',
+            '주차대수',
+            '엘리베이터',
+            '난방방식',
+            '관리비',
+            '관리사무소',
+            '보안시설',
+            'CCTV',
+            '경비실',
+            '출입통제',
+            '주변환경',
+            '교통편의성',
+            '교육시설',
+            '의료시설',
+            '상업시설',
+            '기타특이사항',
+
+            // 시뮬레이션 결과
+            '추천입찰가',
+            '낙찰확률',
+            '예상수익률',
+            '시장상황',
+            '긴급도',
+            '입찰전략',
+            '위험도',
+            '투자가치'
         ];
 
         // 헤더 행 생성
@@ -140,7 +186,11 @@ class ExcelDataManager {
 
         // 데이터 행 생성
         properties.forEach(property => {
+            // 매물별 저장된 모든 데이터 가져오기
+            const allData = this.getPropertyAllData(property);
+
             const row = [
+                // 기본 매물 정보
                 this.escapeCSV(property.caseNumber || ''),
                 this.escapeCSV(property.name || ''),
                 this.escapeCSV(property.type || ''),
@@ -149,13 +199,105 @@ class ExcelDataManager {
                 this.escapeCSV(property.district || ''),
                 this.escapeCSV(property.notes || ''),
                 this.escapeCSV(property.createdAt || ''),
-                this.escapeCSV(property.updatedAt || '')
+                this.escapeCSV(property.updatedAt || ''),
+
+                // 경매 기본 정보
+                this.escapeCSV(allData.auctionInfo?.court || ''),
+                this.escapeCSV(allData.auctionInfo?.auctionDate || ''),
+                this.escapeCSV(allData.auctionInfo?.auctionStatus || ''),
+                this.escapeCSV(allData.auctionInfo?.bidPrice || ''),
+                this.escapeCSV(allData.auctionInfo?.appraisalValue || ''),
+                this.escapeCSV(allData.auctionInfo?.minimumBid || ''),
+                this.escapeCSV(allData.auctionInfo?.deposit || ''),
+                this.escapeCSV(allData.auctionInfo?.auctionType || ''),
+                this.escapeCSV(allData.auctionInfo?.failedCount || ''),
+
+                // 물건조사 정보
+                this.escapeCSV(allData.inspectionData?.buildingYear || ''),
+                this.escapeCSV(allData.inspectionData?.floor || ''),
+                this.escapeCSV(allData.inspectionData?.exclusiveArea || ''),
+                this.escapeCSV(allData.inspectionData?.supplyArea || ''),
+                this.escapeCSV(allData.inspectionData?.rooms || ''),
+                this.escapeCSV(allData.inspectionData?.bathrooms || ''),
+                this.escapeCSV(allData.inspectionData?.parkingSpaces || ''),
+                this.escapeCSV(allData.inspectionData?.elevator || ''),
+                this.escapeCSV(allData.inspectionData?.heatingSystem || ''),
+                this.escapeCSV(allData.inspectionData?.managementFee || ''),
+                this.escapeCSV(allData.inspectionData?.managementOffice || ''),
+                this.escapeCSV(allData.inspectionData?.securityFacilities || ''),
+                this.escapeCSV(allData.inspectionData?.cctv || ''),
+                this.escapeCSV(allData.inspectionData?.securityRoom || ''),
+                this.escapeCSV(allData.inspectionData?.accessControl || ''),
+                this.escapeCSV(allData.inspectionData?.surroundingEnvironment || ''),
+                this.escapeCSV(allData.inspectionData?.transportation || ''),
+                this.escapeCSV(allData.inspectionData?.educationalFacilities || ''),
+                this.escapeCSV(allData.inspectionData?.medicalFacilities || ''),
+                this.escapeCSV(allData.inspectionData?.commercialFacilities || ''),
+                this.escapeCSV(allData.inspectionData?.otherNotes || ''),
+
+                // 시뮬레이션 결과
+                this.escapeCSV(allData.simulationResult?.recommendedBidPrice || ''),
+                this.escapeCSV(allData.simulationResult?.winProbability || ''),
+                this.escapeCSV(allData.simulationResult?.expectedReturn || ''),
+                this.escapeCSV(allData.auctionInfo?.marketCondition || ''),
+                this.escapeCSV(allData.auctionInfo?.urgency || ''),
+                this.escapeCSV(allData.simulationResult?.strategy || ''),
+                this.escapeCSV(allData.simulationResult?.riskLevel || ''),
+                this.escapeCSV(allData.simulationResult?.investmentValue || '')
             ];
             csv += row.join(',') + '\n';
         });
 
         console.log('CSV 변환 완료, 총 행 수:', properties.length + 1);
         return csv;
+    }
+
+    // 매물별 저장된 모든 데이터 가져오기
+    getPropertyAllData(property) {
+        console.log('매물별 모든 데이터 가져오기:', property);
+
+        try {
+            const propertyKey = property.caseNumber || property.name || property.location;
+            if (!propertyKey) {
+                console.warn('매물 키가 없습니다');
+                return { auctionInfo: {}, inspectionData: {}, simulationResult: {} };
+            }
+
+            // localStorage에서 매물별 저장된 데이터 찾기
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('property_all_')) {
+                    try {
+                        const savedData = JSON.parse(localStorage.getItem(key));
+                        if (savedData && savedData.property) {
+                            const savedProperty = savedData.property;
+
+                            // 매물 정보 매칭 확인
+                            if ((savedProperty.caseNumber && savedProperty.caseNumber === property.caseNumber) ||
+                                (savedProperty.name && savedProperty.name === property.name) ||
+                                (savedProperty.location && savedProperty.location === property.location)) {
+
+                                console.log('매칭되는 저장된 데이터 발견:', key);
+                                return {
+                                    auctionInfo: savedData.auctionInfo || {},
+                                    inspectionData: savedData.inspectionData || {},
+                                    simulationResult: savedData.simulationResult || {}
+                                };
+                            }
+                        }
+                    } catch (parseError) {
+                        console.warn('데이터 파싱 오류:', key, parseError);
+                    }
+                }
+            }
+
+            console.log('저장된 데이터를 찾을 수 없습니다');
+            return { auctionInfo: {}, inspectionData: {}, simulationResult: {} };
+
+        } catch (error) {
+            console.error('매물별 데이터 가져오기 오류:', error);
+            return { auctionInfo: {}, inspectionData: {}, simulationResult: {} };
+        }
     }
 
     // CSV 필드 이스케이프 처리
@@ -522,7 +664,7 @@ class ExcelDataManager {
 // 전역 인스턴스 생성
 window.excelDataManager = new ExcelDataManager();
 
-console.log('엑셀 데이터 관리 시스템이 로드되었습니다.');
+console.log('엑셀 데이터 관리 시스템이 로드되었습니다. (확장 버전)');
 console.log('사용법:');
-console.log('- excelDataManager.exportToExcel(): 매물 데이터를 엑셀로 내보내기');
+console.log('- excelDataManager.exportToExcel(): 매물 데이터를 엑셀로 내보내기 (모든 데이터 포함)');
 console.log('- excelDataManager.showImportModal(): 엑셀 파일에서 데이터 가져오기');
