@@ -486,9 +486,19 @@ class ExcelDataManager {
     // CSV 데이터 파싱
     parseCSV(content) {
         console.log('=== CSV 데이터 파싱 시작 ===');
+        console.log('원본 CSV 내용:', content);
         
         try {
-            const lines = content.split('\n').filter(line => line.trim());
+            // BOM 제거 (UTF-8 BOM이 있는 경우)
+            let cleanContent = content;
+            if (content.charCodeAt(0) === 0xFEFF) {
+                cleanContent = content.slice(1);
+                console.log('BOM 제거됨');
+            }
+            
+            const lines = cleanContent.split('\n').filter(line => line.trim());
+            console.log('분할된 라인 수:', lines.length);
+            console.log('분할된 라인들:', lines);
             
             if (lines.length < 2) {
                 alert('유효한 데이터가 없습니다. 헤더와 최소 1개 이상의 데이터 행이 필요합니다.');
@@ -498,23 +508,38 @@ class ExcelDataManager {
             // 헤더 파싱
             const headers = this.parseCSVLine(lines[0]);
             console.log('CSV 헤더:', headers);
+            console.log('헤더 개수:', headers.length);
 
             // 데이터 행 파싱
             const properties = [];
             for (let i = 1; i < lines.length; i++) {
+                console.log(`--- 데이터 행 ${i} 파싱 ---`);
+                console.log('원본 라인:', lines[i]);
+                
                 const values = this.parseCSVLine(lines[i]);
-                if (values.length > 0 && values[0].trim()) { // 빈 행 제외
+                console.log('파싱된 값들:', values);
+                console.log('값 개수:', values.length);
+                
+                // 빈 행이 아닌 경우에만 처리
+                if (values.length > 0 && values.some(v => v.trim())) {
+                    console.log('매물 객체 생성 시도...');
                     const property = this.createPropertyFromCSV(headers, values);
                     if (property) {
+                        console.log('✅ 매물 객체 생성 성공:', property);
                         properties.push(property);
+                    } else {
+                        console.warn('❌ 매물 객체 생성 실패');
                     }
+                } else {
+                    console.log('빈 행 건너뛰기');
                 }
             }
 
             console.log('파싱된 매물 데이터:', properties);
+            console.log('파싱된 매물 개수:', properties.length);
 
             if (properties.length === 0) {
-                alert('유효한 매물 데이터가 없습니다.');
+                alert('유효한 매물 데이터가 없습니다.\n\nCSV 파일 형식을 확인해주세요:\n- 첫 번째 행: 헤더\n- 두 번째 행부터: 데이터\n- 필수 필드: 사건번호 또는 매물명');
                 return;
             }
 
@@ -529,6 +554,8 @@ class ExcelDataManager {
 
     // CSV 라인 파싱 (쉼표와 따옴표 처리)
     parseCSVLine(line) {
+        console.log('CSV 라인 파싱 시작:', line);
+        
         const result = [];
         let current = '';
         let inQuotes = false;
@@ -547,27 +574,38 @@ class ExcelDataManager {
                 }
             } else if (char === ',' && !inQuotes) {
                 // 필드 구분자
-                result.push(current);
+                result.push(current.trim());
                 current = '';
             } else {
                 current += char;
             }
         }
         
-        result.push(current);
+        // 마지막 필드 추가
+        result.push(current.trim());
+        
+        console.log('파싱 결과:', result);
         return result;
     }
 
     // CSV 데이터로부터 매물 객체 생성
     createPropertyFromCSV(headers, values) {
+        console.log('=== 매물 객체 생성 시작 ===');
+        console.log('헤더:', headers);
+        console.log('값:', values);
+        
         try {
             const property = {};
             
             // 헤더와 값 매핑
             headers.forEach((header, index) => {
                 const value = values[index] || '';
+                console.log(`매핑: ${header} = "${value}"`);
                 
-                switch (header) {
+                // 헤더 정규화 (공백 제거)
+                const normalizedHeader = header.trim();
+                
+                switch (normalizedHeader) {
                     case '사건번호':
                         property.caseNumber = value;
                         break;
@@ -595,22 +633,30 @@ class ExcelDataManager {
                     case '수정일시':
                         property.updatedAt = value || new Date().toISOString();
                         break;
+                    default:
+                        // 알 수 없는 헤더는 무시
+                        console.log(`알 수 없는 헤더 무시: ${normalizedHeader}`);
+                        break;
                 }
             });
 
+            console.log('생성된 매물 객체 (필수 필드 확인 전):', property);
+
             // 필수 필드 확인
             if (!property.caseNumber && !property.name) {
-                console.warn('필수 필드가 없는 매물 데이터 건너뛰기:', property);
+                console.warn('❌ 필수 필드가 없는 매물 데이터 건너뛰기:', property);
+                console.warn('필수 필드: 사건번호 또는 매물명 중 하나');
                 return null;
             }
 
             // ID 생성
             property.id = Date.now() + Math.random();
             
+            console.log('✅ 매물 객체 생성 성공:', property);
             return property;
             
         } catch (error) {
-            console.error('매물 객체 생성 오류:', error);
+            console.error('❌ 매물 객체 생성 오류:', error);
             return null;
         }
     }
@@ -758,6 +804,35 @@ window.testPropertyMatching = function() {
     }
 };
 
+// CSV 테스트 파일 생성
+window.createTestCSV = function() {
+    console.log('=== 테스트 CSV 파일 생성 ===');
+    
+    const testData = `사건번호,매물명,매물유형,위치,지역,구/군,메모,생성일시,수정일시
+2024타경12345,강남구 아파트,아파트,서울시 강남구,서울,강남구,매각예정,2024-01-15T10:00:00Z,2024-01-15T10:00:00Z
+2024타경67890,부산시 오피스텔,오피스텔,부산시 해운대구,부산,해운대구,경매진행중,2024-01-16T10:00:00Z,2024-01-16T10:00:00Z`;
+    
+    // BOM 추가
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + testData], { type: 'text/csv;charset=utf-8;' });
+    
+    // 다운로드 링크 생성
+    const link = document.createElement('a');
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', '매물데이터_테스트.csv');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
+    
+    console.log('✅ 테스트 CSV 파일 생성 완료: 매물데이터_테스트.csv');
+    alert('테스트 CSV 파일이 생성되었습니다: 매물데이터_테스트.csv\n\n이 파일을 사용하여 엑셀 가져오기 기능을 테스트해보세요.');
+};
+
 console.log('엑셀 데이터 관리 시스템이 로드되었습니다. (확장 버전)');
 console.log('사용법:');
 console.log('- excelDataManager.exportToExcel(): 매물 데이터를 엑셀로 내보내기 (모든 데이터 포함)');
@@ -766,3 +841,4 @@ console.log('디버깅 함수들:');
 console.log('- debugLocalStorage(): localStorage의 모든 데이터 확인');
 console.log('- debugPropertyData(): 매물 데이터 확인');
 console.log('- testPropertyMatching(): 매물 매칭 테스트');
+console.log('- createTestCSV(): 테스트용 CSV 파일 생성');
