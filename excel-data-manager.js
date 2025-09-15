@@ -588,14 +588,22 @@ class ExcelDataManager {
         return result;
     }
 
-    // CSV 데이터로부터 매물 객체 생성
+    // CSV 데이터로부터 매물 객체 생성 (모든 데이터 포함)
     createPropertyFromCSV(headers, values) {
-        console.log('=== 매물 객체 생성 시작 ===');
+        console.log('=== 매물 객체 생성 시작 (모든 데이터 포함) ===');
         console.log('헤더:', headers);
         console.log('값:', values);
         
         try {
-            const property = {};
+            const property = {
+                // 기본 매물 정보
+                basicInfo: {},
+                // 상세 데이터
+                auctionInfo: {},
+                inspectionData: {},
+                simulationResult: {},
+                auctionResult: {}
+            };
             
             // 헤더와 값 매핑
             headers.forEach((header, index) => {
@@ -605,34 +613,173 @@ class ExcelDataManager {
                 // 헤더 정규화 (공백 제거)
                 const normalizedHeader = header.trim();
                 
+                // 기본 매물 정보 매핑
                 switch (normalizedHeader) {
                     case '사건번호':
-                        property.caseNumber = value;
+                        property.basicInfo.caseNumber = value;
                         break;
                     case '매물명':
-                        property.name = value;
+                        property.basicInfo.name = value;
                         break;
                     case '매물유형':
-                        property.type = value;
+                        property.basicInfo.type = value;
                         break;
                     case '위치':
-                        property.location = value;
+                        property.basicInfo.location = value;
                         break;
                     case '지역':
-                        property.region = value;
+                        property.basicInfo.region = value;
                         break;
                     case '구/군':
-                        property.district = value;
+                        property.basicInfo.district = value;
                         break;
                     case '메모':
-                        property.notes = value;
+                        property.basicInfo.notes = value;
                         break;
                     case '생성일시':
-                        property.createdAt = value || new Date().toISOString();
+                        property.basicInfo.createdAt = value || new Date().toISOString();
                         break;
                     case '수정일시':
-                        property.updatedAt = value || new Date().toISOString();
+                        property.basicInfo.updatedAt = value || new Date().toISOString();
                         break;
+                    
+                    // 경매 기본 정보
+                    case '법원':
+                        property.auctionInfo.court = value;
+                        break;
+                    case '경매일':
+                        property.auctionInfo.auctionDate = value;
+                        break;
+                    case '경매상태':
+                        property.auctionInfo.auctionStatus = value;
+                        break;
+                    case '입찰가':
+                        property.auctionInfo.bidPrice = value;
+                        break;
+                    case '감정가':
+                        property.auctionInfo.appraisalValue = value;
+                        break;
+                    case '최저가':
+                        property.auctionInfo.minimumBid = value;
+                        break;
+                    case '보증금':
+                        property.auctionInfo.deposit = value;
+                        break;
+                    case '경매유형':
+                        property.auctionInfo.auctionType = value;
+                        break;
+                    case '유찰횟수':
+                        property.auctionInfo.failedCount = value;
+                        break;
+                    
+                    // 경매 결과 정보
+                    case '낙찰일':
+                        property.auctionResult.auctionDate = value;
+                        break;
+                    case '낙찰가':
+                        property.auctionResult.winningBid = value;
+                        break;
+                    case '2순위와의차이':
+                        property.auctionResult.secondBidDifference = value;
+                        break;
+                    case '시세대비낙찰액비율':
+                        property.auctionResult.marketRatio = value;
+                        break;
+                    case '경매결과메모':
+                        property.auctionResult.auctionResultMemo = value;
+                        break;
+                    
+                    // 물건조사 정보
+                    case '건물연도':
+                        property.inspectionData.buildingYear = value;
+                        break;
+                    case '층수':
+                        property.inspectionData.floor = value;
+                        break;
+                    case '전용면적':
+                        property.inspectionData.exclusiveArea = value;
+                        break;
+                    case '공급면적':
+                        property.inspectionData.supplyArea = value;
+                        break;
+                    case '방수':
+                        property.inspectionData.rooms = value;
+                        break;
+                    case '욕실수':
+                        property.inspectionData.bathrooms = value;
+                        break;
+                    case '주차대수':
+                        property.inspectionData.parkingSpaces = value;
+                        break;
+                    case '엘리베이터':
+                        property.inspectionData.elevator = value;
+                        break;
+                    case '난방방식':
+                        property.inspectionData.heatingSystem = value;
+                        break;
+                    case '관리비':
+                        property.inspectionData.managementFee = value;
+                        break;
+                    case '관리사무소':
+                        property.inspectionData.managementOffice = value;
+                        break;
+                    case '보안시설':
+                        property.inspectionData.securityFacilities = value;
+                        break;
+                    case 'CCTV':
+                        property.inspectionData.cctv = value;
+                        break;
+                    case '경비실':
+                        property.inspectionData.securityRoom = value;
+                        break;
+                    case '출입통제':
+                        property.inspectionData.accessControl = value;
+                        break;
+                    case '주변환경':
+                        property.inspectionData.surroundingEnvironment = value;
+                        break;
+                    case '교통편의성':
+                        property.inspectionData.transportation = value;
+                        break;
+                    case '교육시설':
+                        property.inspectionData.educationalFacilities = value;
+                        break;
+                    case '의료시설':
+                        property.inspectionData.medicalFacilities = value;
+                        break;
+                    case '상업시설':
+                        property.inspectionData.commercialFacilities = value;
+                        break;
+                    case '기타특이사항':
+                        property.inspectionData.otherNotes = value;
+                        break;
+                    
+                    // 시뮬레이션 결과
+                    case '추천입찰가':
+                        property.simulationResult.recommendedBidPrice = value;
+                        break;
+                    case '낙찰확률':
+                        property.simulationResult.winProbability = value;
+                        break;
+                    case '예상수익률':
+                        property.simulationResult.expectedReturn = value;
+                        break;
+                    case '시장상황':
+                        property.auctionInfo.marketCondition = value;
+                        break;
+                    case '긴급도':
+                        property.auctionInfo.urgency = value;
+                        break;
+                    case '입찰전략':
+                        property.simulationResult.strategy = value;
+                        break;
+                    case '위험도':
+                        property.simulationResult.riskLevel = value;
+                        break;
+                    case '투자가치':
+                        property.simulationResult.investmentValue = value;
+                        break;
+                    
                     default:
                         // 알 수 없는 헤더는 무시
                         console.log(`알 수 없는 헤더 무시: ${normalizedHeader}`);
@@ -642,17 +789,17 @@ class ExcelDataManager {
 
             console.log('생성된 매물 객체 (필수 필드 확인 전):', property);
 
-            // 필수 필드 확인
-            if (!property.caseNumber && !property.name) {
+            // 필수 필드 확인 (기본 정보에서)
+            if (!property.basicInfo.caseNumber && !property.basicInfo.name) {
                 console.warn('❌ 필수 필드가 없는 매물 데이터 건너뛰기:', property);
                 console.warn('필수 필드: 사건번호 또는 매물명 중 하나');
                 return null;
             }
 
             // ID 생성
-            property.id = Date.now() + Math.random();
+            property.basicInfo.id = Date.now() + Math.random();
             
-            console.log('✅ 매물 객체 생성 성공:', property);
+            console.log('✅ 매물 객체 생성 성공 (모든 데이터 포함):', property);
             return property;
             
         } catch (error) {
@@ -676,24 +823,42 @@ class ExcelDataManager {
 
     // 가져오기 실행
     executeImport(properties) {
-        console.log('=== 가져오기 실행 ===');
+        console.log('=== 가져오기 실행 (모든 데이터 포함) ===');
         
         try {
             // StorageManager 우선 사용
             if (window.storageManager) {
-                console.log('StorageManager로 데이터 가져오기');
+                console.log('StorageManager로 데이터 가져오기 (모든 데이터 포함)');
                 
                 // 기존 데이터 초기화
                 window.storageManager.clearAllProperties();
                 
-                // 새 데이터 추가
-                properties.forEach(property => {
-                    window.storageManager.addProperty(property);
+                // 새 데이터 추가 (기본 정보와 상세 데이터 분리)
+                properties.forEach((property, index) => {
+                    console.log(`--- 매물 ${index} 데이터 처리 ---`);
+                    console.log('처리할 매물:', property);
+                    
+                    // 기본 매물 정보만 StorageManager에 추가
+                    const basicProperty = property.basicInfo;
+                    window.storageManager.addProperty(basicProperty);
+                    
+                    // 상세 데이터는 별도 키로 저장
+                    const detailedData = {
+                        auctionInfo: property.auctionInfo,
+                        inspectionData: property.inspectionData,
+                        simulationResult: property.simulationResult,
+                        auctionResult: property.auctionResult
+                    };
+                    
+                    // 매물별 상세 데이터 저장
+                    const propertyKey = `property_all_${index}`;
+                    localStorage.setItem(propertyKey, JSON.stringify(detailedData));
+                    console.log(`✅ 매물 ${index} 상세 데이터 저장 완료: ${propertyKey}`);
                 });
                 
-                // 저장
+                // 기본 데이터 저장
                 const saveResult = window.storageManager.saveData();
-                console.log('StorageManager 가져오기 결과:', saveResult);
+                console.log('StorageManager 기본 데이터 저장 결과:', saveResult);
                 
             } else if (window.simpleStorage) {
                 console.log('SimpleStorage로 데이터 가져오기 (폴백)');
@@ -833,6 +998,26 @@ window.createTestCSV = function() {
     alert('테스트 CSV 파일이 생성되었습니다: 매물데이터_테스트.csv\n\n이 파일을 사용하여 엑셀 가져오기 기능을 테스트해보세요.');
 };
 
+// CSV 불러오기 테스트
+window.testCSVImport = function() {
+    console.log('=== CSV 불러오기 테스트 시작 ===');
+    
+    if (!window.excelDataManager) {
+        console.error('❌ ExcelDataManager가 없습니다');
+        return;
+    }
+    
+    // 테스트 CSV 데이터 생성
+    const testCSVData = `사건번호,매물명,매물유형,위치,지역,구/군,메모,생성일시,수정일시,법원,경매일,경매상태,입찰가,감정가,최저가,보증금,경매유형,유찰횟수,낙찰일,낙찰가,2순위와의차이,시세대비낙찰액비율,경매결과메모,건물연도,층수,전용면적,공급면적,방수,욕실수,주차대수,엘리베이터,난방방식,관리비,관리사무소,보안시설,CCTV,경비실,출입통제,주변환경,교통편의성,교육시설,의료시설,상업시설,기타특이사항,추천입찰가,낙찰확률,예상수익률,시장상황,긴급도,입찰전략,위험도,투자가치
+2024타경12345,강남구 아파트,아파트,서울시 강남구,서울,강남구,매각예정,2024-01-15T10:00:00Z,2024-01-15T10:00:00Z,서울중앙지법,2024-02-15,진행중,500000000,600000000,400000000,50000000,강제경매,0,2024-02-15,520000000,5000000,86.7,성공,2010,15,84.5,105.2,3,2,1,있음,개별난방,150000,있음,있음,있음,있음,출입카드,주택가,지하철5분,초등학교1km,병원500m,백화점2km,조용한주거지,480000000,65,12,보통,보통,공격적,중,높음`;
+    
+    console.log('테스트 CSV 데이터:', testCSVData);
+    
+    // CSV 파싱 테스트
+    console.log('CSV 파싱 테스트 시작...');
+    window.excelDataManager.parseCSV(testCSVData);
+};
+
 console.log('엑셀 데이터 관리 시스템이 로드되었습니다. (확장 버전)');
 console.log('사용법:');
 console.log('- excelDataManager.exportToExcel(): 매물 데이터를 엑셀로 내보내기 (모든 데이터 포함)');
@@ -842,3 +1027,4 @@ console.log('- debugLocalStorage(): localStorage의 모든 데이터 확인');
 console.log('- debugPropertyData(): 매물 데이터 확인');
 console.log('- testPropertyMatching(): 매물 매칭 테스트');
 console.log('- createTestCSV(): 테스트용 CSV 파일 생성');
+console.log('- testCSVImport(): CSV 불러오기 테스트');
