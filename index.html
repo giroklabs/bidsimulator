@@ -36,11 +36,13 @@
         <div class="layout">
             <!-- 사이드바 -->
             <div class="sidebar">
-                <!-- GitHub 연동 섹션 (사이드바 최상단) -->
-                <div class="github-integration-section">
-                    <div class="github-storage-section">
+                <!-- 클라우드 연동 레이어 -->
+                <div class="sidebar-layer cloud-layer">
+                    <div class="layer-header">
                         <h4>☁️ 클라우드 연동</h4>
-                        <div id="github-status">클라우드 미연동</div>
+                    </div>
+                    <div class="layer-content">
+                        <div id="github-status" class="status-indicator">클라우드 미연동</div>
 
                         <button id="github-connect-btn" class="github-btn primary">
                             <span class="btn-icon">🔑</span>
@@ -52,7 +54,7 @@
                             연결 해제
                         </button>
 
-                        <div id="github-sync-buttons" style="display: none;">
+                        <div id="github-sync-buttons" class="sync-buttons" style="display: none;">
                             <button id="github-sync-to-btn" class="github-btn success">
                                 <span class="btn-icon">⬆️</span>
                                 업로드
@@ -70,53 +72,41 @@
                     </div>
                 </div>
 
-                <!-- 카카오 로그인 섹션 (숨김 처리) -->
-                <!--
-                <div class="kakao-login-section">
-                    <div class="kakao-storage-section">
-                        <h4>💬 카카오 로그인</h4>
-                        <div id="kakao-status">카카오 미로그인</div>
-
-                        <button id="kakao-login-btn" class="kakao-btn primary">
-                            <span class="btn-icon">💬</span>
-                            카카오 로그인
-                        </button>
-
-                        <button id="kakao-logout-btn" class="kakao-btn danger" style="display: none;">
-                            <span class="btn-icon">🚪</span>
-                            카카오 로그아웃
-                        </button>
-
-                        <div id="kakao-drive-buttons" style="display: none;">
-                            <button id="kakao-drive-save-btn" class="kakao-btn success">
-                                <span class="btn-icon">☁️</span>
-                                카카오 드라이브에 저장
-                            </button>
-                            <button id="kakao-drive-load-btn" class="kakao-btn info">
-                                <span class="btn-icon">📁</span>
-                                카카오 드라이브에서 불러오기
-                            </button>
-                        </div>
-
-                        <div id="kakao-notice" class="kakao-notice">
-                            <small>💬 카카오 계정으로 간편하게 로그인하세요</small>
+                <!-- 매물 관리 레이어 -->
+                <div class="sidebar-layer property-layer">
+                    <div class="layer-header">
+                        <h4>📋 매물 관리</h4>
+                    </div>
+                    <div class="layer-content">
+                        <button class="add-property-btn" id="addPropertyBtn">+ 매물 추가</button>
+                        <div class="property-list" id="propertyList">
+                            <div class="no-properties">
+                                <p>저장된 매물이 없습니다</p>
+                                <p>+ 버튼을 클릭하여 매물을 추가하세요</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-                -->
 
-                <div class="sidebar-header">
-                    <h3>📋 매물 선택</h3>
-                    <button class="add-property-btn" id="addPropertyBtn">+ 매물 추가</button>
-                    <div class="excel-buttons" style="margin-top: 10px;">
-                        <button class="btn btn-success" id="excelExportBtn" style="margin-right: 5px;">📊 엑셀 내보내기</button>
-                        <button class="btn btn-info" id="excelImportBtn">📥 엑셀 불러오기</button>
+                <!-- 엑셀 데이터 관리 레이어 -->
+                <div class="sidebar-layer excel-layer">
+                    <div class="layer-header">
+                        <h4>📊 데이터 관리</h4>
                     </div>
-                </div>
-                <div class="property-list" id="propertyList">
-                    <div class="no-properties">
-                        <p>저장된 매물이 없습니다</p>
-                        <p>+ 버튼을 클릭하여 매물을 추가하세요</p>
+                    <div class="layer-content">
+                        <div class="excel-buttons">
+                            <button class="btn btn-success" id="excelExportBtn">
+                                <span class="btn-icon">📊</span>
+                                엑셀 내보내기
+                            </button>
+                            <button class="btn btn-info" id="excelImportBtn">
+                                <span class="btn-icon">📥</span>
+                                엑셀 불러오기
+                            </button>
+                        </div>
+                        <div class="excel-notice">
+                            <small>📋 모든 경매정보, 물건조사, 시뮬레이션 결과 포함</small>
+                        </div>
                     </div>
                 </div>
             </div>

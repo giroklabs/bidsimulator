@@ -211,6 +211,144 @@ header p {
     box-shadow: 0 25px 50px rgba(0,0,0,0.15);
 }
 
+/* 사이드바 레이어 스타일 */
+.sidebar-layer {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.sidebar-layer:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.layer-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 15px 20px;
+    color: white;
+}
+
+.layer-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.layer-content {
+    padding: 20px;
+}
+
+/* 클라우드 연동 레이어 */
+.cloud-layer {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+}
+
+.cloud-layer .layer-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 매물 관리 레이어 */
+.property-layer {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.05) 0%, rgba(52, 152, 219, 0.05) 100%);
+}
+
+.property-layer .layer-header {
+    background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
+}
+
+/* 엑셀 데이터 관리 레이어 */
+.excel-layer {
+    background: linear-gradient(135deg, rgba(241, 196, 15, 0.05) 0%, rgba(230, 126, 34, 0.05) 100%);
+}
+
+.excel-layer .layer-header {
+    background: linear-gradient(135deg, #f1c40f 0%, #e67e22 100%);
+}
+
+/* 상태 표시기 */
+.status-indicator {
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.2);
+}
+
+.status-indicator.connected {
+    background: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
+    border: 1px solid rgba(46, 204, 113, 0.2);
+}
+
+/* 동기화 버튼들 */
+.sync-buttons {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.sync-buttons .github-btn {
+    flex: 1;
+    font-size: 0.9rem;
+    padding: 10px 15px;
+}
+
+/* 엑셀 버튼들 */
+.excel-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.excel-buttons .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.excel-buttons .btn-success {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+}
+
+.excel-buttons .btn-info {
+    background: linear-gradient(135deg, #3498db 0%, #5dade2 100%);
+    color: white;
+}
+
+.excel-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.excel-notice {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 0.85rem;
+    padding: 10px;
+    background: rgba(241, 196, 15, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(241, 196, 15, 0.2);
+}
+
+/* 기존 스타일 유지 */
 .sidebar-header {
     display: flex;
     flex-direction: column;
@@ -1888,39 +2026,7 @@ select {
     background: #5a6268;
 }
 
-/* 엑셀 관련 버튼 스타일 */
-.excel-buttons {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-}
-
-.excel-buttons .btn {
-    padding: 6px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 11px;
-    transition: all 0.3s ease;
-}
-
-.excel-buttons .btn-success {
-    background-color: #28a745;
-    color: white;
-}
-
-.excel-buttons .btn-success:hover {
-    background-color: #218838;
-}
-
-.excel-buttons .btn-info {
-    background-color: #17a2b8;
-    color: white;
-}
-
-.excel-buttons .btn-info:hover {
-    background-color: #138496;
-}
+/* 기존 엑셀 버튼 스타일은 새로운 레이어 스타일로 대체됨 */
 
 /* 엑셀 가져오기 모달 스타일 */
 #import-instructions {

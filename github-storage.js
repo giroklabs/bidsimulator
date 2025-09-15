@@ -65,12 +65,18 @@ window.githubStorage = {
         
         if (this.accessToken && this.gistId) {
             const userName = this.userInfo ? this.userInfo.login : '사용자';
-            if (statusElement) statusElement.textContent = `✅ ${userName}님 로그인됨`;
+            if (statusElement) {
+                statusElement.textContent = `${userName}님 로그인됨`;
+                statusElement.className = 'status-indicator connected';
+            }
             if (connectButton) connectButton.style.display = 'none';
             if (disconnectButton) disconnectButton.style.display = 'inline-block';
             if (syncButtons) syncButtons.style.display = 'block';
         } else {
-            if (statusElement) statusElement.textContent = '❌ 클라우드 미연동';
+            if (statusElement) {
+                statusElement.textContent = '클라우드 미연동';
+                statusElement.className = 'status-indicator';
+            }
             if (connectButton) connectButton.style.display = 'inline-block';
             if (disconnectButton) disconnectButton.style.display = 'none';
             if (syncButtons) syncButtons.style.display = 'none';
