@@ -5349,6 +5349,46 @@ window.testGitHubDownload = function() {
     });
 };
 
+// GitHub 재연동 테스트
+window.testGitHubReconnect = function() {
+    console.log('=== GitHub 재연동 테스트 시작 ===');
+    
+    if (!window.githubStorage) {
+        console.error('❌ GitHub Storage가 없습니다');
+        return;
+    }
+    
+    // 1. 현재 연동 상태 확인
+    console.log('1. 현재 연동 상태 확인');
+    console.log('연동 전 상태:', {
+        hasAccessToken: !!window.githubStorage.accessToken,
+        hasGistId: !!window.githubStorage.gistId,
+        hasUserInfo: !!window.githubStorage.userInfo
+    });
+    
+    // 2. 연동 해제
+    console.log('2. GitHub 연동 해제');
+    window.githubStorage.clearCredentials();
+    
+    // 3. 연동 해제 후 상태 확인
+    setTimeout(() => {
+        console.log('3. 연동 해제 후 상태 확인');
+        console.log('연동 해제 후 상태:', {
+            hasAccessToken: !!window.githubStorage.accessToken,
+            hasGistId: !!window.githubStorage.gistId,
+            hasUserInfo: !!window.githubStorage.userInfo
+        });
+        
+        // 4. 재연동 안내
+        console.log('4. 재연동 안내');
+        console.log('이제 GitHub 연동 버튼을 클릭하여 재연동을 진행하세요.');
+        console.log('재연동 후 testGitHubDownload()를 실행하여 다운로드 테스트를 진행하세요.');
+        
+        console.log('=== GitHub 재연동 테스트 완료 ===');
+        alert('GitHub 연동이 해제되었습니다.\n\n이제 GitHub 연동 버튼을 클릭하여 재연동을 진행하세요.\n재연동 후 testGitHubDownload()를 실행하여 다운로드 테스트를 진행하세요.');
+    }, 1000);
+};
+
 // Excel 내보내기 테스트
 window.testExcelExport = function() {
     console.log('=== Excel 내보내기 테스트 시작 ===');
@@ -5369,4 +5409,5 @@ console.log('- testLoadProperty(index): 매물 불러오기 테스트');
 console.log('- testDataStorage(): 종합 데이터 저장 테스트');
 console.log('- testGitHubStorage(): GitHub 저장 테스트');
 console.log('- testGitHubDownload(): GitHub 다운로드 전용 테스트');
+console.log('- testGitHubReconnect(): GitHub 재연동 테스트');
 console.log('- testExcelExport(): Excel 내보내기 테스트');

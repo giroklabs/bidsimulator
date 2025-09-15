@@ -212,16 +212,30 @@ window.githubStorage = {
     
     // Gist 생성 또는 기존 Gist 가져오기
     async createOrGetGist(token) {
+        console.log('=== Gist 생성 또는 기존 Gist 찾기 시작 ===');
+        
         try {
-            // 기존 Gist가 있는지 확인
+            // 1. 기존 Gist가 있는지 확인 (localStorage에서)
             if (this.gistId) {
+                console.log('기존 Gist ID 확인:', this.gistId);
                 const exists = await this.checkGistExists(token, this.gistId);
                 if (exists) {
+                    console.log('✅ 기존 Gist 발견:', this.gistId);
                     return this.gistId;
                 }
+                console.log('❌ 기존 Gist가 존재하지 않음');
             }
             
-            // 새 Gist 생성
+            // 2. 사용자의 모든 Gist에서 경매 데이터 Gist 찾기
+            console.log('사용자의 모든 Gist에서 경매 데이터 Gist 찾기...');
+            const existingGistId = await this.findExistingAuctionGist(token);
+            if (existingGistId) {
+                console.log('✅ 기존 경매 데이터 Gist 발견:', existingGistId);
+                return existingGistId;
+            }
+            
+            // 3. 새 Gist 생성
+            console.log('새로운 경매 데이터 Gist 생성...');
             const gistData = {
                 description: '경매 입찰가격 시뮬레이션 데이터',
                 public: false,
@@ -248,8 +262,11 @@ window.githubStorage = {
             
             if (response.ok) {
                 const gist = await response.json();
+                console.log('✅ 새 Gist 생성 완료:', gist.id);
                 return gist.id;
             } else {
+                const errorText = await response.text();
+                console.error('Gist 생성 실패 응답:', errorText);
                 throw new Error('Gist 생성에 실패했습니다.');
             }
         } catch (error) {
@@ -275,6 +292,58 @@ window.githubStorage = {
         }
     },
     
+    // 사용자의 모든 Gist에서 경매 데이터 Gist 찾기
+    async findExistingAuctionGist(token) {
+        console.log('=== 사용자의 모든 Gist 검색 시작 ===');
+        
+        try {
+            // 사용자의 모든 Gist 목록 가져오기
+            const response = await fetch(`${this.GITHUB_API_BASE}/gists`, {
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (!response.ok) {
+                console.error('Gist 목록 가져오기 실패:', response.status, response.statusText);
+                return null;
+            }
+            
+            const gists = await response.json();
+            console.log(`총 ${gists.length}개의 Gist 발견`);
+            
+            // 경매 데이터 Gist 찾기
+            for (const gist of gists) {
+                console.log(`Gist 검사: ${gist.id} - ${gist.description}`);
+                
+                // 설명이 경매 데이터인지 확인
+                if (gist.description && gist.description.includes('경매 입찰가격 시뮬레이션 데이터')) {
+                    console.log('✅ 경매 데이터 Gist 발견 (설명 기준):', gist.id);
+                    
+                    // 파일이 있는지 확인
+                    if (gist.files && gist.files['auction-data.json']) {
+                        console.log('✅ auction-data.json 파일 확인됨');
+                        return gist.id;
+                    }
+                }
+                
+                // 파일 이름으로도 확인
+                if (gist.files && gist.files['auction-data.json']) {
+                    console.log('✅ auction-data.json 파일 발견 (파일 기준):', gist.id);
+                    return gist.id;
+                }
+            }
+            
+            console.log('❌ 기존 경매 데이터 Gist를 찾을 수 없음');
+            return null;
+            
+        } catch (error) {
+            console.error('Gist 검색 오류:', error);
+            return null;
+        }
+    },
+    
     // 인증 정보 저장
     saveCredentialsLegacy(token, gistId, userInfo = null) {
         this.accessToken = token;
@@ -293,15 +362,31 @@ window.githubStorage = {
     
     // 인증 정보 삭제
     clearCredentials() {
+        console.log('=== GitHub 인증 정보 삭제 시작 ===');
+        
+        // 메모리에서 삭제
         this.accessToken = null;
         this.gistId = null;
         this.userInfo = null;
         
+        // localStorage에서 삭제
         localStorage.removeItem('github_access_token');
         localStorage.removeItem('github_gist_id');
         localStorage.removeItem('github_user_info');
         
-        console.log('GitHub 인증 정보 삭제 완료');
+        // 추가적인 관련 데이터도 삭제
+        localStorage.removeItem('github_storage_version');
+        localStorage.removeItem('github_last_sync');
+        
+        console.log('✅ GitHub 인증 정보 삭제 완료');
+        console.log('삭제된 항목:', [
+            'github_access_token',
+            'github_gist_id', 
+            'github_user_info',
+            'github_storage_version',
+            'github_last_sync'
+        ]);
+        
         this.updateUI();
     },
     
