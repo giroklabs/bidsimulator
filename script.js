@@ -571,6 +571,39 @@ class AuctionSimulator {
 
     // 매물 선택
     selectProperty(index) {
+        console.log('=== 매물 선택 시작 ===');
+        console.log('선택할 매물 인덱스:', index);
+        console.log('현재 선택된 매물 인덱스:', this.selectedPropertyIndex);
+        
+        // 현재 매물이 선택되어 있고, 다른 매물로 이동하는 경우
+        if (this.selectedPropertyIndex !== undefined && this.selectedPropertyIndex !== index) {
+            console.log('다른 매물로 이동 - 저장 확인 필요');
+            
+            // 현재 매물의 데이터가 변경되었는지 확인
+            if (this.hasFormDataChanged()) {
+                console.log('현재 매물의 데이터가 변경됨 - 저장 확인 대화상자 표시');
+                
+                // 저장 확인 대화상자 표시
+                const shouldSave = confirm('현재 매물의 데이터가 변경되었습니다.\n저장하시겠습니까?');
+                
+                if (shouldSave) {
+                    console.log('사용자가 저장을 선택함');
+                    // 현재 매물 데이터 저장
+                    const saveResult = this.saveCurrentPropertyData();
+                    if (saveResult) {
+                        this.showToastNotification('현재 매물 데이터가 저장되었습니다.', 'success');
+                    } else {
+                        this.showToastNotification('저장 중 오류가 발생했습니다.', 'error');
+                        return; // 저장 실패 시 매물 선택 중단
+                    }
+                } else {
+                    console.log('사용자가 저장을 취소함');
+                }
+            } else {
+                console.log('현재 매물의 데이터 변경 없음 - 바로 이동');
+            }
+        }
+        
         // 이전 선택 해제
         document.querySelectorAll('.tree-item.selected').forEach(item => {
             item.classList.remove('selected');
@@ -584,6 +617,7 @@ class AuctionSimulator {
 
         const properties = this.getProperties();
         this.selectedProperty = properties[index];
+        this.selectedPropertyIndex = index; // 현재 선택된 매물 인덱스 저장
         
         // StorageManager에 현재 선택된 매물 인덱스 저장
         if (window.storageManager) {
@@ -1129,6 +1163,110 @@ class AuctionSimulator {
         });
         
         console.log('메인 폼 입력 필드 초기화 완료');
+    }
+
+    // 폼 데이터가 변경되었는지 확인
+    hasFormDataChanged() {
+        console.log('=== 폼 데이터 변경 확인 시작 ===');
+        
+        try {
+            // FormDataManager를 사용하여 현재 폼 데이터 수집
+            if (window.formDataManager) {
+                const currentFormData = window.formDataManager.collectAllFormData();
+                console.log('현재 폼 데이터:', currentFormData);
+                
+                // 저장된 데이터와 비교
+                if (this.selectedPropertyIndex !== undefined) {
+                    const savedData = this.getSavedPropertyData(this.selectedPropertyIndex);
+                    console.log('저장된 데이터:', savedData);
+                    
+                    // 간단한 변경 감지 (주요 필드들만 확인)
+                    const hasChanges = this.compareFormData(currentFormData, savedData);
+                    console.log('데이터 변경 여부:', hasChanges);
+                    
+                    return hasChanges;
+                }
+            }
+            
+            return false;
+            
+        } catch (error) {
+            console.error('폼 데이터 변경 확인 중 오류:', error);
+            return false;
+        }
+    }
+    
+    // 저장된 매물 데이터 가져오기
+    getSavedPropertyData(propertyIndex) {
+        try {
+            if (window.storageManager) {
+                const propertyKey = `property_all_${propertyIndex}`;
+                const savedData = localStorage.getItem(propertyKey);
+                
+                if (savedData) {
+                    return JSON.parse(savedData);
+                }
+            }
+            return null;
+        } catch (error) {
+            console.error('저장된 매물 데이터 가져오기 오류:', error);
+            return null;
+        }
+    }
+    
+    // 폼 데이터 비교
+    compareFormData(currentData, savedData) {
+        if (!savedData) return true; // 저장된 데이터가 없으면 변경된 것으로 간주
+        
+        // 주요 필드들만 비교 (너무 세밀한 비교는 피함)
+        const fieldsToCompare = [
+            'caseNumber', 'propertyName', 'court', 'auctionDate',
+            'bidPrice', 'appraisalValue', 'minimumBid', 'deposit',
+            'buildingYear', 'floor', 'exclusiveArea', 'supplyArea',
+            'rooms', 'bathrooms', 'parkingSpaces'
+        ];
+        
+        for (const field of fieldsToCompare) {
+            const currentValue = currentData[field] || '';
+            const savedValue = savedData.auctionInfo?.[field] || savedData.inspectionData?.[field] || '';
+            
+            if (currentValue.toString().trim() !== savedValue.toString().trim()) {
+                console.log(`필드 변경 감지: ${field}`, { current: currentValue, saved: savedValue });
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    // 현재 매물 데이터 저장
+    saveCurrentPropertyData() {
+        console.log('=== 현재 매물 데이터 저장 시작 ===');
+        
+        try {
+            if (this.selectedPropertyIndex === undefined) {
+                console.log('선택된 매물이 없음');
+                return false;
+            }
+            
+            // FormDataManager를 사용하여 현재 폼 데이터 수집
+            if (window.formDataManager) {
+                const formData = window.formDataManager.collectAllFormData();
+                console.log('수집된 폼 데이터:', formData);
+                
+                // 현재 매물에 데이터 저장
+                const saveResult = this.saveAllDataForProperty(this.selectedPropertyIndex, formData);
+                console.log('저장 결과:', saveResult);
+                
+                return saveResult;
+            }
+            
+            return false;
+            
+        } catch (error) {
+            console.error('현재 매물 데이터 저장 오류:', error);
+            return false;
+        }
     }
 
     // 특정 매물의 저장된 경매 정보 불러오기
@@ -5626,3 +5764,51 @@ console.log('- testGitHubReconnect(): GitHub 재연동 테스트');
 console.log('- testGitHubUploadComplete(): GitHub 완전 업로드 테스트 (모든 데이터 포함)');
 console.log('- testPropertyAutoLoad(index): 매물 자동 불러오기 테스트');
 console.log('- testExcelExport(): Excel 내보내기 테스트');
+console.log('- testAutoSaveOnPropertySwitch(): 매물 간 이동 시 자동 저장 테스트');
+
+// 매물 간 이동 시 자동 저장 테스트
+window.testAutoSaveOnPropertySwitch = function() {
+    console.log('=== 매물 간 이동 시 자동 저장 테스트 시작 ===');
+    
+    if (!window.auctionSimulator) {
+        console.error('❌ AuctionSimulator가 없습니다');
+        return;
+    }
+    
+    const properties = window.auctionSimulator.getProperties();
+    if (properties.length < 2) {
+        console.error('❌ 테스트를 위해 최소 2개의 매물이 필요합니다');
+        console.log('현재 매물 개수:', properties.length);
+        return;
+    }
+    
+    console.log('1. 첫 번째 매물 선택');
+    window.auctionSimulator.selectProperty(0);
+    
+    // 폼에 데이터 입력
+    setTimeout(() => {
+        console.log('2. 폼에 테스트 데이터 입력');
+        const testData = {
+            caseNumber: '테스트사건번호123',
+            propertyName: '테스트매물명',
+            court: '테스트법원',
+            bidPrice: '500000000'
+        };
+        
+        // 폼 데이터 입력
+        Object.keys(testData).forEach(key => {
+            const field = document.getElementById(key);
+            if (field) {
+                field.value = testData[key];
+                console.log(`${key} 필드에 "${testData[key]}" 입력`);
+            }
+        });
+        
+        // 다른 매물로 이동 시도
+        setTimeout(() => {
+            console.log('3. 다른 매물로 이동 시도 (저장 확인 대화상자 예상)');
+            window.auctionSimulator.selectProperty(1);
+        }, 1000);
+        
+    }, 1000);
+};
