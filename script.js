@@ -4617,11 +4617,76 @@ class AuctionSimulator {
         if (strategyAdviceEl) {
             strategyAdviceEl.innerHTML = strategyAdvice;
         }
-        
+
+        // 사용자 입력 입찰가격 낙찰확률 계산 및 표시
+        this.displayUserBidAnalysis(bidPrice, marketPrice, appraisalPrice, competitorCount, marketCondition, urgency, failedCount, salePriceRate);
+
         // 매각통계 데이터 표시
         this.displayStatisticsData(propertyLocation);
     }
-    
+
+    // 사용자 입력 입찰가격 분석 표시
+    displayUserBidAnalysis(bidPrice, marketPrice, appraisalPrice, competitorCount, marketCondition, urgency, failedCount, salePriceRate) {
+        console.log('=== 사용자 입력 입찰가격 분석 시작 ===');
+        console.log('입력값:', { bidPrice, marketPrice, appraisalPrice, competitorCount, marketCondition, urgency, failedCount, salePriceRate });
+
+        try {
+            // 사용자 입력 입찰가격 낙찰확률 계산
+            const priceRatio = bidPrice / marketPrice;
+            const userBidProbability = this.calculateAdvancedWinProbability(
+                priceRatio,
+                competitorCount,
+                marketCondition,
+                urgency,
+                failedCount,
+                salePriceRate
+            );
+
+            // 시세 대비 및 감정가 대비 비율 계산
+            const marketRatio = ((bidPrice / marketPrice) * 100).toFixed(1);
+            const appraisalRatio = ((bidPrice / appraisalPrice) * 100).toFixed(1);
+
+            console.log('계산 결과:', {
+                userBidProbability: Math.round(userBidProbability * 100) + '%',
+                marketRatio: marketRatio + '%',
+                appraisalRatio: appraisalRatio + '%'
+            });
+
+            // UI 업데이트
+            const userBidPriceEl = document.getElementById('userBidPrice');
+            const userBidProbabilityEl = document.getElementById('userBidProbability');
+            const userBidMarketRatioEl = document.getElementById('userBidMarketRatio');
+            const userBidAppraisalRatioEl = document.getElementById('userBidAppraisalRatio');
+
+            if (userBidPriceEl) {
+                userBidPriceEl.textContent = this.formatNumber(Math.round(bidPrice)) + '원';
+            }
+
+            if (userBidProbabilityEl) {
+                userBidProbabilityEl.textContent = Math.round(userBidProbability * 100) + '%';
+            }
+
+            if (userBidMarketRatioEl) {
+                userBidMarketRatioEl.textContent = marketRatio + '%';
+            }
+
+            if (userBidAppraisalRatioEl) {
+                userBidAppraisalRatioEl.textContent = appraisalRatio + '%';
+            }
+
+            // 사용자 입력 입찰가격 분석 섹션 표시
+            const userBidProbabilitySection = document.querySelector('.user-bid-probability');
+            if (userBidProbabilitySection) {
+                userBidProbabilitySection.style.display = 'block';
+            }
+
+            console.log('=== 사용자 입력 입찰가격 분석 완료 ===');
+
+        } catch (error) {
+            console.error('사용자 입력 입찰가격 분석 중 오류:', error);
+        }
+    }
+
     async displayStatisticsData(location) {
         try {
             // 위치에서 지역과 구/군 추출

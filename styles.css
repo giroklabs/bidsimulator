@@ -1477,6 +1477,69 @@ header p {
     max-height: 400px;
 }
 
+/* 사용자 입력 입찰가격 분석 스타일 */
+.user-bid-probability {
+    margin-bottom: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 25px;
+    border-radius: 15px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.user-bid-probability h4 {
+    color: white;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.user-bid-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.bid-probability-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+.bid-probability-item .bid-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.bid-probability-item .bid-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    .user-bid-info {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .bid-probability-item {
+        padding: 12px;
+    }
+
+    .bid-probability-item .bid-value {
+        font-size: 1.1rem;
+    }
+}
+
 .strategy-section {
     width: 100%;
     max-width: none;

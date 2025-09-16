@@ -554,6 +554,29 @@
                             <canvas id="probabilityChart"></canvas>
                         </div>
 
+                        <!-- 사용자 입력 입찰가격 낙찰확률 표시 -->
+                        <div class="user-bid-probability" style="display: none;">
+                            <h4>🎯 내 입찰가격 분석</h4>
+                            <div class="user-bid-info">
+                                <div class="bid-probability-item">
+                                    <span class="bid-label">입력 입찰가격:</span>
+                                    <span class="bid-value" id="userBidPrice">0원</span>
+                                </div>
+                                <div class="bid-probability-item">
+                                    <span class="bid-label">예상 낙찰확률:</span>
+                                    <span class="bid-value" id="userBidProbability">0%</span>
+                                </div>
+                                <div class="bid-probability-item">
+                                    <span class="bid-label">시세 대비:</span>
+                                    <span class="bid-value" id="userBidMarketRatio">0%</span>
+                                </div>
+                                <div class="bid-probability-item">
+                                    <span class="bid-label">감정가 대비:</span>
+                                    <span class="bid-value" id="userBidAppraisalRatio">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
                 <div class="detailed-results" style="display: none;">
                     <h3>상세 비용 분석</h3>
                     
