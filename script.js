@@ -4395,6 +4395,30 @@ class AuctionSimulator {
         console.log('업데이트할 데이터:', data);
         
         try {
+            // 권장입찰가격 표시
+            const bidPriceElement = document.getElementById('recommendedBidPrice');
+            console.log('bidPriceElement:', bidPriceElement);
+            if (bidPriceElement) {
+                const formattedPrice = this.formatNumber(data.recommendedBidPrice) + '원';
+                bidPriceElement.textContent = formattedPrice;
+                console.log('권장입찰가격 업데이트:', formattedPrice);
+            } else {
+                console.error('recommendedBidPrice 요소를 찾을 수 없습니다');
+            }
+            
+            // 낙찰확률 표시
+            const probabilityElement = document.getElementById('recommendedBidProbability');
+            console.log('probabilityElement:', probabilityElement);
+            if (probabilityElement) {
+                // 확률이 0~1 범위면 퍼센트로 변환, 이미 퍼센트면 그대로 사용
+                const probabilityValue = (data.winProbability <= 1) ? Math.round(data.winProbability * 100) : Math.round(data.winProbability);
+                const probabilityText = `낙찰확률: ${probabilityValue}%`;
+                probabilityElement.textContent = probabilityText;
+                console.log('낙찰확률 업데이트:', probabilityText);
+            } else {
+                console.error('recommendedBidProbability 요소를 찾을 수 없습니다');
+            }
+            
             // 계산 근거 업데이트
             const marketPriceElement = document.getElementById('marketPriceBasis');
             console.log('marketPriceElement:', marketPriceElement);
@@ -4416,16 +4440,6 @@ class AuctionSimulator {
                 console.error('saleRateBasis 요소를 찾을 수 없습니다');
             }
             
-            const expectedBidElement = document.getElementById('expectedWinningBid');
-            console.log('expectedBidElement:', expectedBidElement);
-            if (expectedBidElement) {
-                const expectedBidText = this.formatNumber(data.expectedWinningBid) + '원';
-                expectedBidElement.textContent = expectedBidText;
-                console.log('예상낙찰가 업데이트:', expectedBidText);
-            } else {
-                console.error('expectedWinningBid 요소를 찾을 수 없습니다');
-            }
-            
             const calculatedBidElement = document.getElementById('calculatedBidPrice');
             console.log('calculatedBidElement:', calculatedBidElement);
             if (calculatedBidElement) {
@@ -4434,28 +4448,6 @@ class AuctionSimulator {
                 console.log('권장입찰가 업데이트:', calculatedBidText);
             } else {
                 console.error('calculatedBidPrice 요소를 찾을 수 없습니다');
-            }
-            
-            // 그래프 데이터 정보 업데이트
-            const chartDataElement = document.getElementById('chartDataInfo');
-            console.log('chartDataElement:', chartDataElement);
-            if (chartDataElement && data.chartData) {
-                const chartDataText = `${data.chartData.bidPrices.length}개 구간`;
-                chartDataElement.textContent = chartDataText;
-                console.log('그래프 데이터 정보 업데이트:', chartDataText);
-            } else {
-                console.error('chartDataInfo 요소를 찾을 수 없습니다');
-            }
-            
-            // 목표 범위 정보 업데이트
-            const targetRangeElement = document.getElementById('targetRangeInfo');
-            console.log('targetRangeElement:', targetRangeElement);
-            if (targetRangeElement) {
-                const targetRangeText = data.inTargetRange ? '50-60% (달성)' : '50-60% (근접)';
-                targetRangeElement.textContent = targetRangeText;
-                console.log('목표 범위 정보 업데이트:', targetRangeText);
-            } else {
-                console.error('targetRangeInfo 요소를 찾을 수 없습니다');
             }
             
             console.log('권장입찰가격 카드 업데이트 완료');

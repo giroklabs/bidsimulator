@@ -1308,6 +1308,62 @@ header p {
     gap: 20px;
 }
 
+.recommended-bid-main {
+    text-align: center;
+    padding: 20px;
+    background: var(--mac-bg-tertiary);
+    border-radius: 8px;
+    border: 1px solid var(--mac-border-light);
+}
+
+.bid-price-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.bid-amount {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #007AFF;
+    text-shadow: 0 2px 4px rgba(0, 122, 255, 0.1);
+}
+
+.bid-probability {
+    font-size: 1.1rem;
+    color: var(--mac-text-secondary);
+    font-weight: 500;
+}
+
+.bid-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-indicator {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-indicator.optimal {
+    background: linear-gradient(135deg, #34C759, #30D158);
+    color: white;
+    box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
+}
+
+.status-text {
+    font-size: 0.875rem;
+    color: var(--mac-text-secondary);
+    font-weight: 500;
+}
 
 .calculation-basis {
     background: var(--mac-bg-primary);
@@ -1326,7 +1382,7 @@ header p {
 
 .basis-items {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 2fr 1fr 1fr;
     gap: 12px;
     margin-bottom: 16px;
 }
@@ -1363,26 +1419,21 @@ header p {
     text-align: center;
 }
 
-/* 특별한 항목들에 강조 색상 적용 */
-.basis-item:nth-child(3) .basis-value,
-.basis-item:nth-child(4) .basis-value {
-    color: #007AFF; /* 파란색으로 강조 */
-}
-
-.basis-item:nth-child(5) .basis-value,
-.basis-item:nth-child(6) .basis-value {
-    color: #34C759; /* 초록색으로 강조 */
-}
-
-/* 권장입찰가격은 더 강조 */
-.basis-item:nth-child(4) {
+/* 권장입찰가격은 더 강조 (첫 번째 항목) */
+.basis-item:nth-child(1) {
     border: 2px solid #007AFF;
     background: linear-gradient(135deg, var(--mac-bg-tertiary) 0%, rgba(0, 122, 255, 0.05) 100%);
 }
 
-.basis-item:nth-child(4) .basis-value {
+.basis-item:nth-child(1) .basis-value {
     font-size: 1.1rem;
     color: #007AFF;
+}
+
+/* 나머지 항목들 색상 */
+.basis-item:nth-child(2) .basis-value,
+.basis-item:nth-child(3) .basis-value {
+    color: var(--mac-text-primary);
 }
 
 .calculation-formula {

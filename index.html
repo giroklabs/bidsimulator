@@ -515,9 +515,23 @@
                         <div class="recommended-bid-card">
                             <h3>🎯 권장 입찰가격</h3>
                             <div class="recommended-bid-content">
+                                <div class="recommended-bid-main">
+                                    <div class="bid-price-display">
+                                        <span class="bid-amount" id="recommendedBidPrice">0원</span>
+                                        <span class="bid-probability" id="recommendedBidProbability">낙찰확률: 0%</span>
+                                    </div>
+                                    <div class="bid-status" id="recommendedBidStatus">
+                                        <span class="status-indicator optimal">최적</span>
+                                        <span class="status-text">낙찰확률 50-60% 수준 (그래프 기반)</span>
+                                    </div>
+                                </div>
                                 <div class="calculation-basis">
                                     <h4>📊 계산 근거</h4>
                                     <div class="basis-items">
+                                        <div class="basis-item">
+                                            <span class="basis-label">권장입찰가:</span>
+                                            <span class="basis-value" id="calculatedBidPrice">0원</span>
+                                        </div>
                                         <div class="basis-item">
                                             <span class="basis-label">시세 기준가:</span>
                                             <span class="basis-value" id="marketPriceBasis">0원</span>
@@ -525,22 +539,6 @@
                                         <div class="basis-item">
                                             <span class="basis-label">매각가율:</span>
                                             <span class="basis-value" id="saleRateBasis">0%</span>
-                                        </div>
-                                        <div class="basis-item">
-                                            <span class="basis-label">예상낙찰가:</span>
-                                            <span class="basis-value" id="expectedWinningBid">0원</span>
-                                        </div>
-                                        <div class="basis-item">
-                                            <span class="basis-label">권장입찰가:</span>
-                                            <span class="basis-value" id="calculatedBidPrice">0원</span>
-                                        </div>
-                                        <div class="basis-item">
-                                            <span class="basis-label">그래프 데이터:</span>
-                                            <span class="basis-value" id="chartDataInfo">10개 구간</span>
-                                        </div>
-                                        <div class="basis-item">
-                                            <span class="basis-label">목표 범위:</span>
-                                            <span class="basis-value" id="targetRangeInfo">50-60%</span>
                                         </div>
                                     </div>
                                     <div class="calculation-formula">
