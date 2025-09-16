@@ -4587,19 +4587,54 @@ class AuctionSimulator {
         }
         
         // 가격 분석 (사용자 입력 가격 기준으로 계산)
-        const appraisalRatio = ((bidPrice / appraisalPrice) * 100).toFixed(1);
-        const marketRatio = ((bidPrice / marketPrice) * 100).toFixed(1);
-        const minimumRatio = ((bidPrice / minimumBid) * 100).toFixed(1);
-        
+        console.log('=== 가격분석 카드 업데이트 시작 ===');
+        console.log('입력값:', { bidPrice, marketPrice, appraisalPrice, minimumBid });
+
+        // 안전한 비율 계산 (0으로 나누기 방지)
+        const appraisalRatio = appraisalPrice > 0 ? ((bidPrice / appraisalPrice) * 100).toFixed(1) : '0.0';
+        const marketRatio = marketPrice > 0 ? ((bidPrice / marketPrice) * 100).toFixed(1) : '0.0';
+        const minimumRatio = minimumBid > 0 ? ((bidPrice / minimumBid) * 100).toFixed(1) : '0.0';
+
+        console.log('계산된 비율:', { appraisalRatio, marketRatio, minimumRatio });
+
         const appraisalRatioEl = document.getElementById('appraisalRatio');
         const marketRatioEl = document.getElementById('marketRatio');
         const minimumRatioEl = document.getElementById('minimumRatio');
         const marketProfitEl = document.getElementById('marketProfit');
-        
-        if (appraisalRatioEl) appraisalRatioEl.textContent = appraisalRatio + '%';
-        if (marketRatioEl) marketRatioEl.textContent = marketRatio + '%';
-        if (minimumRatioEl) minimumRatioEl.textContent = minimumRatio + '%';
-        if (marketProfitEl) marketProfitEl.textContent = this.formatNumber(Math.round(marketProfitability.marketProfit)) + '원';
+
+        console.log('DOM 요소 찾기:', {
+            appraisalRatioEl: !!appraisalRatioEl,
+            marketRatioEl: !!marketRatioEl,
+            minimumRatioEl: !!minimumRatioEl,
+            marketProfitEl: !!marketProfitEl
+        });
+
+        if (appraisalRatioEl) {
+            appraisalRatioEl.textContent = appraisalRatio + '%';
+            console.log('감정가 대비 업데이트:', appraisalRatio + '%');
+        } else {
+            console.error('appraisalRatio 요소를 찾을 수 없습니다');
+        }
+
+        if (marketRatioEl) {
+            marketRatioEl.textContent = marketRatio + '%';
+            console.log('시세 대비 업데이트:', marketRatio + '%');
+        } else {
+            console.error('marketRatio 요소를 찾을 수 없습니다');
+        }
+
+        if (minimumRatioEl) {
+            minimumRatioEl.textContent = minimumRatio + '%';
+            console.log('최저입찰가 대비 업데이트:', minimumRatio + '%');
+        }
+
+        if (marketProfitEl) {
+            const profitText = this.formatNumber(Math.round(marketProfitability.marketProfit)) + '원';
+            marketProfitEl.textContent = profitText;
+            console.log('시세 대비 예상 수익 업데이트:', profitText);
+        }
+
+        console.log('=== 가격분석 카드 업데이트 완료 ===');
         
         // 목표 수익률과 계산된 목표가 표시
         const targetProfitRateDisplayEl = document.getElementById('targetProfitRateDisplay');
