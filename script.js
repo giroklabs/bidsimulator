@@ -2969,25 +2969,37 @@ class AuctionSimulator {
         return Math.max(0.5, Math.min(1.5, urgencyFactor));
     }
 
-    // 상세 경매비용 계산 (세금, 수수료, 등기비용 등 디테일하게)
+    // 상세 경매비용 계산 (세금, 수수료, 등기비용 등 디테일하게) - 2024년 취득세율 개정 반영
     calculateDetailedAuctionCosts(bidPrice, propertyType = '아파트', isFirstHome = true, homeCount = 1, area = 85) {
-        console.log('상세 경매비용 계산 시작:', { bidPrice, propertyType, isFirstHome, homeCount, area });
+        console.log('상세 경매비용 계산 시작 (2024년 취득세율 반영):', { bidPrice, propertyType, isFirstHome, homeCount, area });
         
         // A. 낙찰대금 잔금 (입찰보증금은 일반적으로 낙찰가의 10%)
         const deposit = bidPrice * 0.1; // 입찰보증금
         const remainingPayment = bidPrice - deposit; // 잔금
         
-        // B. 취득세 및 관련세
+        // B. 취득세 및 관련세 (2024년 개정 법규 반영)
         let acquisitionTaxRate = 0;
         if (propertyType === '아파트' || propertyType === '오피스텔' || propertyType === '빌라' || propertyType === '단독주택') {
             // 주택 취득세
             if (homeCount === 1) {
-                // 1주택자: 면적별 차등 (85㎡ 기준 3%)
-                acquisitionTaxRate = area <= 85 ? 0.03 : (area <= 102 ? 0.02 : 0.01);
+                // 1주택자: 낙찰가별 차등 적용 (면적 무관)
+                if (bidPrice <= 600000000) {
+                    acquisitionTaxRate = 0.01; // 6억 이하: 1%
+                } else if (bidPrice <= 900000000) {
+                    acquisitionTaxRate = 0.02; // 6억 초과 ~ 9억 이하: 2%
+                } else if (bidPrice <= 1200000000) {
+                    acquisitionTaxRate = 0.03; // 9억 초과 ~ 12억 이하: 3%
+                } else if (bidPrice <= 1500000000) {
+                    acquisitionTaxRate = 0.04; // 12억 초과 ~ 15억 이하: 4%
+                } else {
+                    acquisitionTaxRate = 0.05; // 15억 초과: 5%
+                }
             } else if (homeCount === 2) {
                 acquisitionTaxRate = 0.08; // 2주택자: 8%
+            } else if (homeCount >= 3 && homeCount <= 5) {
+                acquisitionTaxRate = 0.12; // 3주택 ~ 5주택: 12%
             } else {
-                acquisitionTaxRate = 0.12; // 3주택 이상: 12%
+                acquisitionTaxRate = 0.15; // 6주택 이상: 15% (2024년 개정)
             }
         } else if (propertyType === '토지') {
             acquisitionTaxRate = 0.03; // 토지: 2-4% (평균 3%)
