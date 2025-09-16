@@ -1382,45 +1382,80 @@ header p {
 
 .basis-items {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 12px;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
 }
 
 .basis-item {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
+    flex-direction: column;
+    padding: 12px 16px;
     background: var(--mac-bg-tertiary);
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid var(--mac-border-light);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.basis-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .basis-label {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: var(--mac-text-secondary);
     font-weight: 500;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .basis-value {
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--mac-text-primary);
-    font-weight: 600;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* 특별한 항목들에 강조 색상 적용 */
+.basis-item:nth-child(3) .basis-value,
+.basis-item:nth-child(4) .basis-value {
+    color: #007AFF; /* 파란색으로 강조 */
+}
+
+.basis-item:nth-child(5) .basis-value,
+.basis-item:nth-child(6) .basis-value {
+    color: #34C759; /* 초록색으로 강조 */
+}
+
+/* 권장입찰가격은 더 강조 */
+.basis-item:nth-child(4) {
+    border: 2px solid #007AFF;
+    background: linear-gradient(135deg, var(--mac-bg-tertiary) 0%, rgba(0, 122, 255, 0.05) 100%);
+}
+
+.basis-item:nth-child(4) .basis-value {
+    font-size: 1.1rem;
+    color: #007AFF;
 }
 
 .calculation-formula {
     text-align: center;
-    padding: 8px;
-    background: var(--mac-bg-secondary);
-    border-radius: 6px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, var(--mac-bg-secondary) 0%, var(--mac-bg-tertiary) 100%);
+    border-radius: 8px;
     border: 1px solid var(--mac-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .calculation-formula small {
-    color: var(--mac-text-secondary);
-    font-size: 0.75rem;
+    color: var(--mac-text-primary);
+    font-size: 0.8rem;
+    font-weight: 500;
     font-style: italic;
+    line-height: 1.4;
 }
 
 .chart-container {
