@@ -4162,13 +4162,18 @@ class AuctionSimulator {
             additionalCosts
         );
         
-        // 권장입찰가격 계산 (낙찰확률 50-60% 목표)
+        // 권장입찰가격 계산 (낙찰확률 50-60% 목표, 그래프 기반)
         const recommendedBidData = this.calculateRecommendedBidForOptimalProbability(
             marketPrice,
             salePriceRate,
             appraisalPrice,
             competitorCount,
-            marketCondition
+            marketCondition,
+            urgency,
+            failedCount,
+            minimumBid,
+            renovationCost,
+            auctionType
         );
         
         const targetPrice = bidCalculation.recommendedBidPrice;
@@ -4257,10 +4262,10 @@ class AuctionSimulator {
         }
     }
 
-    // 권장입찰가격 계산 (낙찰확률 50-60% 목표)
-    calculateRecommendedBidForOptimalProbability(marketPrice, salePriceRate, appraisalPrice, competitorCount, marketCondition) {
-        console.log('=== 권장입찰가격 계산 시작 (낙찰확률 50-60% 목표) ===');
-        console.log('입력값:', { marketPrice, salePriceRate, appraisalPrice, competitorCount, marketCondition });
+    // 권장입찰가격 계산 (그래프 기반, 낙찰확률 50-60% 목표)
+    calculateRecommendedBidForOptimalProbability(marketPrice, salePriceRate, appraisalPrice, competitorCount, marketCondition, urgency = '보통', failedCount = 0, minimumBid = 0, renovationCost = 0, auctionType = '아파트') {
+        console.log('=== 권장입찰가격 계산 시작 (그래프 기반, 낙찰확률 50-60% 목표) ===');
+        console.log('입력값:', { marketPrice, salePriceRate, appraisalPrice, competitorCount, marketCondition, urgency, failedCount, minimumBid, renovationCost, auctionType });
         
         // 1. 시세 기준가 설정
         const basePrice = marketPrice || appraisalPrice || 0;
@@ -4270,43 +4275,91 @@ class AuctionSimulator {
         const effectiveSaleRate = (salePriceRate && salePriceRate > 0) ? salePriceRate : 70;
         console.log('유효 매각가율:', effectiveSaleRate);
         
-        // 2. 예상낙찰가 계산 (매각가율 적용)
+        // 2. 그래프 데이터 생성 (입찰가격별 낙찰확률)
+        const chartData = this.generateChartData(marketPrice, appraisalPrice, minimumBid, competitorCount, marketCondition, urgency, failedCount, renovationCost, auctionType, effectiveSaleRate);
+        console.log('그래프 데이터 생성 완료:', {
+            bidPrices: chartData.bidPrices.length,
+            probabilities: chartData.probabilities.length
+        });
+        
+        // 3. 그래프에서 낙찰확률 50-60% 범위에 해당하는 입찰가격 찾기
+        const optimalBidData = this.findOptimalBidFromChart(chartData.bidPrices, chartData.probabilities, 0.50, 0.60);
+        console.log('그래프에서 찾은 최적 입찰가:', optimalBidData);
+        
+        // 4. 예상낙찰가 계산 (매각가율 적용)
         const expectedWinningBid = Math.round(basePrice * (effectiveSaleRate / 100));
         console.log('예상낙찰가:', expectedWinningBid);
         
-        // 3. 권장입찰가 계산 (낙찰확률 50-60% 목표)
-        // 일반적으로 예상낙찰가의 95% 수준에서 낙찰확률 50-60% 달성
-        let recommendedBid = Math.round(expectedWinningBid * 0.95);
-        console.log('기본 권장입찰가 (95%):', recommendedBid);
-        
-        // 4. 경쟁자 수에 따른 조정
-        if (competitorCount >= 5) {
-            recommendedBid = Math.round(recommendedBid * 1.02); // 경쟁이 치열하면 2% 상향
-        } else if (competitorCount <= 2) {
-            recommendedBid = Math.round(recommendedBid * 0.98); // 경쟁이 적으면 2% 하향
-        }
-        
-        // 5. 시장 상황에 따른 조정
-        if (marketCondition === '상승') {
-            recommendedBid = Math.round(recommendedBid * 1.03); // 상승장이면 3% 상향
-        } else if (marketCondition === '하락') {
-            recommendedBid = Math.round(recommendedBid * 0.97); // 하락장이면 3% 하향
-        }
-        
-        // 6. 낙찰확률 계산 (단순화된 모델)
-        const probability = this.calculateWinProbability(recommendedBid, expectedWinningBid, competitorCount);
-        
         const result = {
-            recommendedBidPrice: recommendedBid,
+            recommendedBidPrice: optimalBidData.bidPrice,
             expectedWinningBid: expectedWinningBid,
             marketPrice: basePrice,
             salePriceRate: effectiveSaleRate,
-            winProbability: probability,
+            winProbability: optimalBidData.probability,
             competitorCount: competitorCount,
-            marketCondition: marketCondition
+            marketCondition: marketCondition,
+            chartBased: true, // 그래프 기반 계산임을 표시
+            chartData: chartData // 그래프 데이터 포함
         };
         
-        console.log('권장입찰가격 계산 결과:', result);
+        console.log('그래프 기반 권장입찰가격 계산 결과:', result);
+        return result;
+    }
+    
+    // 그래프에서 낙찰확률 50-60% 범위에 해당하는 최적 입찰가격 찾기
+    findOptimalBidFromChart(bidPrices, probabilities, minTargetProb = 0.50, maxTargetProb = 0.60) {
+        console.log('=== 그래프에서 최적 입찰가격 찾기 ===');
+        console.log('목표 확률 범위:', `${(minTargetProb * 100).toFixed(0)}% ~ ${(maxTargetProb * 100).toFixed(0)}%`);
+        
+        let bestBid = null;
+        let bestProbability = 0;
+        let bestIndex = -1;
+        
+        // 목표 확률 범위 내에서 가장 가까운 확률 찾기
+        for (let i = 0; i < bidPrices.length; i++) {
+            const probability = probabilities[i];
+            
+            // 목표 확률 범위 내에 있는지 확인
+            if (probability >= minTargetProb && probability <= maxTargetProb) {
+                // 범위 중앙값(55%)에 가장 가까운 확률 선택
+                const targetCenter = (minTargetProb + maxTargetProb) / 2;
+                const distanceFromCenter = Math.abs(probability - targetCenter);
+                
+                if (bestBid === null || distanceFromCenter < Math.abs(bestProbability - targetCenter)) {
+                    bestBid = bidPrices[i];
+                    bestProbability = probability;
+                    bestIndex = i;
+                }
+            }
+        }
+        
+        // 목표 범위 내에 없으면 가장 가까운 확률 찾기
+        if (bestBid === null) {
+            console.log('목표 확률 범위 내에 없음. 가장 가까운 확률 찾기');
+            let closestDistance = Infinity;
+            
+            for (let i = 0; i < bidPrices.length; i++) {
+                const probability = probabilities[i];
+                const targetCenter = (minTargetProb + maxTargetProb) / 2;
+                const distance = Math.abs(probability - targetCenter);
+                
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    bestBid = bidPrices[i];
+                    bestProbability = probability;
+                    bestIndex = i;
+                }
+            }
+        }
+        
+        const result = {
+            bidPrice: Math.round(bestBid),
+            probability: Math.round(bestProbability * 100) / 100,
+            index: bestIndex,
+            inTargetRange: bestProbability >= minTargetProb && bestProbability <= maxTargetProb
+        };
+        
+        console.log('최적 입찰가격 찾기 결과:', result);
         return result;
     }
     
@@ -4405,6 +4458,28 @@ class AuctionSimulator {
                 console.error('calculatedBidPrice 요소를 찾을 수 없습니다');
             }
             
+            // 그래프 데이터 정보 업데이트
+            const chartDataElement = document.getElementById('chartDataInfo');
+            console.log('chartDataElement:', chartDataElement);
+            if (chartDataElement && data.chartData) {
+                const chartDataText = `${data.chartData.bidPrices.length}개 구간`;
+                chartDataElement.textContent = chartDataText;
+                console.log('그래프 데이터 정보 업데이트:', chartDataText);
+            } else {
+                console.error('chartDataInfo 요소를 찾을 수 없습니다');
+            }
+            
+            // 목표 범위 정보 업데이트
+            const targetRangeElement = document.getElementById('targetRangeInfo');
+            console.log('targetRangeElement:', targetRangeElement);
+            if (targetRangeElement) {
+                const targetRangeText = data.inTargetRange ? '50-60% (달성)' : '50-60% (근접)';
+                targetRangeElement.textContent = targetRangeText;
+                console.log('목표 범위 정보 업데이트:', targetRangeText);
+            } else {
+                console.error('targetRangeInfo 요소를 찾을 수 없습니다');
+            }
+            
             console.log('권장입찰가격 카드 업데이트 완료');
             
         } catch (error) {
@@ -4412,9 +4487,9 @@ class AuctionSimulator {
         }
     }
 
-    // 권장입찰가격 테스트 함수
+    // 권장입찰가격 테스트 함수 (그래프 기반)
     testRecommendedBidCalculation() {
-        console.log('=== 권장입찰가격 계산 테스트 ===');
+        console.log('=== 권장입찰가격 계산 테스트 (그래프 기반) ===');
         
         // 테스트 데이터
         const testData = {
@@ -4422,21 +4497,32 @@ class AuctionSimulator {
             salePriceRate: 75, // 75%
             appraisalPrice: 480000000, // 4.8억원
             competitorCount: 3,
-            marketCondition: '보통'
+            marketCondition: '보통',
+            urgency: '보통',
+            failedCount: 0,
+            minimumBid: 300000000, // 3억원
+            renovationCost: 10000000, // 1천만원
+            auctionType: '아파트'
         };
         
         console.log('테스트 데이터:', testData);
         
-        // 권장입찰가격 계산
+        // 권장입찰가격 계산 (그래프 기반)
         const result = this.calculateRecommendedBidForOptimalProbability(
             testData.marketPrice,
             testData.salePriceRate,
             testData.appraisalPrice,
             testData.competitorCount,
-            testData.marketCondition
+            testData.marketCondition,
+            testData.urgency,
+            testData.failedCount,
+            testData.minimumBid,
+            testData.renovationCost,
+            testData.auctionType
         );
         
         console.log('계산 결과:', result);
+        console.log('그래프 데이터:', result.chartData);
         
         // 카드 업데이트 테스트
         this.updateRecommendedBidCard(result);
