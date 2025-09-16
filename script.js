@@ -4262,9 +4262,9 @@ class AuctionSimulator {
         }
     }
 
-    // 권장입찰가격 계산 (그래프 기반, 낙찰확률 50-60% 목표)
+    // 권장입찰가격 계산 (그래프 기반, 낙찰확률 40-50% 목표)
     calculateRecommendedBidForOptimalProbability(marketPrice, salePriceRate, appraisalPrice, competitorCount, marketCondition, urgency = '보통', failedCount = 0, minimumBid = 0, renovationCost = 0, auctionType = '아파트') {
-        console.log('=== 권장입찰가격 계산 시작 (그래프 기반, 낙찰확률 50-60% 목표) ===');
+        console.log('=== 권장입찰가격 계산 시작 (그래프 기반, 낙찰확률 40-50% 목표) ===');
         console.log('입력값:', { marketPrice, salePriceRate, appraisalPrice, competitorCount, marketCondition, urgency, failedCount, minimumBid, renovationCost, auctionType });
         
         // 1. 시세 기준가 설정
@@ -4282,8 +4282,8 @@ class AuctionSimulator {
             probabilities: chartData.probabilities.length
         });
         
-        // 3. 그래프에서 낙찰확률 50-60% 범위에 해당하는 입찰가격 찾기
-        const optimalBidData = this.findOptimalBidFromChart(chartData.bidPrices, chartData.probabilities, 0.50, 0.60);
+        // 3. 그래프에서 낙찰확률 40-50% 범위에 해당하는 입찰가격 찾기
+        const optimalBidData = this.findOptimalBidFromChart(chartData.bidPrices, chartData.probabilities, 0.40, 0.50);
         console.log('그래프에서 찾은 최적 입찰가:', optimalBidData);
         
         // 4. 예상낙찰가 계산 (매각가율 적용)
@@ -4306,8 +4306,8 @@ class AuctionSimulator {
         return result;
     }
     
-    // 그래프에서 낙찰확률 50-60% 범위에 해당하는 최적 입찰가격 찾기
-    findOptimalBidFromChart(bidPrices, probabilities, minTargetProb = 0.50, maxTargetProb = 0.60) {
+    // 그래프에서 낙찰확률 40-50% 범위에 해당하는 최적 입찰가격 찾기
+    findOptimalBidFromChart(bidPrices, probabilities, minTargetProb = 0.40, maxTargetProb = 0.50) {
         console.log('=== 그래프에서 최적 입찰가격 찾기 ===');
         console.log('목표 확률 범위:', `${(minTargetProb * 100).toFixed(0)}% ~ ${(maxTargetProb * 100).toFixed(0)}%`);
         
@@ -4321,7 +4321,7 @@ class AuctionSimulator {
             
             // 목표 확률 범위 내에 있는지 확인
             if (probability >= minTargetProb && probability <= maxTargetProb) {
-                // 범위 중앙값(55%)에 가장 가까운 확률 선택
+                // 범위 중앙값(45%)에 가장 가까운 확률 선택
                 const targetCenter = (minTargetProb + maxTargetProb) / 2;
                 const distanceFromCenter = Math.abs(probability - targetCenter);
                 
@@ -4457,9 +4457,9 @@ class AuctionSimulator {
         }
     }
 
-    // 권장입찰가격 테스트 함수 (그래프 기반)
+    // 권장입찰가격 테스트 함수 (그래프 기반, 40-50% 목표)
     testRecommendedBidCalculation() {
-        console.log('=== 권장입찰가격 계산 테스트 (그래프 기반) ===');
+        console.log('=== 권장입찰가격 계산 테스트 (그래프 기반, 40-50% 목표) ===');
         
         // 테스트 데이터
         const testData = {
