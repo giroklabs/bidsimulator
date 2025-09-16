@@ -1308,62 +1308,6 @@ header p {
     gap: 20px;
 }
 
-.recommended-bid-main {
-    text-align: center;
-    padding: 20px;
-    background: var(--mac-bg-tertiary);
-    border-radius: 8px;
-    border: 1px solid var(--mac-border-light);
-}
-
-.bid-price-display {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
-
-.bid-amount {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #007AFF;
-    text-shadow: 0 2px 4px rgba(0, 122, 255, 0.1);
-}
-
-.bid-probability {
-    font-size: 1.1rem;
-    color: var(--mac-text-secondary);
-    font-weight: 500;
-}
-
-.bid-status {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-
-.status-indicator {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.status-indicator.optimal {
-    background: linear-gradient(135deg, #34C759, #30D158);
-    color: white;
-    box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
-}
-
-.status-text {
-    font-size: 0.875rem;
-    color: var(--mac-text-secondary);
-    font-weight: 500;
-}
 
 .calculation-basis {
     background: var(--mac-bg-primary);

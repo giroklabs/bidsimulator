@@ -4395,30 +4395,6 @@ class AuctionSimulator {
         console.log('업데이트할 데이터:', data);
         
         try {
-            // 권장입찰가격 표시
-            const bidPriceElement = document.getElementById('recommendedBidPrice');
-            console.log('bidPriceElement:', bidPriceElement);
-            if (bidPriceElement) {
-                const formattedPrice = this.formatNumber(data.recommendedBidPrice) + '원';
-                bidPriceElement.textContent = formattedPrice;
-                console.log('권장입찰가격 업데이트:', formattedPrice);
-            } else {
-                console.error('recommendedBidPrice 요소를 찾을 수 없습니다');
-            }
-            
-            // 낙찰확률 표시
-            const probabilityElement = document.getElementById('recommendedBidProbability');
-            console.log('probabilityElement:', probabilityElement);
-            if (probabilityElement) {
-                // 확률이 0~1 범위면 퍼센트로 변환, 이미 퍼센트면 그대로 사용
-                const probabilityValue = (data.winProbability <= 1) ? Math.round(data.winProbability * 100) : Math.round(data.winProbability);
-                const probabilityText = `낙찰확률: ${probabilityValue}%`;
-                probabilityElement.textContent = probabilityText;
-                console.log('낙찰확률 업데이트:', probabilityText);
-            } else {
-                console.error('recommendedBidProbability 요소를 찾을 수 없습니다');
-            }
-            
             // 계산 근거 업데이트
             const marketPriceElement = document.getElementById('marketPriceBasis');
             console.log('marketPriceElement:', marketPriceElement);
