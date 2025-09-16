@@ -504,17 +504,18 @@ header p {
     border: 1px solid var(--mac-border);
 }
 
-/* 동기화 버튼들 */
+/* 동기화 버튼들 - 한 줄 배치 */
 .sync-buttons {
     display: flex;
-    gap: 10px;
-    margin: 15px 0;
+    gap: 6px;
+    margin: 10px 0;
 }
 
 .sync-buttons .github-btn {
     flex: 1;
-    font-size: 0.9rem;
-    padding: 10px 15px;
+    font-size: 0.8rem;
+    padding: 8px 12px;
+    min-width: 0;
 }
 
 /* Modern Minimal 버튼들 */
@@ -597,10 +598,10 @@ header p {
     box-shadow: 0 1px 3px var(--mac-shadow);
 }
 
-/* 간소화된 엑셀 버튼들 */
+/* 간소화된 엑셀 버튼들 - 한 줄 배치 */
 .excel-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 6px;
     margin-bottom: 8px;
 }
@@ -620,6 +621,8 @@ header p {
     letter-spacing: -0.022em;
     background: var(--mac-bg-tertiary);
     color: var(--mac-text-primary);
+    flex: 1;
+    min-width: 0;
 }
 
 .excel-buttons .btn-success {
