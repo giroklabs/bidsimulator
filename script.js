@@ -4654,6 +4654,7 @@ class AuctionSimulator {
         }
 
         // 사용자 입력 입찰가격 낙찰확률 계산 및 표시
+        const salePriceRate = this.getCurrentSalePriceRate();
         this.displayUserBidAnalysis(bidPrice, marketPrice, appraisalPrice, competitorCount, marketCondition, urgency, failedCount, salePriceRate);
 
         // 매각통계 데이터 표시
