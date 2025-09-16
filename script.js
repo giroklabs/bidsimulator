@@ -4162,6 +4162,15 @@ class AuctionSimulator {
             additionalCosts
         );
         
+        // 권장입찰가격 계산 (낙찰확률 50-60% 목표)
+        const recommendedBidData = this.calculateRecommendedBidForOptimalProbability(
+            marketPrice,
+            salePriceRate,
+            appraisalPrice,
+            competitorCount,
+            marketCondition
+        );
+        
         const targetPrice = bidCalculation.recommendedBidPrice;
         
         console.log('매각가율 기반 권장 입찰가 계산:', {
@@ -4211,7 +4220,7 @@ class AuctionSimulator {
             console.log('결과 표시 시작');
             // 결과 표시 (원 단위로 표시) - 비용은 사용자가 입력한 입찰가격 기준으로 계산됨
             this.displayResults(result, costInfo, userBidPrice, competitorCount, marketCondition, urgency,
-                              marketPrice, appraisalPrice, minimumBid, marketProfitability, failedCount, renovationCost, targetProfitRate, result.saleRateBasedCalculation);
+                              marketPrice, appraisalPrice, minimumBid, marketProfitability, failedCount, renovationCost, targetProfitRate, result.saleRateBasedCalculation, recommendedBidData);
             console.log('결과 표시 완료');
             
             console.log('차트 생성 시작');
@@ -4248,9 +4257,126 @@ class AuctionSimulator {
         }
     }
 
+    // 권장입찰가격 계산 (낙찰확률 50-60% 목표)
+    calculateRecommendedBidForOptimalProbability(marketPrice, salePriceRate, appraisalPrice, competitorCount, marketCondition) {
+        console.log('=== 권장입찰가격 계산 시작 (낙찰확률 50-60% 목표) ===');
+        
+        // 1. 시세 기준가 설정
+        const basePrice = marketPrice || appraisalPrice || 0;
+        
+        // 2. 예상낙찰가 계산 (매각가율 적용)
+        const expectedWinningBid = Math.round(basePrice * (salePriceRate / 100));
+        
+        // 3. 권장입찰가 계산 (낙찰확률 50-60% 목표)
+        // 일반적으로 예상낙찰가의 95% 수준에서 낙찰확률 50-60% 달성
+        let recommendedBid = Math.round(expectedWinningBid * 0.95);
+        
+        // 4. 경쟁자 수에 따른 조정
+        if (competitorCount >= 5) {
+            recommendedBid = Math.round(recommendedBid * 1.02); // 경쟁이 치열하면 2% 상향
+        } else if (competitorCount <= 2) {
+            recommendedBid = Math.round(recommendedBid * 0.98); // 경쟁이 적으면 2% 하향
+        }
+        
+        // 5. 시장 상황에 따른 조정
+        if (marketCondition === '상승') {
+            recommendedBid = Math.round(recommendedBid * 1.03); // 상승장이면 3% 상향
+        } else if (marketCondition === '하락') {
+            recommendedBid = Math.round(recommendedBid * 0.97); // 하락장이면 3% 하향
+        }
+        
+        // 6. 낙찰확률 계산 (단순화된 모델)
+        const probability = this.calculateWinProbability(recommendedBid, expectedWinningBid, competitorCount);
+        
+        const result = {
+            recommendedBidPrice: recommendedBid,
+            expectedWinningBid: expectedWinningBid,
+            marketPrice: basePrice,
+            salePriceRate: salePriceRate,
+            winProbability: probability,
+            competitorCount: competitorCount,
+            marketCondition: marketCondition
+        };
+        
+        console.log('권장입찰가격 계산 결과:', result);
+        return result;
+    }
+    
+    // 낙찰확률 계산 (단순화된 모델)
+    calculateWinProbability(bidPrice, expectedWinningBid, competitorCount) {
+        // 예상낙찰가 대비 입찰가 비율
+        const priceRatio = bidPrice / expectedWinningBid;
+        
+        // 기본 확률 계산 (가격 비율 기반)
+        let baseProbability = 0;
+        if (priceRatio >= 1.0) {
+            baseProbability = 90; // 예상낙찰가 이상이면 90%
+        } else if (priceRatio >= 0.98) {
+            baseProbability = 75; // 98% 이상이면 75%
+        } else if (priceRatio >= 0.95) {
+            baseProbability = 55; // 95% 이상이면 55%
+        } else if (priceRatio >= 0.90) {
+            baseProbability = 35; // 90% 이상이면 35%
+        } else {
+            baseProbability = 15; // 90% 미만이면 15%
+        }
+        
+        // 경쟁자 수에 따른 조정
+        const competitorAdjustment = Math.max(0, 10 - competitorCount);
+        const finalProbability = Math.min(95, Math.max(5, baseProbability - competitorAdjustment));
+        
+        return Math.round(finalProbability);
+    }
+    
+    // 권장입찰가격 카드 업데이트
+    updateRecommendedBidCard(data) {
+        console.log('=== 권장입찰가격 카드 업데이트 ===');
+        console.log('업데이트할 데이터:', data);
+        
+        try {
+            // 권장입찰가격 표시
+            const bidPriceElement = document.getElementById('recommendedBidPrice');
+            if (bidPriceElement) {
+                bidPriceElement.textContent = this.formatNumber(data.recommendedBidPrice) + '원';
+            }
+            
+            // 낙찰확률 표시
+            const probabilityElement = document.getElementById('recommendedBidProbability');
+            if (probabilityElement) {
+                probabilityElement.textContent = `낙찰확률: ${data.winProbability}%`;
+            }
+            
+            // 계산 근거 업데이트
+            const marketPriceElement = document.getElementById('marketPriceBasis');
+            if (marketPriceElement) {
+                marketPriceElement.textContent = this.formatNumber(data.marketPrice) + '원';
+            }
+            
+            const saleRateElement = document.getElementById('saleRateBasis');
+            if (saleRateElement) {
+                saleRateElement.textContent = data.salePriceRate + '%';
+            }
+            
+            const expectedBidElement = document.getElementById('expectedWinningBid');
+            if (expectedBidElement) {
+                expectedBidElement.textContent = this.formatNumber(data.expectedWinningBid) + '원';
+            }
+            
+            const calculatedBidElement = document.getElementById('calculatedBidPrice');
+            if (calculatedBidElement) {
+                calculatedBidElement.textContent = this.formatNumber(data.recommendedBidPrice) + '원';
+            }
+            
+            console.log('권장입찰가격 카드 업데이트 완료');
+            
+        } catch (error) {
+            console.error('권장입찰가격 카드 업데이트 오류:', error);
+        }
+    }
+
     // 결과 표시
     displayResults(result, costInfo, bidPrice, competitorCount, marketCondition, urgency,
-                  marketPrice, appraisalPrice, minimumBid, marketProfitability, failedCount, renovationCost, targetProfitRate, bidCalculation = null) {
+                  marketPrice, appraisalPrice, minimumBid, marketProfitability, failedCount, renovationCost, targetProfitRate, bidCalculation = null, recommendedBidData = null) {
         // 초기 메시지 숨기기
         const initialMessage = document.getElementById('initialMessage');
         if (initialMessage) {
@@ -4268,6 +4394,11 @@ class AuctionSimulator {
                 section.style.display = 'block';
             }
         });
+        
+        // 권장입찰가격 카드 업데이트
+        if (recommendedBidData) {
+            this.updateRecommendedBidCard(recommendedBidData);
+        }
         
         // 통합된 권장 입찰가 표시 제거 - 그래프만 표시
         

@@ -511,7 +511,48 @@
                     <div class="simulation-results-section" style="display: none;">
                         <h2>시뮬레이션 결과</h2>
                         
-                        <!-- 입찰가격별 낙찰 확률 그래프 (최상단으로 이동) -->
+                        <!-- 권장 입찰가격 카드 -->
+                        <div class="recommended-bid-card">
+                            <h3>🎯 권장 입찰가격</h3>
+                            <div class="recommended-bid-content">
+                                <div class="recommended-bid-main">
+                                    <div class="bid-price-display">
+                                        <span class="bid-amount" id="recommendedBidPrice">0원</span>
+                                        <span class="bid-probability" id="recommendedBidProbability">낙찰확률: 0%</span>
+                                    </div>
+                                    <div class="bid-status" id="recommendedBidStatus">
+                                        <span class="status-indicator optimal">최적</span>
+                                        <span class="status-text">낙찰확률 50-60% 수준</span>
+                                    </div>
+                                </div>
+                                <div class="calculation-basis">
+                                    <h4>📊 계산 근거</h4>
+                                    <div class="basis-items">
+                                        <div class="basis-item">
+                                            <span class="basis-label">시세 기준가:</span>
+                                            <span class="basis-value" id="marketPriceBasis">0원</span>
+                                        </div>
+                                        <div class="basis-item">
+                                            <span class="basis-label">매각가율:</span>
+                                            <span class="basis-value" id="saleRateBasis">0%</span>
+                                        </div>
+                                        <div class="basis-item">
+                                            <span class="basis-label">예상낙찰가:</span>
+                                            <span class="basis-value" id="expectedWinningBid">0원</span>
+                                        </div>
+                                        <div class="basis-item">
+                                            <span class="basis-label">권장입찰가:</span>
+                                            <span class="basis-value" id="calculatedBidPrice">0원</span>
+                                        </div>
+                                    </div>
+                                    <div class="calculation-formula">
+                                        <small>권장입찰가 = 예상낙찰가 × 0.95 (낙찰확률 50-60% 목표)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 입찰가격별 낙찰 확률 그래프 -->
                         <div class="chart-container">
                             <h3>입찰가격별 낙찰 확률</h3>
                             <canvas id="probabilityChart"></canvas>
