@@ -52,17 +52,14 @@
                     </div>
                     <div class="layer-content">
                         <div id="github-status" class="status-indicator">클라우드 미연동</div>
-
                         <button id="github-connect-btn" class="github-btn primary">
                             <span class="btn-icon">🔑</span>
                             GitHub 연동
                         </button>
-
                         <button id="github-disconnect-btn" class="github-btn danger" style="display: none;">
                             <span class="btn-icon">❌</span>
                             연결 해제
                         </button>
-
                         <div id="github-sync-buttons" class="sync-buttons" style="display: none;">
                             <button id="github-sync-to-btn" class="github-btn success">
                                 <span class="btn-icon">⬆️</span>
@@ -73,10 +70,24 @@
                                 다운로드
                             </button>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- GitHub 연동 안내 -->
-                        <div id="github-notice" class="github-notice">
-                            <small>🔑 Personal Access Token으로 안전하게 연동됩니다</small>
+                <!-- 엑셀 데이터 관리 레이어 -->
+                <div class="sidebar-layer excel-layer">
+                    <div class="layer-header">
+                        <h4>📊 데이터 관리</h4>
+                    </div>
+                    <div class="layer-content">
+                        <div class="excel-buttons">
+                            <button class="btn btn-success" id="excelExportBtn">
+                                <span class="btn-icon">📊</span>
+                                내보내기
+                            </button>
+                            <button class="btn btn-info" id="excelImportBtn">
+                                <span class="btn-icon">📥</span>
+                                불러오기
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -93,28 +104,6 @@
                                 <p>저장된 매물이 없습니다</p>
                                 <p>+ 버튼을 클릭하여 매물을 추가하세요</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 엑셀 데이터 관리 레이어 -->
-                <div class="sidebar-layer excel-layer">
-                    <div class="layer-header">
-                        <h4>📊 데이터 관리</h4>
-                    </div>
-                    <div class="layer-content">
-                        <div class="excel-buttons">
-                            <button class="btn btn-success" id="excelExportBtn">
-                                <span class="btn-icon">📊</span>
-                                엑셀 내보내기
-                            </button>
-                            <button class="btn btn-info" id="excelImportBtn">
-                                <span class="btn-icon">📥</span>
-                                엑셀 불러오기
-                            </button>
-                        </div>
-                        <div class="excel-notice">
-                            <small>📋 모든 경매정보, 물건조사, 시뮬레이션 결과 포함</small>
                         </div>
                     </div>
                 </div>

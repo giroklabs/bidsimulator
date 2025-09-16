@@ -216,25 +216,25 @@ header p {
     font-weight: 500;
 }
 
-/* GitHub 버튼 - 심플 모던 디자인 */
+/* GitHub 버튼 - 간소화된 디자인 */
 .github-btn {
     border: 1px solid #e1e5e9;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
     width: 100%;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-family: 'Noto Sans KR', sans-serif;
     background: white;
     color: #24292f;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    min-height: 44px;
+    gap: 6px;
+    min-height: 36px;
 }
 
 .github-btn:hover {
@@ -325,9 +325,9 @@ header p {
     box-shadow: 0 8px 24px var(--mac-shadow-hover), 0 1px 0 var(--mac-border-light);
 }
 
-/* 사이드바 레이어 스타일 - 다양한 카드 디자인 */
+/* 사이드바 레이어 스타일 - 간소화된 카드 디자인 */
 .sidebar-layer {
-    margin-bottom: 25px;
+    margin-bottom: 15px;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
@@ -358,7 +358,7 @@ header p {
 }
 
 .layer-header {
-    padding: 18px 20px;
+    padding: 12px 16px;
     color: white;
     position: relative;
     overflow: hidden;
@@ -396,7 +396,7 @@ header p {
 }
 
 .layer-content {
-    padding: 25px;
+    padding: 15px;
     position: relative;
 }
 
@@ -412,7 +412,7 @@ header p {
 .cloud-layer .layer-header {
     background: var(--mac-bg-tertiary);
     border-bottom: 1px solid var(--mac-border);
-    padding: 16px 20px;
+    padding: 10px 14px;
 }
 
 .cloud-layer .layer-header h4 {
@@ -425,7 +425,7 @@ header p {
 
 .cloud-layer .layer-content {
     background: var(--mac-bg-secondary);
-    padding: 20px;
+    padding: 12px;
 }
 
 /* Modern Minimal 매물 관리 카드 */
@@ -468,7 +468,7 @@ header p {
 .excel-layer .layer-header {
     background: var(--mac-bg-tertiary);
     border-bottom: 1px solid var(--mac-border);
-    padding: 16px 20px;
+    padding: 10px 14px;
 }
 
 .excel-layer .layer-header h4 {
@@ -481,17 +481,17 @@ header p {
 
 .excel-layer .layer-content {
     background: var(--mac-bg-secondary);
-    padding: 20px;
+    padding: 12px;
 }
 
-/* Modern Minimal 상태 표시기 */
+/* 간소화된 상태 표시기 */
 .status-indicator {
     text-align: center;
-    padding: 8px 16px;
+    padding: 6px 12px;
     border-radius: 6px;
     font-weight: 400;
     font-size: 0.875rem;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     background: var(--mac-bg-tertiary);
     color: var(--mac-text-secondary);
     border: 1px solid var(--mac-border);
@@ -597,23 +597,23 @@ header p {
     box-shadow: 0 1px 3px var(--mac-shadow);
 }
 
-/* Modern Minimal 엑셀 버튼들 */
+/* 간소화된 엑셀 버튼들 */
 .excel-buttons {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 16px;
+    gap: 6px;
+    margin-bottom: 8px;
 }
 
 .excel-buttons .btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 10px 16px;
+    gap: 6px;
+    padding: 8px 12px;
     border-radius: 6px;
     font-weight: 400;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     border: 1px solid var(--mac-border);
     cursor: pointer;
