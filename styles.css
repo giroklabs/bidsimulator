@@ -7,9 +7,9 @@
 
 :root {
     /* Modern Minimal Light Mode Colors */
-    --mac-bg-primary: #ffffff;
-    --mac-bg-secondary: #ffffff;
-    --mac-bg-tertiary: #f8f8f8;
+    --mac-bg-primary: #f8f8f8;
+    --mac-bg-secondary: #f8f8f8;
+    --mac-bg-tertiary: #f0f0f0;
     --mac-text-primary: #1a1a1a;
     --mac-text-secondary: #666666;
     --mac-text-tertiary: #999999;
