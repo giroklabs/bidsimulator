@@ -4431,36 +4431,6 @@ class AuctionSimulator {
                 console.error('recommendedBidProbability 요소를 찾을 수 없습니다');
             }
             
-            // 계산 근거 업데이트
-            const marketPriceElement = document.getElementById('marketPriceBasis');
-            console.log('marketPriceElement:', marketPriceElement);
-            if (marketPriceElement) {
-                const marketPriceText = this.formatNumber(data.marketPrice) + '원';
-                marketPriceElement.textContent = marketPriceText;
-                console.log('시세 기준가 업데이트:', marketPriceText);
-            } else {
-                console.error('marketPriceBasis 요소를 찾을 수 없습니다');
-            }
-            
-            const saleRateElement = document.getElementById('saleRateBasis');
-            console.log('saleRateElement:', saleRateElement);
-            if (saleRateElement) {
-                const saleRateText = data.salePriceRate + '%';
-                saleRateElement.textContent = saleRateText;
-                console.log('매각가율 업데이트:', saleRateText);
-            } else {
-                console.error('saleRateBasis 요소를 찾을 수 없습니다');
-            }
-            
-            const calculatedBidElement = document.getElementById('calculatedBidPrice');
-            console.log('calculatedBidElement:', calculatedBidElement);
-            if (calculatedBidElement) {
-                const calculatedBidText = this.formatNumber(data.recommendedBidPrice) + '원';
-                calculatedBidElement.textContent = calculatedBidText;
-                console.log('권장입찰가 업데이트:', calculatedBidText);
-            } else {
-                console.error('calculatedBidPrice 요소를 찾을 수 없습니다');
-            }
             
             console.log('권장입찰가격 카드 업데이트 완료');
             
