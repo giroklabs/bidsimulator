@@ -1,0 +1,731 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3FCE2B067DB9E6174A7E631F /* Pods_bidcalTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A481DC6786594134D812D87D /* Pods_bidcalTests.framework */; };
+		4A94FFCB2EB0E21C00FC670C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4A94FFCA2EB0E21C00FC670C /* GoogleService-Info.plist */; };
+		9B6057823F5132366705CF2C /* Pods_bidcalUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4E21F730F3069614299A085 /* Pods_bidcalUITests.framework */; };
+		FAAFEB0947DCCE0734D06220 /* Pods_bidcal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 972A5F294A33752FEF6A2A8C /* Pods_bidcal.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4A94FF5F2EB0D63500FC670C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4A94FF472EB0D63400FC670C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4A94FF4E2EB0D63400FC670C;
+			remoteInfo = bidcal;
+		};
+		4A94FF692EB0D63500FC670C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4A94FF472EB0D63400FC670C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4A94FF4E2EB0D63400FC670C;
+			remoteInfo = bidcal;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		21BB015993C0FFF7A907EA99 /* Pods-bidcalUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcalUITests.release.xcconfig"; path = "Target Support Files/Pods-bidcalUITests/Pods-bidcalUITests.release.xcconfig"; sourceTree = "<group>"; };
+		376988604BE3C4861E1E2B0F /* Pods-bidcal.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcal.release.xcconfig"; path = "Target Support Files/Pods-bidcal/Pods-bidcal.release.xcconfig"; sourceTree = "<group>"; };
+		410D11A59A82694329B4066E /* Pods-bidcalTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcalTests.release.xcconfig"; path = "Target Support Files/Pods-bidcalTests/Pods-bidcalTests.release.xcconfig"; sourceTree = "<group>"; };
+		4A94FF4F2EB0D63400FC670C /* bidcal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = bidcal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A94FF5E2EB0D63500FC670C /* bidcalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = bidcalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A94FF682EB0D63500FC670C /* bidcalUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = bidcalUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4A94FFCA2EB0E21C00FC670C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		972A5F294A33752FEF6A2A8C /* Pods_bidcal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_bidcal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A481DC6786594134D812D87D /* Pods_bidcalTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_bidcalTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4E21F730F3069614299A085 /* Pods_bidcalUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_bidcalUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B0DFDCD623AE6C267F02912F /* Pods-bidcalTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcalTests.debug.xcconfig"; path = "Target Support Files/Pods-bidcalTests/Pods-bidcalTests.debug.xcconfig"; sourceTree = "<group>"; };
+		D30D447B320E2FE71E494764 /* Pods-bidcal.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcal.debug.xcconfig"; path = "Target Support Files/Pods-bidcal/Pods-bidcal.debug.xcconfig"; sourceTree = "<group>"; };
+		F9172B12F320F51B6AB17506 /* Pods-bidcalUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcalUITests.debug.xcconfig"; path = "Target Support Files/Pods-bidcalUITests/Pods-bidcalUITests.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4A94FFC22EB0E01800FC670C /* Exceptions for "bidcal" folder in "bidcal" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 4A94FF4E2EB0D63400FC670C /* bidcal */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		4A94FF512EB0D63400FC670C /* bidcal */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4A94FFC22EB0E01800FC670C /* Exceptions for "bidcal" folder in "bidcal" target */,
+			);
+			path = bidcal;
+			sourceTree = "<group>";
+		};
+		4A94FF612EB0D63500FC670C /* bidcalTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = bidcalTests;
+			sourceTree = "<group>";
+		};
+		4A94FF6B2EB0D63500FC670C /* bidcalUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = bidcalUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4A94FF4C2EB0D63400FC670C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FAAFEB0947DCCE0734D06220 /* Pods_bidcal.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A94FF5B2EB0D63500FC670C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3FCE2B067DB9E6174A7E631F /* Pods_bidcalTests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A94FF652EB0D63500FC670C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B6057823F5132366705CF2C /* Pods_bidcalUITests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4A94FF462EB0D63400FC670C = {
+			isa = PBXGroup;
+			children = (
+				4A94FF512EB0D63400FC670C /* bidcal */,
+				4A94FF612EB0D63500FC670C /* bidcalTests */,
+				4A94FF6B2EB0D63500FC670C /* bidcalUITests */,
+				4A94FF502EB0D63400FC670C /* Products */,
+				5CAEDA98B4218A0826B21BE1 /* Pods */,
+				BD65A408EA8F4E83A84BB79A /* Frameworks */,
+				4A94FFCA2EB0E21C00FC670C /* GoogleService-Info.plist */,
+			);
+			sourceTree = "<group>";
+		};
+		4A94FF502EB0D63400FC670C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4A94FF4F2EB0D63400FC670C /* bidcal.app */,
+				4A94FF5E2EB0D63500FC670C /* bidcalTests.xctest */,
+				4A94FF682EB0D63500FC670C /* bidcalUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5CAEDA98B4218A0826B21BE1 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D30D447B320E2FE71E494764 /* Pods-bidcal.debug.xcconfig */,
+				376988604BE3C4861E1E2B0F /* Pods-bidcal.release.xcconfig */,
+				B0DFDCD623AE6C267F02912F /* Pods-bidcalTests.debug.xcconfig */,
+				410D11A59A82694329B4066E /* Pods-bidcalTests.release.xcconfig */,
+				F9172B12F320F51B6AB17506 /* Pods-bidcalUITests.debug.xcconfig */,
+				21BB015993C0FFF7A907EA99 /* Pods-bidcalUITests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		BD65A408EA8F4E83A84BB79A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				972A5F294A33752FEF6A2A8C /* Pods_bidcal.framework */,
+				A481DC6786594134D812D87D /* Pods_bidcalTests.framework */,
+				A4E21F730F3069614299A085 /* Pods_bidcalUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4A94FF4E2EB0D63400FC670C /* bidcal */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4A94FF722EB0D63500FC670C /* Build configuration list for PBXNativeTarget "bidcal" */;
+			buildPhases = (
+				AC6BDC93456D10EED1A09503 /* [CP] Check Pods Manifest.lock */,
+				4A94FF4B2EB0D63400FC670C /* Sources */,
+				4A94FF4C2EB0D63400FC670C /* Frameworks */,
+				4A94FF4D2EB0D63400FC670C /* Resources */,
+				C6CC3581859D174775A58494 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				4A94FF512EB0D63400FC670C /* bidcal */,
+			);
+			name = bidcal;
+			productName = bidcal;
+			productReference = 4A94FF4F2EB0D63400FC670C /* bidcal.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4A94FF5D2EB0D63500FC670C /* bidcalTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4A94FF752EB0D63500FC670C /* Build configuration list for PBXNativeTarget "bidcalTests" */;
+			buildPhases = (
+				84CA23880EEA2F3F10C01C0E /* [CP] Check Pods Manifest.lock */,
+				4A94FF5A2EB0D63500FC670C /* Sources */,
+				4A94FF5B2EB0D63500FC670C /* Frameworks */,
+				4A94FF5C2EB0D63500FC670C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4A94FF602EB0D63500FC670C /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4A94FF612EB0D63500FC670C /* bidcalTests */,
+			);
+			name = bidcalTests;
+			productName = bidcalTests;
+			productReference = 4A94FF5E2EB0D63500FC670C /* bidcalTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4A94FF672EB0D63500FC670C /* bidcalUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4A94FF782EB0D63500FC670C /* Build configuration list for PBXNativeTarget "bidcalUITests" */;
+			buildPhases = (
+				1151963001DE90D4A63E5768 /* [CP] Check Pods Manifest.lock */,
+				4A94FF642EB0D63500FC670C /* Sources */,
+				4A94FF652EB0D63500FC670C /* Frameworks */,
+				4A94FF662EB0D63500FC670C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4A94FF6A2EB0D63500FC670C /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4A94FF6B2EB0D63500FC670C /* bidcalUITests */,
+			);
+			name = bidcalUITests;
+			productName = bidcalUITests;
+			productReference = 4A94FF682EB0D63500FC670C /* bidcalUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4A94FF472EB0D63400FC670C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					4A94FF4E2EB0D63400FC670C = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					4A94FF5D2EB0D63500FC670C = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 4A94FF4E2EB0D63400FC670C;
+					};
+					4A94FF672EB0D63500FC670C = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 4A94FF4E2EB0D63400FC670C;
+					};
+				};
+			};
+			buildConfigurationList = 4A94FF4A2EB0D63400FC670C /* Build configuration list for PBXProject "bidcal" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4A94FF462EB0D63400FC670C;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4A94FF502EB0D63400FC670C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4A94FF4E2EB0D63400FC670C /* bidcal */,
+				4A94FF5D2EB0D63500FC670C /* bidcalTests */,
+				4A94FF672EB0D63500FC670C /* bidcalUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4A94FF4D2EB0D63400FC670C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4A94FFCB2EB0E21C00FC670C /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A94FF5C2EB0D63500FC670C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A94FF662EB0D63500FC670C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1151963001DE90D4A63E5768 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-bidcalUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		84CA23880EEA2F3F10C01C0E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-bidcalTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		AC6BDC93456D10EED1A09503 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-bidcal-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C6CC3581859D174775A58494 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-bidcal/Pods-bidcal-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-bidcal/Pods-bidcal-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-bidcal/Pods-bidcal-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4A94FF4B2EB0D63400FC670C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A94FF5A2EB0D63500FC670C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4A94FF642EB0D63500FC670C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4A94FF602EB0D63500FC670C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4A94FF4E2EB0D63400FC670C /* bidcal */;
+			targetProxy = 4A94FF5F2EB0D63500FC670C /* PBXContainerItemProxy */;
+		};
+		4A94FF6A2EB0D63500FC670C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4A94FF4E2EB0D63400FC670C /* bidcal */;
+			targetProxy = 4A94FF692EB0D63500FC670C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4A94FF702EB0D63500FC670C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = R5N9ZMU6G7;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PODS_CONFIGURATION_BUILD_DIR = "Pods-bidcal.debug.xcconfig";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4A94FF712EB0D63500FC670C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = R5N9ZMU6G7;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PODS_CONFIGURATION_BUILD_DIR = "Pods-bidcal.release.xcconfig";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4A94FF732EB0D63500FC670C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D30D447B320E2FE71E494764 /* Pods-bidcal.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = bidcal/bidcal.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R5N9ZMU6G7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = bidcal/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.giroklabs.bidcal;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		4A94FF742EB0D63500FC670C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 376988604BE3C4861E1E2B0F /* Pods-bidcal.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = bidcal/bidcal.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R5N9ZMU6G7;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = bidcal/Info.plist;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.giroklabs.bidcal;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		4A94FF762EB0D63500FC670C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B0DFDCD623AE6C267F02912F /* Pods-bidcalTests.debug.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R5N9ZMU6G7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.giroklabs.bidcalTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/bidcal.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/bidcal";
+			};
+			name = Debug;
+		};
+		4A94FF772EB0D63500FC670C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 410D11A59A82694329B4066E /* Pods-bidcalTests.release.xcconfig */;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R5N9ZMU6G7;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.giroklabs.bidcalTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/bidcal.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/bidcal";
+			};
+			name = Release;
+		};
+		4A94FF792EB0D63500FC670C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = F9172B12F320F51B6AB17506 /* Pods-bidcalUITests.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R5N9ZMU6G7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.giroklabs.bidcalUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = bidcal;
+			};
+			name = Debug;
+		};
+		4A94FF7A2EB0D63500FC670C /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 21BB015993C0FFF7A907EA99 /* Pods-bidcalUITests.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = R5N9ZMU6G7;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.giroklabs.bidcalUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = bidcal;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4A94FF4A2EB0D63400FC670C /* Build configuration list for PBXProject "bidcal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A94FF702EB0D63500FC670C /* Debug */,
+				4A94FF712EB0D63500FC670C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4A94FF722EB0D63500FC670C /* Build configuration list for PBXNativeTarget "bidcal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A94FF732EB0D63500FC670C /* Debug */,
+				4A94FF742EB0D63500FC670C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4A94FF752EB0D63500FC670C /* Build configuration list for PBXNativeTarget "bidcalTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A94FF762EB0D63500FC670C /* Debug */,
+				4A94FF772EB0D63500FC670C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4A94FF782EB0D63500FC670C /* Build configuration list for PBXNativeTarget "bidcalUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4A94FF792EB0D63500FC670C /* Debug */,
+				4A94FF7A2EB0D63500FC670C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4A94FF472EB0D63400FC670C /* Project object */;
+}

@@ -2630,24 +2630,48 @@ class AuctionSimulator {
 
     // 입찰긴급도 승수 (권장가격 직접 조정용)
     getUrgencyMultiplier(urgency) {
+        // 한국어 값을 영어로 매핑
+        const urgencyMapping = {
+            '높음': 'high',
+            '보통': 'medium',
+            '낮음': 'low',
+            'high': 'high',
+            'medium': 'medium',
+            'low': 'low'
+        };
+
+        const mappedUrgency = urgencyMapping[urgency] || 'medium';
+
         const multipliers = {
             high: 1.12,   // 높음: 12% 상향 (더 명확한 차이)
             medium: 1.0,  // 보통: 조정 없음
             low: 0.92     // 낮음: 8% 하향 (더 명확한 차이)
         };
-        return multipliers[urgency] || 1.0;
+
+        console.log('긴급도 매핑:', {
+            입력값: urgency,
+            매핑된값: mappedUrgency,
+            승수: multipliers[mappedUrgency]
+        });
+
+        return multipliers[mappedUrgency] || 1.0;
     }
 
-    // 유찰 횟수에 따른 가격 조정
+    // Phase 1 개선: 유찰 패턴 개선 - 3회차 피크 포인트 반영
     getFailedCountAdjustment(failedCount) {
-        const adjustments = {
-            0: 1.0,    // 첫 경매: 조정 없음
-            1: 0.95,   // 1회 유찰: 5% 하향
-            2: 0.90,   // 2회 유찰: 10% 하향
-            3: 0.85,   // 3회 유찰: 15% 하향
-            4: 0.80    // 4회 이상 유찰: 20% 하향
-        };
-        return adjustments[failedCount] || 1.0;
+        // 유찰 패턴 분석 기반 조정 (3회차 피크 반영)
+        if (failedCount === 0) return 1.02;     // 첫 경매 → 2% 상향
+        if (failedCount === 1) return 1.05;     // 1회 유찰 → 5% 상향
+        if (failedCount === 2) return 1.08;     // 2회 유찰 → 8% 상향 (피크)
+        if (failedCount === 3) return 1.06;     // 3회 유찰 → 6% 상향
+        if (failedCount === 4) return 1.04;     // 4회 유찰 → 4% 상향
+
+        // 5회 이상: 점진적 감소
+        if (failedCount >= 5) {
+            return Math.max(0.95, 1.04 * Math.pow(0.95, failedCount - 4));
+        }
+
+        return 1.0; // 기본값
     }
 
     // 감정가 대비 적정 입찰가 비율 계산
@@ -2675,46 +2699,162 @@ class AuctionSimulator {
         };
     }
 
-    // 간단하고 현실적인 낙찰 확률 계산
-    calculateWinProbability(bidPrice, propertyValue, competitorCount, marketWeight, urgencyWeight, failedCount, appraisalPrice, minimumBid, marketPrice, renovationCost) {
-        // 1. 기본 확률 (가격 대비)
+    // 긴급도 기반 낙찰 확률 계산 - 전략별 차별화 적용
+    calculateWinProbability(bidPrice, propertyValue, competitorCount, marketWeight, urgencyWeight, failedCount, appraisalPrice, minimumBid, marketPrice, renovationCost, urgency = '보통') {
+        console.log('=== 긴급도 기반 낙찰확률 계산 시작 ===');
+        console.log('긴급도:', urgency);
+
+        // 1. 긴급도별 전략적 확률 계산
         const priceRatio = bidPrice / propertyValue;
-        let baseProbability = this.calculateSimpleBaseProbability(priceRatio);
-        
-        // 2. 경쟁자 수 조정
-        const competitorFactor = this.calculateSimpleCompetitorFactor(competitorCount);
-        
-        // 3. 시장 상황 조정
-        const marketFactor = marketWeight;
-        
-        // 4. 긴급도 조정
-        const urgencyFactor = urgencyWeight;
-        
-        // 5. 유찰 횟수 조정
-        const failedFactor = this.calculateSimpleFailedFactor(failedCount);
-        
+        let baseProbability = this.calculateUrgencyBasedProbability(priceRatio, appraisalPrice, marketPrice, minimumBid, urgency);
+
+        // 2. 긴급도별 경쟁자 수 영향 조정
+        const competitorFactor = this.calculateUrgencyBasedCompetitorFactor(competitorCount, urgency);
+
+        // 3. 긴급도별 시장 상황 영향 조정
+        const marketFactor = this.calculateUrgencyBasedMarketFactor(marketWeight, competitorCount, urgency);
+
+        // 4. 긴급도별 유찰 영향 조정
+        const failedFactor = this.calculateUrgencyBasedFailedFactor(failedCount, urgency);
+
+        // 5. 긴급도에 따른 최종 확률 보정
+        let urgencyFactor = urgencyWeight;
+        const urgencyBoost = this.getUrgencyProbabilityBoost(urgency);
+
         // 6. 최저입찰가 대비 조정
         const minimumBidFactor = this.calculateMinimumBidFactor(bidPrice, minimumBid);
-        
+
         // 7. 감정가 대비 조정
         const appraisalFactor = this.calculateAppraisalFactor(bidPrice, appraisalPrice);
-        
-        // 8. 최종 확률 계산
-        const finalProbability = baseProbability * competitorFactor * marketFactor * urgencyFactor * 
-                                failedFactor * minimumBidFactor * appraisalFactor;
-        
+
+        // 8. 긴급도별 최종 확률 계산
+        let finalProbability = baseProbability * competitorFactor * marketFactor * urgencyFactor *
+                              failedFactor * minimumBidFactor * appraisalFactor;
+
+        // 긴급도별 추가 보정 적용
+        finalProbability *= urgencyBoost;
+
+        console.log('긴급도별 최종 확률:', finalProbability);
+
         return Math.max(0.01, Math.min(0.99, finalProbability));
     }
 
-    // 간단한 기본 확률 계산
-    calculateSimpleBaseProbability(priceRatio) {
-        if (priceRatio < 0.7) return 0.1;      // 70% 미만: 10%
-        if (priceRatio < 0.8) return 0.3;      // 70-80%: 30%
-        if (priceRatio < 0.9) return 0.6;      // 80-90%: 60%
-        if (priceRatio < 1.0) return 0.8;      // 90-100%: 80%
-        if (priceRatio < 1.1) return 0.9;      // 100-110%: 90%
-        if (priceRatio < 1.2) return 0.95;     // 110-120%: 95%
-        return 0.98;                           // 120% 이상: 98%
+    // 긴급도별 전략적 확률 계산
+    calculateUrgencyBasedProbability(priceRatio, appraisalPrice, marketPrice, minimumBid, urgency) {
+        console.log('긴급도별 기본 확률 계산:', urgency);
+
+        // 긴급도별로 다른 확률 곡선 적용
+        let adjustedRatio = priceRatio;
+
+        switch(urgency) {
+            case '낮음':
+            case 'low':
+                // 보수적: 더 낮은 확률 목표 (30-40%)
+                // 가격 비율을 더 엄격하게 적용
+                adjustedRatio = priceRatio * 0.9;
+                break;
+
+            case '높음':
+            case 'high':
+                // 적극적: 더 높은 확률 목표 (50-60%)
+                // 가격 비율을 더 유연하게 적용
+                adjustedRatio = priceRatio * 1.1;
+                break;
+
+            default: // 보통
+                // 균형적: 중간 확률 목표 (40-50%)
+                adjustedRatio = priceRatio;
+        }
+
+        // 감정가와 시세의 차이에 따른 추가 조정
+        if (appraisalPrice && marketPrice) {
+            const appraisalRatio = appraisalPrice / marketPrice;
+            if (appraisalRatio > 1.2) {
+                // 감정가가 높음: 보수적 조정
+                adjustedRatio *= (urgency === '높음' ? 1.05 : 0.95);
+            } else if (appraisalRatio < 0.8) {
+                // 감정가가 낮음: 적극적 조정
+                adjustedRatio *= (urgency === '낮음' ? 0.95 : 1.05);
+            }
+        }
+
+        return this.calculateBaseProbability(adjustedRatio, appraisalPrice, marketPrice, minimumBid);
+    }
+
+    // 긴급도별 경쟁자 수 영향 조정
+    calculateUrgencyBasedCompetitorFactor(competitorCount, urgency) {
+        let baseFactor = this.calculateCompetitorFactor(competitorCount);
+
+        switch(urgency) {
+            case '낮음':
+            case 'low':
+                // 보수적: 경쟁자 영향을 더 크게 반영
+                return baseFactor * 0.9;
+
+            case '높음':
+            case 'high':
+                // 적극적: 경쟁자 영향을 덜 반영
+                return baseFactor * 1.1;
+
+            default: // 보통
+                return baseFactor;
+        }
+    }
+
+    // 긴급도별 시장 상황 영향 조정
+    calculateUrgencyBasedMarketFactor(marketWeight, competitorCount, urgency) {
+        let baseFactor = this.calculateMarketFactor(marketWeight, competitorCount);
+
+        switch(urgency) {
+            case '낮음':
+            case 'low':
+                // 보수적: 시장 상황을 더 중요하게
+                return marketWeight === 'cold' ? baseFactor * 0.9 : baseFactor;
+
+            case '높음':
+            case 'high':
+                // 적극적: 시장 상황을 덜 중요하게
+                return marketWeight === 'hot' ? baseFactor * 1.05 : baseFactor;
+
+            default: // 보통
+                return baseFactor;
+        }
+    }
+
+    // 긴급도별 유찰 영향 조정
+    calculateUrgencyBasedFailedFactor(failedCount, urgency) {
+        let baseFactor = this.getFailedCountAdjustment(failedCount);
+
+        switch(urgency) {
+            case '낮음':
+            case 'low':
+                // 보수적: 유찰 영향을 더 크게
+                return Math.pow(baseFactor, 0.8);
+
+            case '높음':
+            case 'high':
+                // 적극적: 유찰 영향을 덜 크게
+                return Math.pow(baseFactor, 1.2);
+
+            default: // 보통
+                return baseFactor;
+        }
+    }
+
+    // 긴급도별 확률 보정 계수
+    getUrgencyProbabilityBoost(urgency) {
+        switch(urgency) {
+            case '낮음':
+            case 'low':
+                return 0.85;  // 보수적: 확률 15% 감소
+
+            case '높음':
+            case 'high':
+                return 1.15;  // 적극적: 확률 15% 증가
+
+            default: // 보통
+                return 1.0;   // 균형적: 변화 없음
+        }
     }
 
     // 간단한 경쟁자 수 조정
@@ -2849,68 +2989,102 @@ class AuctionSimulator {
         return 0.8; // 고정값
     }
 
-    // 기본 확률 계산 (개선된 S자 곡선 모델)
-    calculateBaseProbability(priceRatio) {
-        // 최저입찰가 근처에서의 확률을 더 현실적으로 조정
-        if (priceRatio < 0.7) {
-            return 0.15; // 70% 미만: 15% (0.05 → 0.15)
-        } else if (priceRatio < 0.8) {
-            return 0.35; // 70-80%: 35%
-        } else if (priceRatio < 0.9) {
-            return 0.60; // 80-90%: 60%
-        } else if (priceRatio < 1.0) {
-            return 0.80; // 90-100%: 80%
-        } else if (priceRatio < 1.1) {
-            return 0.90; // 100-110%: 90%
-        } else if (priceRatio < 1.2) {
-            return 0.95; // 110-120%: 95%
+    // Phase 1 개선: 동적 기본 비율 계산 (감정가/최저입찰가 연계)
+    calculateBaseProbability(priceRatio, appraisalPrice = null, marketPrice = null, minimumBid = null) {
+        // 기본 가격 비율 계산 (시세 대비)
+        let baseRatio = 0.75; // 기본 75%
+
+        if (appraisalPrice && marketPrice) {
+            const appraisalRatio = appraisalPrice / marketPrice;
+
+            // 감정가와 시세의 차이에 따른 기본 비율 조정
+            if (appraisalRatio > 1.2) {
+                // 감정가가 시세보다 20% 높음 → 보수적 입찰
+                baseRatio -= 0.1;
+            } else if (appraisalRatio < 0.8) {
+                // 감정가가 시세보다 20% 낮음 → 적극적 입찰
+                baseRatio += 0.1;
+            }
+        }
+
+        if (minimumBid && marketPrice) {
+            const minimumRatio = minimumBid / marketPrice;
+            // 최저입찰가 수준에 따른 조정
+            if (minimumRatio > 0.7) {
+                // 최저입찰가가 높음 → 더 적극적
+                baseRatio += 0.05;
+            }
+        }
+
+        // 범위 제한
+        baseRatio = Math.max(0.6, Math.min(0.9, baseRatio));
+
+        // 기존의 가격 비율 기반 확률 계산 적용
+        const adjustedPriceRatio = priceRatio * baseRatio;
+
+        if (adjustedPriceRatio < 0.7) {
+            return 0.15;
+        } else if (adjustedPriceRatio < 0.8) {
+            return 0.35;
+        } else if (adjustedPriceRatio < 0.9) {
+            return 0.60;
+        } else if (adjustedPriceRatio < 1.0) {
+            return 0.80;
+        } else if (adjustedPriceRatio < 1.1) {
+            return 0.90;
+        } else if (adjustedPriceRatio < 1.2) {
+            return 0.95;
         } else {
-            return 0.98; // 120% 이상: 98%
+            return 0.98;
         }
     }
 
-    // 경쟁자 수에 따른 확률 조정 (개선된 모델)
+    // Phase 1 개선: 경쟁자 수 조정 - 지수적 모델 적용 (상향/하향 명확 구분)
     calculateCompetitorFactor(competitorCount) {
-        if (competitorCount <= 1) {
-            return 0.95; // 경쟁자 없거나 1명이면 95%
+        // 경쟁자 수에 따른 지수적 감소 모델
+        if (competitorCount <= 2) return 0.95;      // 경쟁자 적음 → 95% (상향)
+        if (competitorCount === 3) return 0.98;     // 3명 → 98% (약간 상향)
+        if (competitorCount === 4) return 0.99;     // 4명 → 99% (중립)
+        if (competitorCount === 5) return 0.97;     // 5명 → 97% (약간 하향)
+        if (competitorCount === 6) return 0.94;     // 6명 → 94% (하향)
+        if (competitorCount === 7) return 0.91;     // 7명 → 91% (하향)
+        if (competitorCount === 8) return 0.88;     // 8명 → 88% (하향)
+
+        // 9명 이상: 지수적 감소 (더 가파르게)
+        if (competitorCount >= 9) {
+            return Math.max(0.01, 0.88 * Math.pow(0.85, competitorCount - 8));
         }
-        
-        // 경쟁자 수에 따른 기본 확률 (더 현실적으로 조정)
-        const baseProbabilities = {
-            2: 0.70,  // 2명: 70%
-            3: 0.50,  // 3명: 50%
-            4: 0.35,  // 4명: 35%
-            5: 0.25,  // 5명: 25%
-            6: 0.18,  // 6명: 18%
-            7: 0.13,  // 7명: 13%
-            8: 0.10,  // 8명: 10%
-            9: 0.08,  // 9명: 8%
-            10: 0.06  // 10명: 6%
-        };
-        
-        // 10명 이상인 경우 지수적 감소
-        if (competitorCount > 10) {
-            return Math.max(0.01, 0.06 * Math.pow(0.8, competitorCount - 10));
-        }
-        
-        return baseProbabilities[competitorCount] || 0.05;
+
+        return 0.90; // 기본값
     }
 
-    // 시장 상황별 가중치 (더 정교한 모델)
+    // Phase 1 개선: 시장 상황 연계 - 경쟁자 수와 상호작용 강화
     calculateMarketFactor(marketWeight, competitorCount) {
         // 시장 상황에 따른 기본 가중치
-        let baseFactor = marketWeight;
-        
-        // 경쟁자 수와 시장 상황의 상호작용
-        if (competitorCount >= 5) {
-            // 경쟁자가 많을 때는 시장 상황이 더 중요
-            baseFactor = Math.pow(marketWeight, 1.5);
-        } else if (competitorCount <= 2) {
-            // 경쟁자가 적을 때는 시장 상황 영향 감소
-            baseFactor = Math.pow(marketWeight, 0.7);
+        const baseAdjustments = {
+            'hot': 1.03,      // 활발한 시장 → 3% 상향
+            'normal': 1.0,    // 보통 시장 → 조정 없음
+            'cold': 0.97      // 침체 시장 → 3% 하향
+        };
+
+        let adjustment = baseAdjustments[marketWeight] || 1.0;
+
+        // 경쟁자 수와 시장 상황의 상호작용 강화
+        if (marketWeight === 'hot' && competitorCount >= 5) {
+            // 활발한 시장 + 많은 경쟁자 → 더 적극적
+            adjustment += 0.02;
+        } else if (marketWeight === 'hot' && competitorCount <= 3) {
+            // 활발한 시장 + 적은 경쟁자 → 매우 적극적
+            adjustment += 0.03;
+        } else if (marketWeight === 'cold' && competitorCount <= 3) {
+            // 침체 시장 + 적은 경쟁자 → 덜 보수적
+            adjustment += 0.02;
+        } else if (marketWeight === 'cold' && competitorCount >= 6) {
+            // 침체 시장 + 많은 경쟁자 → 매우 보수적
+            adjustment -= 0.02;
         }
-        
-        return Math.max(0.1, Math.min(2.0, baseFactor));
+
+        return Math.max(0.85, Math.min(1.15, adjustment));
     }
 
     // 입찰자 행동 패턴 모델링 (개선된 모델)
@@ -3426,7 +3600,7 @@ class AuctionSimulator {
         });
         
         // 입찰가격별 낙찰 확률 그래프를 위한 데이터 생성
-        const chartData = this.generateChartData(marketPrice, appraisalPrice, minimumBid, competitorCount, marketCondition, urgency, failedCount, renovationCost, auctionType, salePriceRate);
+        const chartData = this.generateChartData(marketPrice, appraisalPrice, minimumBid, competitorCount, marketCondition, mappedUrgency, failedCount, renovationCost, auctionType, salePriceRate);
         
         return {
             recommendedBid: recommendedBid,
@@ -3768,67 +3942,138 @@ class AuctionSimulator {
             salePriceRate = this.getCurrentSalePriceRate();
         }
         
-        // 기본 확률 (가격 비율 기반) - 50~60% 목표에 맞게 조정
+        // 긴급도에 따른 기본 확률 곡선 조정
         let baseProbability = 0.5;
-        if (priceRatio < 0.65) baseProbability = 0.15;  // 65% 미만: 15%
-        else if (priceRatio < 0.75) baseProbability = 0.35;  // 65-75%: 35%
-        else if (priceRatio < 0.83) baseProbability = 0.50;  // 75-83%: 50%
-        else if (priceRatio < 0.90) baseProbability = 0.65;  // 83-90%: 65%
-        else if (priceRatio < 0.97) baseProbability = 0.80;  // 90-97%: 80%
-        else if (priceRatio < 1.05) baseProbability = 0.90;  // 97-105%: 90%
-        else if (priceRatio < 1.15) baseProbability = 0.95;  // 105-115%: 95%
-        else baseProbability = 0.98;  // 115% 이상: 98%
+
+        if (urgency === '높음' || urgency === 'high') {
+            // 적극적: 더 높은 확률 목표 (50-60%)
+            if (priceRatio < 0.70) baseProbability = 0.20;  // 70% 미만: 20%
+            else if (priceRatio < 0.80) baseProbability = 0.40;  // 70-80%: 40%
+            else if (priceRatio < 0.88) baseProbability = 0.55;  // 80-88%: 55%
+            else if (priceRatio < 0.95) baseProbability = 0.70;  // 88-95%: 70%
+            else if (priceRatio < 1.03) baseProbability = 0.85;  // 95-103%: 85%
+            else if (priceRatio < 1.13) baseProbability = 0.95;  // 103-113%: 95%
+            else baseProbability = 0.98;  // 113% 이상: 98%
+        } else if (urgency === '낮음' || urgency === 'low') {
+            // 보수적: 더 낮은 확률 목표 (30-40%)
+            if (priceRatio < 0.60) baseProbability = 0.10;  // 60% 미만: 10%
+            else if (priceRatio < 0.70) baseProbability = 0.25;  // 60-70%: 25%
+            else if (priceRatio < 0.78) baseProbability = 0.35;  // 70-78%: 35%
+            else if (priceRatio < 0.85) baseProbability = 0.45;  // 78-85%: 45%
+            else if (priceRatio < 0.93) baseProbability = 0.60;  // 85-93%: 60%
+            else if (priceRatio < 1.03) baseProbability = 0.75;  // 93-103%: 75%
+            else if (priceRatio < 1.13) baseProbability = 0.85;  // 103-113%: 85%
+            else baseProbability = 0.90;  // 113% 이상: 90%
+        } else {
+            // 보통: 균형적 확률 목표 (40-50%)
+            if (priceRatio < 0.65) baseProbability = 0.15;  // 65% 미만: 15%
+            else if (priceRatio < 0.75) baseProbability = 0.35;  // 65-75%: 35%
+            else if (priceRatio < 0.83) baseProbability = 0.50;  // 75-83%: 50%
+            else if (priceRatio < 0.90) baseProbability = 0.65;  // 83-90%: 65%
+            else if (priceRatio < 0.97) baseProbability = 0.80;  // 90-97%: 80%
+            else if (priceRatio < 1.05) baseProbability = 0.90;  // 97-105%: 90%
+            else if (priceRatio < 1.15) baseProbability = 0.95;  // 105-115%: 95%
+            else baseProbability = 0.98;  // 115% 이상: 98%
+        }
         
-        // 경쟁자 수 조정 (완화된 조정)
+        // 긴급도별 경쟁자 수 조정
         let competitionPenalty = 1.0;
-        if (competitorCount <= 2) competitionPenalty = 1.0;
-        else if (competitorCount === 3) competitionPenalty = 0.9;
-        else if (competitorCount === 4) competitionPenalty = 0.8;
-        else if (competitorCount === 5) competitionPenalty = 0.75;
-        else if (competitorCount === 6) competitionPenalty = 0.7;
-        else if (competitorCount === 7) competitionPenalty = 0.65;
-        else if (competitorCount === 8) competitionPenalty = 0.6;
-        else competitionPenalty = 0.55; // 9명 이상
-        
+        if (urgency === '높음' || urgency === 'high') {
+            // 적극적: 경쟁자 영향을 덜 받음
+            if (competitorCount <= 2) competitionPenalty = 1.05;
+            else if (competitorCount === 3) competitionPenalty = 0.95;
+            else if (competitorCount === 4) competitionPenalty = 0.88;
+            else if (competitorCount === 5) competitionPenalty = 0.82;
+            else if (competitorCount === 6) competitionPenalty = 0.78;
+            else if (competitorCount === 7) competitionPenalty = 0.75;
+            else if (competitorCount === 8) competitionPenalty = 0.72;
+            else competitionPenalty = 0.70; // 9명 이상
+        } else if (urgency === '낮음' || urgency === 'low') {
+            // 보수적: 경쟁자 영향을 더 많이 받음
+            if (competitorCount <= 2) competitionPenalty = 0.95;
+            else if (competitorCount === 3) competitionPenalty = 0.85;
+            else if (competitorCount === 4) competitionPenalty = 0.75;
+            else if (competitorCount === 5) competitionPenalty = 0.68;
+            else if (competitorCount === 6) competitionPenalty = 0.62;
+            else if (competitorCount === 7) competitionPenalty = 0.58;
+            else if (competitorCount === 8) competitionPenalty = 0.55;
+            else competitionPenalty = 0.50; // 9명 이상
+        } else {
+            // 보통: 균형적 조정
+            if (competitorCount <= 2) competitionPenalty = 1.0;
+            else if (competitorCount === 3) competitionPenalty = 0.9;
+            else if (competitorCount === 4) competitionPenalty = 0.8;
+            else if (competitorCount === 5) competitionPenalty = 0.75;
+            else if (competitorCount === 6) competitionPenalty = 0.7;
+            else if (competitorCount === 7) competitionPenalty = 0.65;
+            else if (competitorCount === 8) competitionPenalty = 0.6;
+            else competitionPenalty = 0.55; // 9명 이상
+        }
+
         baseProbability *= competitionPenalty;
         
         // 시장 상황 조정 제거 (유찰조정만 적용)
         
-        // 유찰 횟수 조정 (연구 논문 기반: 3회차에서 최고 낙찰가)
+        // 긴급도별 유찰 횟수 조정
         let failureBonus = 1.0;
-        if (failedCount === 0) {
-            failureBonus = 0.9; // 1회차: 낙찰 확률 10% 감소
-        } else if (failedCount === 1) {
-            failureBonus = 1.1; // 2회차: 낙찰 확률 10% 증가
-        } else if (failedCount === 2) {
-            failureBonus = 1.25; // 3회차: 낙찰 확률 25% 증가 (최고점)
-        } else if (failedCount === 3) {
-            failureBonus = 1.15; // 4회차: 낙찰 확률 15% 증가
+        if (urgency === '높음' || urgency === 'high') {
+            // 적극적: 유찰 효과를 더 크게 반영
+            if (failedCount === 0) failureBonus = 0.92;
+            else if (failedCount === 1) failureBonus = 1.15;
+            else if (failedCount === 2) failureBonus = 1.35; // 적극적일 때 더 큰 효과
+            else if (failedCount === 3) failureBonus = 1.25;
+            else failureBonus = 1.10;
+        } else if (urgency === '낮음' || urgency === 'low') {
+            // 보수적: 유찰 효과를 덜 반영
+            if (failedCount === 0) failureBonus = 0.88;
+            else if (failedCount === 1) failureBonus = 1.05;
+            else if (failedCount === 2) failureBonus = 1.15; // 보수적일 때 작은 효과
+            else if (failedCount === 3) failureBonus = 1.08;
+            else failureBonus = 1.02;
         } else {
-            failureBonus = 1.05; // 5회차 이상: 낙찰 확률 5% 증가
+            // 보통: 기존 논문 기반 조정
+            if (failedCount === 0) failureBonus = 0.9;
+            else if (failedCount === 1) failureBonus = 1.1;
+            else if (failedCount === 2) failureBonus = 1.25;
+            else if (failedCount === 3) failureBonus = 1.15;
+            else failureBonus = 1.05;
         }
         baseProbability *= failureBonus;
         
-        // 매각가율 조정 (연구 논문 기반 지역별 경매 성공률 반영)
+        // 긴급도별 매각가율 조정
         let saleRateAdjustment = 1.0;
-        if (salePriceRate < 70) {
-            saleRateAdjustment = 0.75; // 지방 도시(70% 미만): 낙찰 확률 25% 감소
-        } else if (salePriceRate < 75) {
-            saleRateAdjustment = 0.85; // 지방 도시(70-75%): 낙찰 확률 15% 감소
-        } else if (salePriceRate < 80) {
-            saleRateAdjustment = 0.95; // 경기도(75-80%): 낙찰 확률 5% 감소
-        } else if (salePriceRate < 85) {
-            saleRateAdjustment = 1.05; // 서울 기타 지역(80-85%): 낙찰 확률 5% 증가
-        } else if (salePriceRate < 90) {
-            saleRateAdjustment = 1.15; // 서울 강남권(85-90%): 낙찰 확률 15% 증가
+        if (urgency === '높음' || urgency === 'high') {
+            // 적극적: 지역별 효과를 더 크게 반영
+            if (salePriceRate < 70) saleRateAdjustment = 0.80;
+            else if (salePriceRate < 75) saleRateAdjustment = 0.90;
+            else if (salePriceRate < 80) saleRateAdjustment = 1.0;
+            else if (salePriceRate < 85) saleRateAdjustment = 1.10;
+            else if (salePriceRate < 90) saleRateAdjustment = 1.20;
+            else saleRateAdjustment = 1.30;
+        } else if (urgency === '낮음' || urgency === 'low') {
+            // 보수적: 지역별 효과를 덜 반영
+            if (salePriceRate < 70) saleRateAdjustment = 0.70;
+            else if (salePriceRate < 75) saleRateAdjustment = 0.80;
+            else if (salePriceRate < 80) saleRateAdjustment = 0.90;
+            else if (salePriceRate < 85) saleRateAdjustment = 1.0;
+            else if (salePriceRate < 90) saleRateAdjustment = 1.08;
+            else saleRateAdjustment = 1.15;
         } else {
-            saleRateAdjustment = 1.25; // 초고가 지역(90% 이상): 낙찰 확률 25% 증가
+            // 보통: 기존 논문 기반 조정
+            if (salePriceRate < 70) saleRateAdjustment = 0.75;
+            else if (salePriceRate < 75) saleRateAdjustment = 0.85;
+            else if (salePriceRate < 80) saleRateAdjustment = 0.95;
+            else if (salePriceRate < 85) saleRateAdjustment = 1.05;
+            else if (salePriceRate < 90) saleRateAdjustment = 1.15;
+            else saleRateAdjustment = 1.25;
         }
         
         baseProbability *= saleRateAdjustment;
         
         // 최종 확률 제한 (0.1 ~ 0.95)
         const finalProbability = Math.max(0.1, Math.min(0.95, baseProbability));
+
+        console.log(`긴급도 ${urgency} - 최종 확률: ${(finalProbability * 100).toFixed(1)}%`);
         
         // 디버깅 로그 (개발 시에만)
         if (window.location.hostname === 'localhost' || window.location.hostname.includes('github.io')) {
@@ -4131,8 +4376,26 @@ class AuctionSimulator {
         });
     }
 
+    // 긴급도를 지정하여 시뮬레이션 실행
+    runSimulationWithUrgency(specifiedUrgency) {
+        console.log('=== 긴급도 지정 시뮬레이션 시작 ===');
+        console.log('지정된 긴급도:', specifiedUrgency);
+        console.log('시뮬레이터 객체:', this);
+
+        if (!specifiedUrgency || specifiedUrgency === '') {
+            console.error('지정된 긴급도가 유효하지 않음:', specifiedUrgency);
+            return;
+        }
+
+        // 기존 시뮬레이션 로직 실행하되 긴급도만 지정된 값 사용
+        console.log('runSimulation 호출 준비...');
+        const result = this.runSimulation(specifiedUrgency);
+        console.log('runSimulation 호출 완료, 결과:', result);
+        return result;
+    }
+
     // 시뮬레이션 실행
-    runSimulation() {
+    runSimulation(specifiedUrgency = null) {
         console.log('시뮬레이션 시작');
         
         // 입력값 가져오기 (원 단위로 입력받음)
@@ -4140,7 +4403,19 @@ class AuctionSimulator {
         const auctionType = document.getElementById('auctionType').value;
         const competitorCount = parseInt(document.getElementById('competitorCount').value);
         const marketCondition = document.getElementById('marketCondition').value;
-        const urgency = document.getElementById('urgency').value;
+
+        // 긴급도: 지정된 값이 있으면 사용, 없으면 DOM에서 가져옴
+        let urgency;
+        if (specifiedUrgency !== null && specifiedUrgency !== undefined) {
+            urgency = specifiedUrgency;
+            console.log('=== 지정된 긴급도 사용 ===');
+            console.log('urgency 값:', urgency);
+        } else {
+            urgency = document.getElementById('urgency').value;
+            console.log('=== DOM에서 읽은 긴급도 값 ===');
+            console.log('urgency 값:', urgency);
+        }
+        console.log('urgency 타입:', typeof urgency);
         const marketPrice = parseInt(document.getElementById('marketPrice').value);
         const appraisalPrice = parseInt(document.getElementById('appraisalPrice').value);
         const minimumBid = parseInt(document.getElementById('minimumBid').value);
@@ -4148,9 +4423,15 @@ class AuctionSimulator {
         const renovationCost = parseInt(document.getElementById('renovationCost').value);
 
         console.log('입력값 확인:', {
-            bidPrice, auctionType, competitorCount, marketCondition, 
+            bidPrice, auctionType, competitorCount, marketCondition,
             urgency, marketPrice, appraisalPrice, minimumBid, failedCount, renovationCost
         });
+
+        // 긴급도 값 검증
+        if (!urgency || urgency === '') {
+            console.warn('⚠️ 긴급도가 선택되지 않음 - 기본값 "보통" 사용');
+            urgency = '보통';
+        }
 
         // 매각가율 기반 권장 입찰가 계산
         const salePriceRate = this.getCurrentSalePriceRate();
@@ -4274,28 +4555,86 @@ class AuctionSimulator {
         }
     }
 
-    // 권장입찰가격 계산 (그래프 기반, 낙찰확률 40-50% 목표)
+    // 권장입찰가격 계산 (그래프 기반, 긴급도 기반 목표 확률)
     calculateRecommendedBidForOptimalProbability(marketPrice, salePriceRate, appraisalPrice, competitorCount, marketCondition, urgency = '보통', failedCount = 0, minimumBid = 0, renovationCost = 0, auctionType = '아파트') {
-        console.log('=== 권장입찰가격 계산 시작 (그래프 기반, 낙찰확률 40-50% 목표) ===');
-        console.log('입력값:', { marketPrice, salePriceRate, appraisalPrice, competitorCount, marketCondition, urgency, failedCount, minimumBid, renovationCost, auctionType });
+        console.log('=== calculateRecommendedBidForOptimalProbability 시작 ===');
+        console.log('전달받은 긴급도:', urgency);
+
+        // 긴급도에 따른 목표 확률 범위 설정
+        const urgencyTargets = {
+            low: { min: 0.30, max: 0.40, desc: '낙찰확률 30-40% (보수적)' },
+            medium: { min: 0.40, max: 0.50, desc: '낙찰확률 40-50% (균형적)' },
+            high: { min: 0.50, max: 0.60, desc: '낙찰확률 50-60% (적극적)' },
+            보통: { min: 0.40, max: 0.50, desc: '낙찰확률 40-50% (균형적)' },
+            높음: { min: 0.50, max: 0.60, desc: '낙찰확률 50-60% (적극적)' },
+            낮음: { min: 0.30, max: 0.40, desc: '낙찰확률 30-40% (보수적)' }
+        };
+
+        console.log('사용 가능한 긴급도 키들:', Object.keys(urgencyTargets));
+        console.log('입력된 긴급도:', urgency);
+        console.log('매칭되는 타겟:', urgencyTargets[urgency]);
+
+        // 긴급도 매핑 (한글 → 영어)
+        const urgencyMapping = {
+            '낮음': 'low',
+            '보통': 'medium', 
+            '높음': 'high'
+        };
         
+        const mappedUrgency = urgencyMapping[urgency] || urgency;
+        console.log('원본 긴급도:', urgency);
+        console.log('매핑된 긴급도:', mappedUrgency);
+        
+        const targetRange = urgencyTargets[mappedUrgency] || urgencyTargets.medium;
+        console.log('선택된 긴급도:', mappedUrgency);
+        console.log('긴급도 키 존재 여부:', mappedUrgency in urgencyTargets);
+        console.log('적용된 목표 범위:', targetRange);
+
+        // 긴급도 매핑 디버깅
+        if (!urgencyTargets[mappedUrgency]) {
+            console.warn('⚠️ 긴급도 매핑 실패:', urgency, '→', mappedUrgency);
+            console.log('사용 가능한 긴급도:', Object.keys(urgencyTargets));
+        }
+
+        console.log('=== 권장입찰가격 계산 시작 (그래프 기반) ===');
+        console.log('📊 긴급도 파라미터:', urgency);
+        console.log('🎯 목표 확률 범위:', targetRange);
+        console.log('📈 긴급도별 매핑 결과:', urgencyTargets[mappedUrgency]);
+        console.log('🔧 입력값:', {
+            marketPrice,
+            salePriceRate,
+            appraisalPrice,
+            competitorCount,
+            marketCondition,
+            urgency,
+            failedCount,
+            minimumBid,
+            renovationCost,
+            auctionType
+        });
+
         // 1. 시세 기준가 설정
         const basePrice = marketPrice || appraisalPrice || 0;
         console.log('시세 기준가:', basePrice);
-        
+
         // 매각가율이 0이거나 없으면 기본값 70% 사용
         const effectiveSaleRate = (salePriceRate && salePriceRate > 0) ? salePriceRate : 70;
         console.log('유효 매각가율:', effectiveSaleRate);
-        
+
         // 2. 그래프 데이터 생성 (입찰가격별 낙찰확률)
         const chartData = this.generateChartData(marketPrice, appraisalPrice, minimumBid, competitorCount, marketCondition, urgency, failedCount, renovationCost, auctionType, effectiveSaleRate);
         console.log('그래프 데이터 생성 완료:', {
             bidPrices: chartData.bidPrices.length,
             probabilities: chartData.probabilities.length
         });
+
+        // 3. 긴급도에 따른 목표 확률 범위로 최적 입찰가격 찾기
+        console.log('🎯 최적 입찰가 찾기 시작');
+        console.log('목표 확률 범위:', targetRange.min * 100 + '% ~ ' + targetRange.max * 100 + '%');
+        console.log('차트 데이터 개수:', chartData.bidPrices.length);
+        console.log('차트 확률 범위:', Math.min(...chartData.probabilities) * 100 + '% ~ ' + Math.max(...chartData.probabilities) * 100 + '%');
         
-        // 3. 그래프에서 낙찰확률 40-50% 범위에 해당하는 입찰가격 찾기
-        const optimalBidData = this.findOptimalBidFromChart(chartData.bidPrices, chartData.probabilities, 0.40, 0.50);
+        const optimalBidData = this.findOptimalBidFromChart(chartData.bidPrices, chartData.probabilities, targetRange.min, targetRange.max);
         console.log('그래프에서 찾은 최적 입찰가:', optimalBidData);
         
         // 4. 예상낙찰가 계산 (매각가율 적용)
@@ -4310,6 +4649,8 @@ class AuctionSimulator {
             winProbability: optimalBidData.probability,
             competitorCount: competitorCount,
             marketCondition: marketCondition,
+            urgency: urgency,
+            targetRange: targetRange,
             chartBased: true, // 그래프 기반 계산임을 표시
             chartData: chartData // 그래프 데이터 포함
         };
@@ -4318,10 +4659,21 @@ class AuctionSimulator {
         return result;
     }
     
-    // 그래프에서 낙찰확률 40-50% 범위에 해당하는 최적 입찰가격 찾기
+    // 그래프에서 긴급도에 따른 목표 확률 범위에 해당하는 최적 입찰가격 찾기
     findOptimalBidFromChart(bidPrices, probabilities, minTargetProb = 0.40, maxTargetProb = 0.50) {
         console.log('=== 그래프에서 최적 입찰가격 찾기 ===');
-        console.log('목표 확률 범위:', `${(minTargetProb * 100).toFixed(0)}% ~ ${(maxTargetProb * 100).toFixed(0)}%`);
+        console.log('전달받은 목표 확률 범위:', `${(minTargetProb * 100).toFixed(0)}% ~ ${(maxTargetProb * 100).toFixed(0)}%`);
+
+        // 긴급도별 목표 범위 확인
+        if (minTargetProb === 0.30 && maxTargetProb === 0.40) {
+            console.log('🎯 긴급도: 낮음 (보수적) - 목표 범위 적용됨');
+        } else if (minTargetProb === 0.40 && maxTargetProb === 0.50) {
+            console.log('🎯 긴급도: 보통 (균형적) - 목표 범위 적용됨');
+        } else if (minTargetProb === 0.50 && maxTargetProb === 0.60) {
+            console.log('🎯 긴급도: 높음 (적극적) - 목표 범위 적용됨');
+        } else {
+            console.log('⚠️ 사용자 지정 범위 사용:', `${(minTargetProb * 100).toFixed(0)}% ~ ${(maxTargetProb * 100).toFixed(0)}%`);
+        }
         
         let bestBid = null;
         let bestProbability = 0;
@@ -4429,6 +4781,22 @@ class AuctionSimulator {
                 console.log('낙찰확률 업데이트:', probabilityText);
             } else {
                 console.error('recommendedBidProbability 요소를 찾을 수 없습니다');
+            }
+
+            // 긴급도에 따른 상태 설명 업데이트
+            const statusTextElement = document.querySelector('.status-text');
+            console.log('statusTextElement:', statusTextElement);
+            console.log('권장입찰가 업데이트 시 긴급도 정보:', data.urgency);
+            console.log('권장입찰가 업데이트 시 목표 범위:', data.targetRange);
+
+            if (statusTextElement && data.targetRange) {
+                statusTextElement.textContent = data.targetRange.desc + ' (그래프 기반)';
+                console.log('상태 설명 업데이트:', data.targetRange.desc);
+            } else {
+                console.error('status-text 요소 또는 targetRange 데이터를 찾을 수 없습니다');
+                if (statusTextElement) {
+                    statusTextElement.textContent = '권장입찰가격 계산 완료 (그래프 기반)';
+                }
             }
             
             
@@ -5344,6 +5712,204 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 조정계수 검증 테스트를 전역에서 호출할 수 있도록 설정
                 window.testAdjustmentFactors = () => auctionSimulator.testAdjustmentFactors();
                 console.log('조정계수 검증 테스트 함수 등록 완료: testAdjustmentFactors()');
+
+                // 긴급도 변경 테스트 함수 추가
+                window.testUrgencyChange = (urgencyValue) => {
+                    console.log('=== 긴급도 변경 테스트 시작 ===');
+                    console.log('테스트할 긴급도 값:', urgencyValue);
+
+                    if (window.auctionSimulator) {
+                        window.auctionSimulator.runSimulationWithUrgency(urgencyValue);
+                        console.log('긴급도 변경 테스트 완료');
+                    } else {
+                        console.error('auctionSimulator가 존재하지 않음');
+                    }
+                };
+                console.log('긴급도 변경 테스트 함수 등록 완료: testUrgencyChange("높음")');
+
+                // 긴급도 디버깅 함수 추가
+                window.debugUrgency = () => {
+                    console.log('=== 긴급도 디버깅 시작 ===');
+
+                    // 1. 긴급도 요소 확인
+                    const urgencyElement = document.getElementById('urgency');
+                    console.log('긴급도 요소:', urgencyElement);
+                    console.log('긴급도 요소 존재:', !!urgencyElement);
+
+                    if (urgencyElement) {
+                        console.log('긴급도 현재 값:', urgencyElement.value);
+                        console.log('긴급도 옵션들:');
+                        for (let option of urgencyElement.options) {
+                            console.log(`  ${option.value}: ${option.text}`);
+                        }
+                    }
+
+                    // 2. 시뮬레이터 확인
+                    console.log('auctionSimulator 존재:', !!window.auctionSimulator);
+                    console.log('auctionSimulator 객체:', window.auctionSimulator);
+
+                    // 3. 이벤트 리스너 확인
+                    console.log('긴급도 변경 이벤트 리스너 등록 상태 확인 필요');
+
+                    console.log('=== 긴급도 디버깅 완료 ===');
+                };
+                console.log('긴급도 디버깅 함수 등록 완료: debugUrgency()');
+
+                // 긴급도 변경 이벤트 리스너 추가 (즉시 실행 방식)
+                console.log('긴급도 이벤트 리스너 설정 시작...');
+                
+                // 긴급도 변경 핸들러 함수 정의 (즉시 실행)
+                window.handleUrgencyChange = function(e) {
+                    console.log('🔥🔥🔥 긴급도 변경 이벤트 발생!');
+                    console.log('변경된 긴급도 값:', e.target.value);
+                    console.log('이벤트 타입:', e.type);
+                    
+                    const newUrgency = e.target.value;
+                    console.log('사용할 긴급도 값:', newUrgency);
+
+                    // 값 검증
+                    if (!newUrgency || newUrgency === '') {
+                        console.error('긴급도 값이 비어있음!');
+                        return;
+                    }
+
+                    console.log('긴급도 값 검증 통과');
+
+                    // 즉시 시뮬레이션 실행
+                    if (window.auctionSimulator) {
+                        console.log('auctionSimulator 존재 확인, 시뮬레이션 실행 시도...');
+                        try {
+                            const result = window.auctionSimulator.runSimulationWithUrgency(newUrgency);
+                            console.log('시뮬레이션 실행 결과:', result);
+                            console.log('시뮬레이션 실행 성공');
+                        } catch (error) {
+                            console.error('시뮬레이션 실행 중 오류:', error);
+                            console.error('에러 스택:', error.stack);
+                        }
+                    } else {
+                        console.error('auctionSimulator가 존재하지 않음');
+                    }
+                };
+
+                // 긴급도 핸들러가 정의되었는지 확인
+                console.log('긴급도 핸들러 정의됨:', typeof window.handleUrgencyChange);
+                
+                // 긴급도 요소에 직접 이벤트 리스너 추가 (즉시 실행)
+                const urgencyElement = document.getElementById('urgency');
+                if (urgencyElement) {
+                    console.log('✅ 긴급도 요소 즉시 찾음:', urgencyElement);
+                    console.log('현재 긴급도 값:', urgencyElement.value);
+                    
+                    // 이벤트 리스너 등록
+                    urgencyElement.addEventListener('change', window.handleUrgencyChange);
+                    console.log('✅ 긴급도 변경 이벤트 리스너 즉시 등록 완료');
+                } else {
+                    console.error('❌ 긴급도 요소를 즉시 찾을 수 없음');
+                }
+
+                // 긴급도 변경 테스트 함수
+                window.testUrgencyChange = function(urgencyValue) {
+                    console.log('=== 긴급도 변경 테스트 시작 ===');
+                    console.log('테스트할 긴급도 값:', urgencyValue);
+                    
+                    const urgencyElement = document.getElementById('urgency');
+                    if (urgencyElement) {
+                        console.log('긴급도 요소 찾음:', urgencyElement);
+                        console.log('현재 값:', urgencyElement.value);
+                        
+                        // 긴급도 값 직접 설정
+                        urgencyElement.value = urgencyValue;
+                        console.log('값 설정 후:', urgencyElement.value);
+                        
+                        // change 이벤트 수동 발생
+                        const changeEvent = new Event('change', { bubbles: true });
+                        urgencyElement.dispatchEvent(changeEvent);
+                        
+                        console.log('긴급도 변경 테스트 완료');
+                    } else {
+                        console.error('긴급도 요소를 찾을 수 없음');
+                    }
+                };
+
+                // 긴급도 요소 상태 확인 함수
+                window.checkUrgencyElement = function() {
+                    console.log('=== 긴급도 요소 상태 확인 ===');
+                    const urgencyElement = document.getElementById('urgency');
+                    if (urgencyElement) {
+                        console.log('✅ 긴급도 요소 존재');
+                        console.log('요소:', urgencyElement);
+                        console.log('현재 값:', urgencyElement.value);
+                        console.log('옵션 개수:', urgencyElement.options.length);
+                        console.log('onchange 속성:', urgencyElement.getAttribute('onchange'));
+                        
+                        // 이벤트 리스너 확인
+                        const listeners = urgencyElement.onchange;
+                        console.log('onchange 리스너:', listeners);
+                        
+                        // addEventListener로 등록된 리스너는 확인하기 어려움
+                        console.log('addEventListener 등록 여부: 확인 불가');
+                        
+                    } else {
+                        console.error('❌ 긴급도 요소 없음');
+                    }
+                };
+
+                // 긴급도 강제 변경 함수
+                window.forceUrgencyChange = function(urgencyValue) {
+                    console.log('=== 긴급도 강제 변경 ===');
+                    const urgencyElement = document.getElementById('urgency');
+                    if (urgencyElement) {
+                        console.log('변경 전 값:', urgencyElement.value);
+                        urgencyElement.value = urgencyValue;
+                        console.log('변경 후 값:', urgencyElement.value);
+                        
+                        // 직접 핸들러 호출
+                        if (window.handleUrgencyChange) {
+                            console.log('핸들러 직접 호출');
+                            const mockEvent = { target: urgencyElement, type: 'change' };
+                            window.handleUrgencyChange(mockEvent);
+                        } else {
+                            console.error('핸들러가 정의되지 않음');
+                        }
+                    } else {
+                        console.error('긴급도 요소를 찾을 수 없음');
+                    }
+                };
+
+                // 이벤트 리스너 등록 (여러 시도)
+                const trySetupUrgencyListener = () => {
+                    const urgencyElement = document.getElementById('urgency');
+                    if (urgencyElement) {
+                        console.log('✅ 긴급도 요소 찾음:', urgencyElement);
+                        console.log('현재 긴급도 값:', urgencyElement.value);
+                        
+                        // 이벤트 리스너 등록
+                        urgencyElement.addEventListener('change', window.handleUrgencyChange);
+                        console.log('✅ 긴급도 변경 이벤트 리스너 등록 완료');
+                        return true;
+                    } else {
+                        console.log('❌ 긴급도 요소를 찾을 수 없음, 재시도...');
+                        return false;
+                    }
+                };
+
+                // 즉시 시도
+                if (!trySetupUrgencyListener()) {
+                    // 500ms 후 재시도
+                    setTimeout(() => {
+                        if (!trySetupUrgencyListener()) {
+                            // 1초 후 재시도
+                            setTimeout(() => {
+                                if (!trySetupUrgencyListener()) {
+                                    // 2초 후 최종 시도
+                                    setTimeout(() => {
+                                        trySetupUrgencyListener();
+                                    }, 2000);
+                                }
+                            }, 1000);
+                        }
+                    }, 500);
+                }
     } catch (error) {
         console.error('시뮬레이터 초기화 오류:', error);
     }

@@ -1,0 +1,6 @@
+framework module Pods_bidcalTests {
+  umbrella header "Pods-bidcalTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
