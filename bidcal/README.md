@@ -105,10 +105,14 @@ pod install
 ### 3. Firebase 설정
 1. [Firebase Console](https://console.firebase.google.com/)에서 프로젝트 생성
 2. iOS 앱 추가 (Bundle ID: `com.giroklabs.bidcal`)
-3. `GoogleService-Info.plist` 다운로드 및 프로젝트에 추가
-4. Authentication 활성화 (Google Sign-In)
-5. Firestore Database 생성
-6. Storage 버킷 생성
+3. `GoogleService-Info.plist` 다운로드
+4. **중요**: 다운로드한 파일을 `bidcal/bidcal/` 디렉터리에 복사 (Git에 커밋하지 말것!)
+5. Authentication 활성화 (Google Sign-In)
+6. Firestore Database 생성
+7. Storage 버킷 생성
+8. **보안**: API 키 제한사항 설정 (애플리케이션 제한 + API 제한)
+
+⚠️ **주의**: `GoogleService-Info.plist`는 `.gitignore`에 포함되어 있으며, 절대 Git에 커밋하지 마세요!
 
 ### 4. 프로젝트 실행
 ```bash
