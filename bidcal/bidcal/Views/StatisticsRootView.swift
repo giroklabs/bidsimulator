@@ -2,7 +2,7 @@ import SwiftUI
 import Charts
 
 struct StatisticsRootView: View {
-    @StateObject private var regionDataLoader = RegionDataLoader.shared
+    @StateObject private var regionDataLoader = RegionData.shared
     @StateObject private var dataManager = DataManager.shared
     
     @State private var selectedRegion: String = "전체"
@@ -457,7 +457,7 @@ struct RegionalStatCard: View {
                 
                 Spacer()
                 
-                Text(stat.investmentRecommendation)
+                Text(stat.investmentRecommendation ?? "")
                     .font(.title2)
             }
             

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3FCE2B067DB9E6174A7E631F /* Pods_bidcalTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A481DC6786594134D812D87D /* Pods_bidcalTests.framework */; };
-		4A94FFCB2EB0E21C00FC670C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4A94FFCA2EB0E21C00FC670C /* GoogleService-Info.plist */; };
+		4A7F95472EB1042D00D84A50 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4A7F95462EB1042D00D84A50 /* GoogleService-Info.plist */; };
 		9B6057823F5132366705CF2C /* Pods_bidcalUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4E21F730F3069614299A085 /* Pods_bidcalUITests.framework */; };
 		FAAFEB0947DCCE0734D06220 /* Pods_bidcal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 972A5F294A33752FEF6A2A8C /* Pods_bidcal.framework */; };
 /* End PBXBuildFile section */
@@ -34,10 +34,10 @@
 		21BB015993C0FFF7A907EA99 /* Pods-bidcalUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcalUITests.release.xcconfig"; path = "Target Support Files/Pods-bidcalUITests/Pods-bidcalUITests.release.xcconfig"; sourceTree = "<group>"; };
 		376988604BE3C4861E1E2B0F /* Pods-bidcal.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcal.release.xcconfig"; path = "Target Support Files/Pods-bidcal/Pods-bidcal.release.xcconfig"; sourceTree = "<group>"; };
 		410D11A59A82694329B4066E /* Pods-bidcalTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcalTests.release.xcconfig"; path = "Target Support Files/Pods-bidcalTests/Pods-bidcalTests.release.xcconfig"; sourceTree = "<group>"; };
+		4A7F95462EB1042D00D84A50 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "bidcal/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4A94FF4F2EB0D63400FC670C /* bidcal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = bidcal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A94FF5E2EB0D63500FC670C /* bidcalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = bidcalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A94FF682EB0D63500FC670C /* bidcalUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = bidcalUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4A94FFCA2EB0E21C00FC670C /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		972A5F294A33752FEF6A2A8C /* Pods_bidcal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_bidcal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A481DC6786594134D812D87D /* Pods_bidcalTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_bidcalTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4E21F730F3069614299A085 /* Pods_bidcalUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_bidcalUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -50,6 +50,7 @@
 		4A94FFC22EB0E01800FC670C /* Exceptions for "bidcal" folder in "bidcal" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"GoogleService-Info.plist",
 				Info.plist,
 			);
 			target = 4A94FF4E2EB0D63400FC670C /* bidcal */;
@@ -108,13 +109,13 @@
 		4A94FF462EB0D63400FC670C = {
 			isa = PBXGroup;
 			children = (
+				4A7F95462EB1042D00D84A50 /* GoogleService-Info.plist */,
 				4A94FF512EB0D63400FC670C /* bidcal */,
 				4A94FF612EB0D63500FC670C /* bidcalTests */,
 				4A94FF6B2EB0D63500FC670C /* bidcalUITests */,
 				4A94FF502EB0D63400FC670C /* Products */,
 				5CAEDA98B4218A0826B21BE1 /* Pods */,
 				BD65A408EA8F4E83A84BB79A /* Frameworks */,
-				4A94FFCA2EB0E21C00FC670C /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -269,7 +270,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4A94FFCB2EB0E21C00FC670C /* GoogleService-Info.plist in Resources */,
+				4A7F95472EB1042D00D84A50 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,6 +554,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = bidcal/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "경매다이어리";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -588,6 +590,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = bidcal/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "경매다이어리";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

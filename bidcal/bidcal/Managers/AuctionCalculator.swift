@@ -12,7 +12,7 @@ class AuctionCalculator {
         let salePriceRate = getSalePriceRate(region: property.region, district: property.district)
         
         // 2. 예상 낙찰가 계산
-        let expectedAuctionPrice = property.marketPrice * (salePriceRate / 100.0)
+        _ = property.marketPrice * (salePriceRate / 100.0)
         
         // 3. 권장 입찰가 계산
         let recommendedBidPrice = calculateRecommendedBidPrice(
@@ -43,6 +43,7 @@ class AuctionCalculator {
         // 7. 가격 비율
         let marketRatio = (property.bidPrice / property.marketPrice) * 100.0
         let appraisalRatio = property.appraisalPrice > 0 ? (property.bidPrice / property.appraisalPrice) * 100.0 : 0
+        let minimumRatio = property.minimumBid > 0 ? (property.bidPrice / property.minimumBid) * 100.0 : 0
         
         return SimulationResult(
             recommendedBidPrice: recommendedBidPrice,
@@ -59,7 +60,8 @@ class AuctionCalculator {
             professionalFees: costs.professionalFees,
             otherCosts: costs.otherCosts,
             marketRatio: marketRatio,
-            appraisalRatio: appraisalRatio
+            appraisalRatio: appraisalRatio,
+            minimumRatio: minimumRatio
         )
     }
     
@@ -174,8 +176,8 @@ class AuctionCalculator {
     private func getSalePriceRate(region: String?, district: String?) -> Double {
         guard let region = region else { return 80.0 }
         
-        // RegionDataLoader에서 매각가율 조회
-        let rate = RegionDataLoader.shared.getSalePriceRate(region: region, district: district)
+        // RegionData에서 매각가율 조회
+        let rate = RegionData.shared.getSalePriceRate(region: region, district: district)
         return rate > 0 ? rate : 80.0
     }
 }
