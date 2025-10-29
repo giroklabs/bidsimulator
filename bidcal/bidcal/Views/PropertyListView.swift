@@ -268,6 +268,11 @@ struct PropertyCard: View {
                 PriceInfo(title: "입찰가", amount: property.bidPrice, color: AppTheme.accent)
                 PriceInfo(title: "시세", amount: property.marketPrice, color: AppTheme.secondary)
                 PriceInfo(title: "감정가", amount: property.appraisalPrice, color: AppTheme.tertiary)
+                
+                // 권장 입찰가 (시뮬레이션 결과가 있을 때만)
+                if let result = property.simulationResult {
+                    PriceInfo(title: "권장가", amount: result.recommendedBidPrice, color: .green)
+                }
             }
             
             // 경매일

@@ -10,7 +10,7 @@ struct EditPropertyView: View {
     @State private var caseNumber = ""
     @State private var propertyLocation = ""
     @State private var propertyType: PropertyType = .apartment
-    @State private var court = ""
+    @State private var selectedCourt: Court = .seoulCentral
     @State private var auctionDate = Date()
     @State private var auctionStatus: AuctionStatus = .scheduled
     
@@ -53,7 +53,15 @@ struct EditPropertyView: View {
                             }
                         }
                         
-                        TextField("관할 법원", text: $court)
+                        Picker("관할 법원", selection: $selectedCourt) {
+                            ForEach(Court.groupedCourts, id: \.region) { group in
+                                Section(header: Text(group.region)) {
+                                    ForEach(group.courts, id: \.self) { court in
+                                        Text(court.rawValue).tag(court)
+                                    }
+                                }
+                            }
+                        }
                         
                         DatePicker("경매일", selection: $auctionDate, displayedComponents: .date)
                         
@@ -138,7 +146,16 @@ struct EditPropertyView: View {
         caseNumber = property.caseNumber
         propertyLocation = property.propertyLocation
         propertyType = property.propertyType
-        court = property.court
+        
+        // 법원 문자열을 Court enum으로 매칭
+        if let matchedCourt = Court.allCases.first(where: { $0.rawValue == property.court }) {
+            selectedCourt = matchedCourt
+        } else if let matchedCourt = Court.allCases.first(where: { property.court.contains($0.rawValue) || $0.rawValue.contains(property.court) }) {
+            selectedCourt = matchedCourt
+        } else {
+            selectedCourt = .other
+        }
+        
         auctionDate = property.auctionDate
         auctionStatus = property.auctionStatus
         
@@ -174,11 +191,7 @@ struct EditPropertyView: View {
             return
         }
         
-        guard !court.isEmpty else {
-            alertMessage = "관할 법원을 입력해주세요."
-            showingAlert = true
-            return
-        }
+        // 관할 법원은 항상 선택되어 있으므로 검증 불필요
         
         // 가격 정보 변환
         let bidPriceValue = Double(bidPrice) ?? 0
@@ -198,7 +211,7 @@ struct EditPropertyView: View {
         updatedProperty.caseNumber = caseNumber
         updatedProperty.propertyLocation = propertyLocation
         updatedProperty.propertyType = propertyType
-        updatedProperty.court = court
+        updatedProperty.court = selectedCourt.rawValue
         updatedProperty.auctionDate = auctionDate
         updatedProperty.auctionStatus = auctionStatus
         updatedProperty.bidPrice = bidPriceValue

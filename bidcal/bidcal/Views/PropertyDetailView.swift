@@ -292,8 +292,9 @@ struct PropertyDetailView: View {
                 Button {
                     showingSimulationView = true
                 } label: {
-                    Image(systemName: "arrow.clockwise")
+                    Text("상세보기")
                         .font(.subheadline)
+                        .fontWeight(.semibold)
                         .foregroundColor(AppTheme.accent)
                 }
             }
@@ -370,28 +371,36 @@ struct PropertyDetailView: View {
                 
                 Spacer()
                 
-                if let score = property.inspection?.finalScore {
-                    Text("\(score)점")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(scoreColor(score))
+                Button {
+                    showingInspectionView = true
+                } label: {
+                    Text("상세보기")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(AppTheme.accent)
                 }
             }
             
             Divider()
             
+            // 점수를 내용 파트로 이동
+            if let score = property.inspection?.finalScore {
+                HStack {
+                    Text("종합 점수")
+                        .font(.subheadline)
+                        .foregroundColor(AppTheme.secondary)
+                    Spacer()
+                    Text("\(score)점")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundColor(scoreColor(score))
+                }
+                .padding(.bottom, 4)
+            }
+            
             Text("물건조사 내용이 기록되어 있습니다")
                 .font(.subheadline)
                 .foregroundColor(AppTheme.secondary)
-            
-            Button {
-                showingInspectionView = true
-            } label: {
-                Text("상세보기")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(AppTheme.accent)
-            }
         }
         .padding(AppTheme.mediumPadding)
         .cardStyle()

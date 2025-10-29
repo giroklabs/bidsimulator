@@ -104,6 +104,85 @@ enum AuctionStatus: String, Codable, CaseIterable {
     }
 }
 
+// MARK: - 관할 법원
+enum Court: String, Codable, CaseIterable {
+    // 서울
+    case seoulCentral = "서울중앙지방법원"
+    case seoulSouth = "서울남부지방법원"
+    case seoulNorth = "서울북부지방법원"
+    case seoulEast = "서울동부지방법원"
+    case seoulWest = "서울서부지방법원"
+    
+    // 인천
+    case incheon = "인천지방법원"
+    
+    // 경기
+    case suwon = "수원지방법원"
+    case uijeongbu = "의정부지방법원"
+    
+    // 강원
+    case chuncheon = "춘천지방법원"
+    case wonju = "원주지방법원"
+    
+    // 충북
+    case cheongju = "청주지방법원"
+    
+    // 충남
+    case daejeon = "대전지방법원"
+    case seosan = "서산지방법원"
+    
+    // 전북
+    case jeonju = "전주지방법원"
+    
+    // 전남
+    case gwangju = "광주지방법원"
+    case mokpo = "목포지방법원"
+    
+    // 경북
+    case daegu = "대구지방법원"
+    case andong = "안동지방법원"
+    case pohang = "포항지방법원"
+    
+    // 경남
+    case busan = "부산지방법원"
+    case changwon = "창원지방법원"
+    case jinju = "진주지방법원"
+    
+    // 부산
+    case busanDistrict = "부산지방법원 동부지원"
+    case busanWest = "부산지방법원 서부지원"
+    case busanNorth = "부산지방법원 북부지원"
+    
+    // 울산
+    case ulsan = "울산지방법원"
+    
+    // 제주
+    case jeju = "제주지방법원"
+    
+    // 기타
+    case other = "기타"
+    
+    /// 전체 법원 목록을 지역별로 그룹화
+    static var groupedCourts: [(region: String, courts: [Court])] {
+        return [
+            ("서울", [.seoulCentral, .seoulSouth, .seoulNorth, .seoulEast, .seoulWest]),
+            ("인천", [.incheon]),
+            ("경기", [.suwon, .uijeongbu]),
+            ("강원", [.chuncheon, .wonju]),
+            ("충북", [.cheongju]),
+            ("충남", [.daejeon, .seosan]),
+            ("전북", [.jeonju]),
+            ("전남", [.gwangju, .mokpo]),
+            ("경북", [.daegu, .andong, .pohang]),
+            ("경남", [.busan, .changwon, .jinju]),
+            ("부산", [.busanDistrict, .busanWest, .busanNorth]),
+            ("울산", [.ulsan]),
+            ("제주", [.jeju]),
+            ("기타", [.other])
+        ]
+    }
+}
+
 // MARK: - 물건조사
 struct PropertyInspection: Codable {
     // 물건조사

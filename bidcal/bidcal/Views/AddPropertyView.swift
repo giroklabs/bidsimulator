@@ -10,7 +10,7 @@ struct AddPropertyView: View {
     @State private var caseNumber = ""
     @State private var propertyLocation = ""
     @State private var propertyType: PropertyType = .apartment
-    @State private var court = ""
+    @State private var selectedCourt: Court = .seoulCentral
     @State private var auctionDate = Date()
     @State private var auctionStatus: AuctionStatus = .scheduled
     
@@ -116,8 +116,17 @@ struct AddPropertyView: View {
             }
             .listRowSeparator(.visible)
             
+            // 관할 법원
             Group {
-                TextField("관할 법원", text: $court)
+                Picker("관할 법원", selection: $selectedCourt) {
+                    ForEach(Court.groupedCourts, id: \.region) { group in
+                        Section(header: Text(group.region)) {
+                            ForEach(group.courts, id: \.self) { court in
+                                Text(court.rawValue).tag(court)
+                            }
+                        }
+                    }
+                }
             }
             .listRowSeparator(.visible)
             
@@ -272,7 +281,12 @@ struct AddPropertyView: View {
                     propertyLocation = data.propertyLocation
                 }
                 if !data.court.isEmpty {
-                    court = data.court
+                    // 법원 이름으로 Court enum 찾기
+                    if let matchedCourt = Court.allCases.first(where: { $0.rawValue == data.court }) {
+                        selectedCourt = matchedCourt
+                    } else if let matchedCourt = Court.allCases.first(where: { data.court.contains($0.rawValue) || $0.rawValue.contains(data.court) }) {
+                        selectedCourt = matchedCourt
+                    }
                 }
                 if !data.marketPrice.isEmpty {
                     marketPrice = data.marketPrice
@@ -313,11 +327,7 @@ struct AddPropertyView: View {
             return
         }
         
-        guard !court.isEmpty else {
-            alertMessage = "관할 법원을 입력해주세요."
-            showingAlert = true
-            return
-        }
+        // 관할 법원은 항상 선택되어 있으므로 검증 불필요
         
         // 가격 정보 변환
         let bidPriceValue = Double(bidPrice) ?? 0
@@ -333,11 +343,11 @@ struct AddPropertyView: View {
         }
         
         // AuctionProperty 생성
-        let property = AuctionProperty(
-            caseNumber: caseNumber,
-            propertyLocation: propertyLocation,
-            propertyType: propertyType,
-            court: court,
+            let property = AuctionProperty(
+                caseNumber: caseNumber,
+                propertyLocation: propertyLocation,
+                propertyType: propertyType,
+                court: selectedCourt.rawValue,
             auctionDate: auctionDate,
             auctionStatus: auctionStatus,
             bidPrice: bidPriceValue,
