@@ -14,24 +14,32 @@ struct StatisticsRootView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                AppTheme.background.ignoresSafeArea()
+        ZStack {
+            AppTheme.background.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // 커스텀 헤더
+                customHeader
                 
-                VStack(spacing: 0) {
-                    // 탭 선택
-                    tabSelector
-                    
-                    // 콘텐츠
-                    if selectedTab == .regional {
-                        regionalStatisticsView
-                    } else {
-                        myDataStatisticsView
-                    }
-                }
+                // 내 데이터만 표시
+                myDataStatisticsView
             }
-            .navigationTitle("통계")
         }
+    }
+    
+    // MARK: - Custom Header
+    private var customHeader: some View {
+        HStack {
+            Text("통계")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(AppTheme.primary)
+            
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 12)
+        .background(AppTheme.background)
     }
     
     // MARK: - Tab Selector

@@ -62,6 +62,29 @@ enum PropertyType: String, Codable, CaseIterable {
         case .other: return "square.grid.2x2"
         }
     }
+    
+    /// 문자열로부터 PropertyType 생성 (API 응답용)
+    static func from(string: String) -> PropertyType {
+        let lowercased = string.lowercased()
+        
+        if lowercased.contains("아파트") || lowercased.contains("apartment") {
+            return .apartment
+        } else if lowercased.contains("오피스텔") || lowercased.contains("officetel") {
+            return .officetel
+        } else if lowercased.contains("빌라") || lowercased.contains("villa") {
+            return .villa
+        } else if lowercased.contains("단독주택") || lowercased.contains("house") {
+            return .house
+        } else if lowercased.contains("상가") || lowercased.contains("shop") {
+            return .shop
+        } else if lowercased.contains("사무실") || lowercased.contains("office") {
+            return .office
+        } else if lowercased.contains("토지") || lowercased.contains("land") {
+            return .land
+        } else {
+            return .other
+        }
+    }
 }
 
 // MARK: - 경매 상태

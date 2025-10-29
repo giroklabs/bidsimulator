@@ -35,6 +35,7 @@
 		376988604BE3C4861E1E2B0F /* Pods-bidcal.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcal.release.xcconfig"; path = "Target Support Files/Pods-bidcal/Pods-bidcal.release.xcconfig"; sourceTree = "<group>"; };
 		410D11A59A82694329B4066E /* Pods-bidcalTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-bidcalTests.release.xcconfig"; path = "Target Support Files/Pods-bidcalTests/Pods-bidcalTests.release.xcconfig"; sourceTree = "<group>"; };
 		4A7F95462EB1042D00D84A50 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "bidcal/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4A7F95AD2EB2395000D84A50 /* MaruBuri-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "MaruBuri-Bold.otf"; sourceTree = "<group>"; };
 		4A94FF4F2EB0D63400FC670C /* bidcal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = bidcal.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A94FF5E2EB0D63500FC670C /* bidcalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = bidcalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4A94FF682EB0D63500FC670C /* bidcalUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = bidcalUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +53,7 @@
 			membershipExceptions = (
 				"GoogleService-Info.plist",
 				Info.plist,
+				"MaruBuri-Bold.otf",
 			);
 			target = 4A94FF4E2EB0D63400FC670C /* bidcal */;
 		};
@@ -109,6 +111,7 @@
 		4A94FF462EB0D63400FC670C = {
 			isa = PBXGroup;
 			children = (
+				4A7F95AD2EB2395000D84A50 /* MaruBuri-Bold.otf */,
 				4A7F95462EB1042D00D84A50 /* GoogleService-Info.plist */,
 				4A94FF512EB0D63400FC670C /* bidcal */,
 				4A94FF612EB0D63500FC670C /* bidcalTests */,
@@ -554,7 +557,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = bidcal/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "경매다이어리";
+				INFOPLIST_KEY_CFBundleDisplayName = "경매일기";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -590,7 +593,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = bidcal/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "경매다이어리";
+				INFOPLIST_KEY_CFBundleDisplayName = "경매일기";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

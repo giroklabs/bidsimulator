@@ -34,42 +34,55 @@ struct PropertyListView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                AppTheme.background.ignoresSafeArea()
+        ZStack {
+            AppTheme.background.ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // 커스텀 헤더
+                customHeader
                 
-                VStack(spacing: 0) {
-                    // 필터 섹션
-                    filterSection
-                    
-                    // 매물 목록
-                    if filteredProperties.isEmpty {
-                        emptyStateView
-                    } else {
-                        propertyListView
-                    }
+                // 필터 섹션
+                filterSection
+                
+                // 매물 목록
+                if filteredProperties.isEmpty {
+                    emptyStateView
+                } else {
+                    propertyListView
                 }
-            }
-            .navigationTitle("경매일기")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showingAddProperty = true
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title3)
-                            .foregroundColor(AppTheme.accent)
-                    }
-                }
-            }
-            .searchable(text: $searchText, prompt: "사건번호, 주소, 법원 검색")
-            .sheet(isPresented: $showingAddProperty) {
-                AddPropertyView()
-            }
-            .sheet(item: $selectedProperty) { property in
-                PropertyDetailView(property: property)
             }
         }
+        .sheet(isPresented: $showingAddProperty) {
+            AddPropertyView()
+        }
+        .sheet(item: $selectedProperty) { property in
+            PropertyDetailView(property: property)
+        }
+    }
+    
+    // MARK: - Custom Header
+    private var customHeader: some View {
+        HStack(spacing: 0) {
+            Text("경매일기")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundColor(AppTheme.primary)
+            
+            Spacer()
+            
+            // 추가 버튼
+            Button {
+                showingAddProperty = true
+            } label: {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 28, weight: .medium))
+                    .foregroundColor(AppTheme.accent)
+                    .padding(.leading, 4)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 8)
+        .padding(.bottom, 12)
+        .background(AppTheme.background)
     }
     
     // MARK: - Filter Section
@@ -162,7 +175,7 @@ struct PropertyListView: View {
             } label: {
                 Label("매물 등록", systemImage: "plus.circle.fill")
                     .font(.headline)
-                    .foregroundColor(AppTheme.primary)
+                    .foregroundColor(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background(
@@ -196,7 +209,7 @@ struct FilterChip: View {
                     .font(.subheadline)
                     .fontWeight(.medium)
             }
-            .foregroundColor(isSelected ? AppTheme.primary : AppTheme.secondary)
+            .foregroundColor(isSelected ? .white : AppTheme.secondary)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
             .background(

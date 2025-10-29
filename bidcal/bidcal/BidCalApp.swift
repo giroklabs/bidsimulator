@@ -9,7 +9,7 @@ struct BidCalApp: App {
 	
 	var body: some Scene {
 		WindowGroup {
-			RootTabView()
+			SplashView()
 		}
 	}
 }

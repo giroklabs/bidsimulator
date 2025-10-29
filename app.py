@@ -17,6 +17,27 @@ from real_court_auction_crawler import RealCourtAuctionCrawler
 from official_api_integration import OfficialAPIIntegration
 from auction_statistics import AuctionStatisticsAnalyzer
 
+# Firebase 핸들러 추가
+try:
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).parent))
+    from crawler.firebase_handler import FirebaseHandler
+    from firebase_admin import firestore
+    
+    # Firebase 초기화 (환경변수로 cred 경로 설정)
+    firebase_cred_path = os.getenv('FIREBASE_CRED_PATH')
+    firebase_handler = FirebaseHandler(firebase_cred_path) if firebase_cred_path else None
+except Exception as e:
+    print(f"Firebase 초기화 실패 (선택사항): {e}")
+    firebase_handler = None
+    
+    # firestore가 없는 경우를 위한 대체
+    try:
+        from firebase_admin import firestore
+    except:
+        firestore = None
+
 app = Flask(__name__)
 CORS(app)  # CORS 허용
 
@@ -467,6 +488,101 @@ def get_all_regions_summary():
             'data': summary
         })
             
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# ===== Firebase 통합 API 엔드포인트 =====
+
+@app.route('/api/firebase/search-auctions', methods=['POST'])
+def firebase_search_auctions():
+    """
+    Firebase에서 경매 검색
+    """
+    if not firebase_handler:
+        return jsonify({
+            'success': False,
+            'error': 'Firebase가 초기화되지 않았습니다'
+        }), 503
+    
+    try:
+        data = request.get_json()
+        filters = data.get('filters', {})
+        limit = data.get('limit', 100)
+        
+        results = firebase_handler.search_auctions(filters, limit)
+        
+        return jsonify({
+            'success': True,
+            'data': results,
+            'count': len(results)
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/firebase/auction-detail/<case_number>', methods=['GET'])
+def firebase_get_auction_detail(case_number):
+    """
+    Firebase에서 특정 사건번호 상세 정보 조회
+    """
+    if not firebase_handler:
+        return jsonify({
+            'success': False,
+            'error': 'Firebase가 초기화되지 않았습니다'
+        }), 503
+    
+    try:
+        detail = firebase_handler.get_auction_detail(case_number)
+        
+        if detail:
+            return jsonify({
+                'success': True,
+                'data': detail
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': '사건을 찾을 수 없습니다'
+            }), 404
+            
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/firebase/daily-collections', methods=['GET'])
+def firebase_get_daily_collections():
+    """
+    일일 수집 기록 조회
+    """
+    if not firebase_handler:
+        return jsonify({
+            'success': False,
+            'error': 'Firebase가 초기화되지 않았습니다'
+        }), 503
+    
+    try:
+        # 최근 30일 수집 기록 조회
+        limit = request.args.get('limit', 30, type=int)
+        
+        # Firebase에서 최근 문서들 조회
+        docs = firebase_handler.db.collection('daily_collections').order_by('collected_at', direction=firestore.Query.DESCENDING).limit(limit).stream()
+        
+        results = [doc.to_dict() for doc in docs]
+        
+        return jsonify({
+            'success': True,
+            'data': results,
+            'count': len(results)
+        })
+        
     except Exception as e:
         return jsonify({
             'success': False,

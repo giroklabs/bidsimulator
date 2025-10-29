@@ -125,3 +125,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+
+# Firebase Admin key (backend)
+serviceAccountKey.json
+
+# Logs
+*.log
+
+# Xcode user state
+*.xcuserstate

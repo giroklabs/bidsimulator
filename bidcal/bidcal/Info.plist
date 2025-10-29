@@ -5,6 +5,8 @@
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
+			<key>CFBundleIdentifier</key>
+			<string></string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
@@ -15,6 +17,10 @@
 			</array>
 		</dict>
 		<dict/>
+	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>MaruBuri-Bold.otf</string>
 	</array>
 </dict>
 </plist>

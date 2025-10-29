@@ -1,14 +1,14 @@
 import SwiftUI
 
-// MARK: - 앱 테마 (노란색 포인트 + 그레이 톤)
+// MARK: - 앱 테마 (블랙 포인트 + 그레이 톤)
 struct AppTheme {
-    // MARK: - Colors (Yellow Accent + Gray Tone)
+    // MARK: - Colors (Black Accent + Gray Tone)
     
-    // 노란색 계열 (강조색)
-    static let accent = Color(red: 1.0, green: 0.84, blue: 0.04)        // 밝은 노란색 #FFD60A
-    static let accentDark = Color(red: 1.0, green: 0.76, blue: 0.03)    // 진한 노란색 #FFC107
-    static let accentLight = Color(red: 1.0, green: 0.92, blue: 0.54)   // 연한 노란색 #FFEB8A
-    static let accentPale = Color(red: 1.0, green: 0.96, blue: 0.80)    // 매우 연한 노란색 #FFF5CC
+    // 블랙 계열 (강조색)
+    static let accent = Color(red: 0.12, green: 0.12, blue: 0.14)       // 블랙 #1E1E24
+    static let accentDark = Color(red: 0.08, green: 0.08, blue: 0.10)   // 진한 블랙
+    static let accentLight = Color(red: 0.30, green: 0.30, blue: 0.32)  // 연한 블랙
+    static let accentPale = Color(red: 0.88, green: 0.88, blue: 0.90)   // 매우 연한 블랙
     
     // 그레이 계열
     static let primary = Color(red: 0.20, green: 0.20, blue: 0.22)      // 다크 그레이 (메인 텍스트)
