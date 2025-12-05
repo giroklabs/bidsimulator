@@ -62,7 +62,10 @@ struct PropertyListView: View {
     
     // MARK: - Custom Header
     private var customHeader: some View {
-        HStack(spacing: 0) {
+        HStack(spacing: 12) {
+            // 앱 아이콘 이미지
+            appIconImage
+            
             Text("경매일기")
                 .font(.system(size: 28, weight: .bold))
                 .foregroundColor(AppTheme.primary)
@@ -83,6 +86,46 @@ struct PropertyListView: View {
         .padding(.top, 8)
         .padding(.bottom, 12)
         .background(AppTheme.background)
+    }
+    
+    // MARK: - App Icon Image
+    private var appIconImage: some View {
+        Group {
+            if let icon = getAppIcon() {
+                Image(uiImage: icon)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 32, height: 32)
+                    .cornerRadius(6)
+            } else {
+                // Fallback: 건물 아이콘 (첨부파일과 유사한 스타일)
+                Image(systemName: "building.2.fill")
+                    .font(.system(size: 24))
+                    .foregroundColor(AppTheme.accent)
+                    .frame(width: 32, height: 32)
+            }
+        }
+    }
+    
+    // AppIcon을 Bundle에서 가져오기
+    private func getAppIcon() -> UIImage? {
+        // 방법 1: AppIcon 이미지셋에서 직접 로드
+        if let icon = UIImage(named: "AppIcon") {
+            return icon
+        }
+        
+        // 방법 2: 1024.png 파일 직접 로드
+        if let iconPath = Bundle.main.path(forResource: "1024", ofType: "png", inDirectory: "AppIcon.appiconset"),
+           let icon = UIImage(contentsOfFile: iconPath) {
+            return icon
+        }
+        
+        // 방법 3: Assets에서 AppIcon 이미지셋 찾기
+        if let icon = UIImage(named: "AppIcon", in: Bundle.main, compatibleWith: nil) {
+            return icon
+        }
+        
+        return nil
     }
     
     // MARK: - Filter Section

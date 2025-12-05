@@ -1,10 +1,13 @@
 import SwiftUI
 import FirebaseCore
+import GoogleMobileAds
 
 @main
 struct BidCalApp: App {
 	init() {
 		FirebaseApp.configure()
+		// AdMob 초기화
+        MobileAds.shared.start(completionHandler: nil)
 	}
 	
 	var body: some Scene {

@@ -13,6 +13,9 @@ target 'bidcal' do
   
   # Google Sign-In
   pod 'GoogleSignIn'
+  
+  # Google Mobile Ads
+  pod 'Google-Mobile-Ads-SDK'
 
   target 'bidcalTests' do
     inherit! :search_paths

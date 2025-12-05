@@ -14,12 +14,21 @@ struct AddPropertyView: View {
     @State private var auctionDate = Date()
     @State private var auctionStatus: AuctionStatus = .scheduled
     
-    // 가격 정보
-    @State private var bidPrice = ""
-    @State private var marketPrice = ""
-    @State private var appraisalPrice = ""
-    @State private var minimumBid = ""
-    @State private var renovationCost = ""
+    // 가격 정보 (내부 저장용 - 숫자만)
+    @State private var bidPriceValue: Double = 0
+    @State private var marketPriceValue: Double = 0
+    @State private var appraisalPriceValue: Double = 0
+    @State private var minimumBidValue: Double = 0
+    @State private var renovationCostValue: Double = 0
+    
+    // 가격 정보 포맷터
+    private let numberFormatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.groupingSeparator = ","
+        formatter.usesGroupingSeparator = true
+        return formatter
+    }()
     
     // 지역 정보
     @State private var region = ""
@@ -41,10 +50,20 @@ struct AddPropertyView: View {
             ZStack {
                 AppTheme.background.ignoresSafeArea()
                 
-                formContent
-                    .scrollContentBackground(.hidden)
-                    .listStyle(.insetGrouped)
-                    .environment(\.defaultMinListRowHeight, 44)
+                VStack(spacing: 0) {
+                    formContent
+                        .scrollContentBackground(.hidden)
+                        .listStyle(.insetGrouped)
+                        .environment(\.defaultMinListRowHeight, 44)
+                    
+                    // 배너 광고 (최하단) - Exchange Alert 스타일
+                    VStack(spacing: 0) {
+                        Divider()
+                        AdMobBannerView(adUnitID: "ca-app-pub-3940256099942544/2934735716")
+                            .frame(height: 50)
+                            .background(Color(red: 0.95, green: 0.95, blue: 0.95))
+                    }
+                }
             }
             .navigationTitle("매물 등록")
             .navigationBarTitleDisplayMode(.inline)
@@ -138,6 +157,7 @@ struct AddPropertyView: View {
                             .frame(width: 60, alignment: .leading)
                         DatePicker("경매일", selection: $auctionDate, displayedComponents: .date)
                             .labelsHidden()
+                            .environment(\.locale, Locale(identifier: "ko_KR"))
                     }
                     .frame(maxWidth: .infinity)
                     
@@ -160,32 +180,72 @@ struct AddPropertyView: View {
     private var priceInfoSection: some View {
         Section(header: Text("가격 정보 (원)")) {
             Group {
-                TextField("입찰가격", text: $bidPrice)
-                    .keyboardType(.numberPad)
+                TextField("입찰가격", text: Binding(
+                    get: {
+                        bidPriceValue == 0 ? "" : numberFormatter.string(from: NSNumber(value: bidPriceValue)) ?? ""
+                    },
+                    set: { newValue in
+                        let cleaned = newValue.replacingOccurrences(of: ",", with: "")
+                        bidPriceValue = Double(cleaned) ?? 0
+                    }
+                ))
+                .keyboardType(.numberPad)
             }
             .listRowSeparator(.visible)
             
             Group {
-                TextField("시세", text: $marketPrice)
-                    .keyboardType(.numberPad)
+                TextField("시세", text: Binding(
+                    get: {
+                        marketPriceValue == 0 ? "" : numberFormatter.string(from: NSNumber(value: marketPriceValue)) ?? ""
+                    },
+                    set: { newValue in
+                        let cleaned = newValue.replacingOccurrences(of: ",", with: "")
+                        marketPriceValue = Double(cleaned) ?? 0
+                    }
+                ))
+                .keyboardType(.numberPad)
             }
             .listRowSeparator(.visible)
             
             Group {
-                TextField("감정가", text: $appraisalPrice)
-                    .keyboardType(.numberPad)
+                TextField("감정가", text: Binding(
+                    get: {
+                        appraisalPriceValue == 0 ? "" : numberFormatter.string(from: NSNumber(value: appraisalPriceValue)) ?? ""
+                    },
+                    set: { newValue in
+                        let cleaned = newValue.replacingOccurrences(of: ",", with: "")
+                        appraisalPriceValue = Double(cleaned) ?? 0
+                    }
+                ))
+                .keyboardType(.numberPad)
             }
             .listRowSeparator(.visible)
             
             Group {
-                TextField("최저입찰가", text: $minimumBid)
-                    .keyboardType(.numberPad)
+                TextField("최저입찰가", text: Binding(
+                    get: {
+                        minimumBidValue == 0 ? "" : numberFormatter.string(from: NSNumber(value: minimumBidValue)) ?? ""
+                    },
+                    set: { newValue in
+                        let cleaned = newValue.replacingOccurrences(of: ",", with: "")
+                        minimumBidValue = Double(cleaned) ?? 0
+                    }
+                ))
+                .keyboardType(.numberPad)
             }
             .listRowSeparator(.visible)
             
             Group {
-                TextField("리모델링 비용", text: $renovationCost)
-                    .keyboardType(.numberPad)
+                TextField("리모델링 비용", text: Binding(
+                    get: {
+                        renovationCostValue == 0 ? "" : numberFormatter.string(from: NSNumber(value: renovationCostValue)) ?? ""
+                    },
+                    set: { newValue in
+                        let cleaned = newValue.replacingOccurrences(of: ",", with: "")
+                        renovationCostValue = Double(cleaned) ?? 0
+                    }
+                ))
+                .keyboardType(.numberPad)
             }
             .listRowSeparator(.visible)
         }
@@ -289,13 +349,13 @@ struct AddPropertyView: View {
                     }
                 }
                 if !data.marketPrice.isEmpty {
-                    marketPrice = data.marketPrice
+                    marketPriceValue = Double(data.marketPrice.replacingOccurrences(of: ",", with: "")) ?? 0
                 }
                 if !data.appraisalPrice.isEmpty {
-                    appraisalPrice = data.appraisalPrice
+                    appraisalPriceValue = Double(data.appraisalPrice.replacingOccurrences(of: ",", with: "")) ?? 0
                 }
                 if !data.minimumBid.isEmpty {
-                    minimumBid = data.minimumBid
+                    minimumBidValue = Double(data.minimumBid.replacingOccurrences(of: ",", with: "")) ?? 0
                 }
                 propertyType = data.propertyType
                 auctionDate = data.auctionDate
@@ -328,13 +388,6 @@ struct AddPropertyView: View {
         }
         
         // 관할 법원은 항상 선택되어 있으므로 검증 불필요
-        
-        // 가격 정보 변환
-        let bidPriceValue = Double(bidPrice) ?? 0
-        let marketPriceValue = Double(marketPrice) ?? 0
-        let appraisalPriceValue = Double(appraisalPrice) ?? 0
-        let minimumBidValue = Double(minimumBid) ?? 0
-        let renovationCostValue = Double(renovationCost) ?? 0
         
         guard bidPriceValue > 0 else {
             alertMessage = "입찰가격을 입력해주세요."
